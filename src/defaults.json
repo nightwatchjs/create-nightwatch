@@ -1,0 +1,19 @@
+{
+  "rootDir": "/Users/priyansh/nightwatch/nightwatch",
+  "onlyConfig": false,
+  "language": "ts",
+  "backend": "both",
+  "seleniumServer": true,
+  "hostname": "localhost",
+  "port": 80,
+  "browserstack": false,
+  "remoteName": "remote",
+  "baseUrl": "http://localhost",
+  "runner": "nightwatch",
+  "addExamples": true,
+  "examplesLocation": "nightwatch-examples",
+  "boilerplates": false,
+  "additionalHelp": "yes",
+  "browsers": ["edge", "ie", "safari"],
+  "remoteBrowsers": ["chrome", "firefox", "edge", "ie", "safari"]
+}

@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    // "rootDirs": ["src",],
+    "strict": true,
+    "module": "commonjs",
+    "allowJs": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "esnext",
+    "moduleResolution": "node",
+    "sourceMap": false,
+    "outDir": "lib",
+    "resolveJsonModule": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true,
+    "skipLibCheck": true
+    // "typeRoots": [
+    //   "./custom-typings",
+    //   "./node_modules/@types"
+    // ]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
