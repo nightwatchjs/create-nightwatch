@@ -13,7 +13,6 @@ interface ConfigGeneratorAnswers {
   testsLocation?: string;
   addExamples?: boolean;
   examplesLocation?: string;
-  boilerplates?: boolean;
   additionalHelp?: string;
   browsers?: string[];
   defaultBrowser?: string;

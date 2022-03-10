@@ -46,8 +46,8 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     name: 'language',
     message: 'Do you want to use JavaScript or TypeScript?',
     choices: [
-      {name: 'TypeScript', value: 'ts'},
-      {name: 'JavaScript', value: 'js'}
+      {name: 'JavaScript', value: 'js'},
+      {name: 'TypeScript', value: 'ts'}
     ]
   },
 
@@ -55,7 +55,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
   {
     type: 'list',
     name: 'backend',
-    message: 'Where is your testing backend located?',
+    message: 'Where do you want to run your e2e tests?',
     choices: [
       {name: 'On my local machine', value: 'local'},
       {name: 'On a remote machine (cloud)', value: 'remote'},
@@ -76,7 +76,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
       }
 
       if (['local', 'both'].includes(answers.backend)) {
-        browsers.push({name: 'Local selenium-server', value: 'selenium-server'});
+        return browsers.concat({name: 'Local selenium-server', value: 'selenium-server'});
       }
 
       return browsers;

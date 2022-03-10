@@ -37,9 +37,10 @@ export default class NightwatchInit {
       // Add a newline after questions.
       console.error();
 
-      this.refineAnswers(answers);
       // this.mergeWithDefaults(answers);
     }
+
+    this.refineAnswers(answers);
 
     // Install Packages
     const packagesToInstall = this.identifyPackagesToInstall(answers);
