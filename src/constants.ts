@@ -24,8 +24,8 @@ We'll setup everything for you :-)
 `;
 
 export const BROWSER_CHOICES = [
-  {name: 'Chrome', value: 'chrome'},
   {name: 'Firefox', value: 'firefox'},
+  {name: 'Chrome', value: 'chrome'},
   {name: 'Edge', value: 'edge'},
   {name: 'Safari', value: 'safari'},
   {name: 'IE (requires selenium-server)', value: 'ie'}
@@ -55,7 +55,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
   {
     type: 'list',
     name: 'backend',
-    message: 'Where is your automation backend located?',
+    message: 'Where is your testing backend located?',
     choices: [
       {name: 'On my local machine', value: 'local'},
       {name: 'On a remote machine (cloud)', value: 'remote'},
@@ -64,20 +64,39 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     default: 'local'
   },
 
-  // FOR LOCAL
+  // BROWSERS
   {
-    type: 'confirm',
-    name: 'seleniumServer',
-    message: 'Will you be working with selenium-server on your local machine?',
-    default: false,
-    when: (answers) => ['local', 'both'].includes(answers.backend)
+    type: 'checkbox',
+    name: 'browsers',
+    message: 'Where you\'ll be testing on?',
+    choices: (answers) => {
+      const browsers = BROWSER_CHOICES;
+      if (answers.backend === 'local' && process.platform !== 'darwin') {
+        return browsers.filter((browser) => browser.value !== 'safari');
+      }
+
+      if (['local', 'both'].includes(answers.backend)) {
+        browsers.push({name: 'Local selenium-server', value: 'selenium-server'});
+      }
+
+      return browsers;
+    },
+    default: ['firefox'],
+    validate: (value) => {
+      return !!value.length || 'Please select at least 1 browser.';
+    },
+    // when: (answers) => ['local', 'both'].includes(answers.backend),
+    filter: (value, answers) => {
+      if (value.includes('ie') || value.includes('selenium-server')) answers.seleniumServer = true;
+      return value;
+    }
   },
 
   // FOR REMOTE
   {
     type: 'input',
     name: 'hostname',
-    message: 'What is the host address of your remote machine?',
+    message: '(Remote) What is the host address of your remote machine?',
     default: 'localhost',
     when: (answers) => ['remote', 'both'].includes(answers.backend),
     filter: (value, answers) => {
@@ -88,9 +107,17 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
   {
     type: 'input',
     name: 'port',
-    message: 'What is the port on which your test backend is running on your remote machine?',
+    message: '(Remote) What is the port on which your test backend is running on your remote machine?',
     default: 80,
     when: (answers) => ['remote', 'both'].includes(answers.backend)
+  },
+
+  // TEST LOCATION
+  {
+    type: 'input',
+    name: 'testsLocation',
+    message: 'Where do you plan to keep your end-to-end tests?',
+    default: 'tests'
   },
 
   // BASE URL
@@ -113,48 +140,11 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     ]
   },
 
-  // TEST LOCATION
-  {
-    type: 'input',
-    name: 'testsLocation',
-    message: 'Where do you plan to keep your end-to-end tests?',
-    default: 'tests'
-  },
-
   // NIGHTWATCH EXAMPLES
   {
     type: 'list',
     name: 'addExamples',
-    message: 'Add some Nightwatch examples for you to explore?',
-    choices: [
-      {name: 'Yes, please!', value: true},
-      {name: 'No, thanks!', value: false}
-    ],
-    default: false,
-    when: (answers) => !answers.onlyConfig
-    // If the answer to this is false, add a line at the end that the test examples
-    // are available at node_modules/...
-  },
-  {
-    type: 'input',
-    name: 'examplesLocation',
-    message: 'Where to add example tests?',
-    default: (answers: { testsLocation: string; }) => path.join('.', answers.testsLocation, 'nightwatch-examples'),
-    validate: (value, answers) => {
-      if (answers && fs.existsSync(path.join(answers.rootDir, value))) {
-        return 'Directory already exists! Please choose a non-existent directory.';
-      }
-
-      return true;
-    },
-    when: (answers) => answers.addExamples
-  },
-
-  // BOILERPLATES
-  {
-    type: 'list',
-    name: 'boilerplates',
-    message: 'Add some boilerplates for using custom commands, custom assertions, etc.?',
+    message: 'Should we generate some examples for you to explore?',
     choices: [
       {name: 'Yes, please!', value: true},
       {name: 'No, thanks!', value: false}
@@ -175,36 +165,12 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     ],
     default: 'no'
   },
-  
-  // BROWSERS (LOCAL)
-  {
-    type: 'checkbox',
-    name: 'browsers',
-    message: 'Browsers you\'ll use for testing on your local machine?',
-    choices: () => {
-      const browsers = BROWSER_CHOICES;
-      if (process.platform !== 'darwin') {
-        return browsers.filter((browser) => browser.value !== 'safari');
-      }
-
-      return browsers;
-    },
-    default: ['chrome'],
-    validate: (value) => {
-      return !!value.length || 'Please select at least 1 browser.';
-    },
-    when: (answers) => answers.additionalHelp === 'yes' && ['local', 'both'].includes(answers.backend),
-    filter: (value, answers) => {
-      if (value.includes('ie')) answers.seleniumServer = true;
-      return value;
-    }
-  },
 
   // BROWSERS (Remote)
   {
     type: 'checkbox',
     name: 'remoteBrowsers',
-    message: 'Browsers you\'ll use for testing on your remote machine?',
+    message: '(Remote) Browsers you\'ll be testing on on your remote machine?',
     choices: () => {
       const browsers = BROWSER_CHOICES;
       // Remove selenium-server note from IE.

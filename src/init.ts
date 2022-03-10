@@ -58,7 +58,7 @@ export default class NightwatchInit {
 
     // Create tests location and copy example files
     if (answers.testsLocation) {this.createTestLocation(answers.testsLocation)}
-    if (answers.examplesLocation && !fs.existsSync(path.join(this.rootDir, answers.examplesLocation))) {
+    if (answers.examplesLocation) {
       this.copyExamples(answers.examplesLocation, answers.language === 'ts');
     }
 
@@ -82,8 +82,16 @@ export default class NightwatchInit {
       answers.remoteName = 'remote';
     }
 
-    if (answers.additionalHelp !== 'yes') {
-      answers.browsers = answers.remoteBrowsers = BROWSER_CHOICES.map((browser) => browser.value);
+    if (!answers.browsers) {
+      answers.browsers = BROWSER_CHOICES.map((browser) => browser.value);
+    }
+
+    if (!answers.remoteBrowsers) {
+      answers.remoteBrowsers = answers.browsers;
+    }
+
+    if (process.platform !== 'darwin') {
+      answers.browsers.filter((browser) => browser !== 'safari');
     }
 
     if (!answers.defaultBrowser) {
@@ -337,6 +345,11 @@ export default class NightwatchInit {
   copyExamples(examplesLocation: string, typescript: boolean) {
     console.error('Generating example files...');
 
+    if (fs.existsSync(path.join(this.rootDir, examplesLocation))) {
+      console.error(`Examples already exists at '${examplesLocation}'. Skipping...`);
+      return;
+    }
+
     let examplesSrcPath: string;
     if (typescript) {
       examplesSrcPath = path.join(__dirname, '..', 'assets', 'ts-examples');
@@ -366,7 +379,12 @@ export default class NightwatchInit {
   }
 
   postInstructions(answers: ConfigGeneratorAnswers) {
-    console.log('Nightwatch setup complete!!\n');
+    console.error('Nightwatch setup complete!!\n');
+
+    if (this.rootDir !== process.cwd()) {
+      console.error('First, change directory to the root dir of your project:');
+      console.error(colors.cyan(`  cd ${path.relative(process.cwd(), this.rootDir) || '.'}`), '\n');
+    }
 
     if (answers.addExamples) {
       if (answers.language === 'ts') {

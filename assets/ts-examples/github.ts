@@ -22,7 +22,7 @@ const home: NightwatchTests = {
       .waitForElementVisible('.repo-list-item:first-child')
       .assert.containsText(
         '.repo-list-item:first-child',
-        'End-to-end testing framework written in Node.js and using the Webdriver API'
+        'End-to-end testing framework written in Node.js and using the W3C Webdriver API'
       );
   },
 
