@@ -31,20 +31,22 @@ export const symbols = () => {
   };
 }
 
-export const copyFallback = (src: string, dest: string): void => {
+export const copy = (src: string, dest: string, excludeDir: string[]): void => {
   const stat = fs.statSync(src);
   if (stat.isDirectory()) {
-    copyDir(src, dest);
+    copyDir(src, dest, excludeDir);
   } else {
     fs.copyFileSync(src, dest);
   }
 }
 
-const copyDir = (srcDir: string, destDir: string): void => {
+const copyDir = (srcDir: string, destDir: string, excludeDir: string[]): void => {
+  if (excludeDir.some((dir) => srcDir.endsWith(dir))) return;
+
   fs.mkdirSync(destDir, { recursive: true });
   for (const file of fs.readdirSync(srcDir)) {
     const srcFile = path.resolve(srcDir, file);
     const destFile = path.resolve(destDir, file);
-    copyFallback(srcFile, destFile);
+    copy(srcFile, destFile, excludeDir);
   }
 }

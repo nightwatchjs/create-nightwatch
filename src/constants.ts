@@ -163,7 +163,8 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
       {name: 'Yes, but minimal help.', value: 'minimal'},
       {name: 'No, thanks!', value: 'no'}
     ],
-    default: 'no'
+    default: 'no',
+    when: (answers) => ['remote', 'both'].includes(answers.backend)
   },
 
   // BROWSERS (Remote)

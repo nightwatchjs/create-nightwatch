@@ -4,7 +4,7 @@ import ejs from 'ejs';
 import colors from 'ansi-colors';
 import {prompt} from 'inquirer';
 import {execSync} from 'child_process';
-import { copyFallback, stripControlChars, symbols} from './utils';
+import { copy, stripControlChars, symbols} from './utils';
 
 import {CONFIG_INTRO, BROWSER_CHOICES, QUESTIONAIRRE, CONFIG_DEST_QUES} from './constants';
 import defaultAnswers from './defaults.json';
@@ -60,11 +60,11 @@ export default class NightwatchInit {
     // Create tests location and copy example files
     if (answers.testsLocation) {this.createTestLocation(answers.testsLocation)}
     if (answers.examplesLocation) {
-      this.copyExamples(answers.examplesLocation, answers.language === 'ts');
+      this.copyExamples(answers.examplesLocation, answers.language === 'ts', answers.runner || '');
     }
 
     // Post instructions to run their first test
-    this.postInstructions(answers);
+    this.postSetupInstructions(answers);
   }
 
   async askQuestions(onlyConfig: boolean) {
@@ -207,7 +207,7 @@ export default class NightwatchInit {
     const src_folders: string[] = [];
 
     let testsJsSrc: string = path.join(this.otherInfo.tsOutDir || '', answers.testsLocation || '');
-    if (testsJsSrc) {
+    if (testsJsSrc !== ".") {
       src_folders.push(testsJsSrc);
       this.otherInfo.testsJsSrc = testsJsSrc;
     }
@@ -343,7 +343,7 @@ export default class NightwatchInit {
     }
   }
 
-  copyExamples(examplesLocation: string, typescript: boolean) {
+  copyExamples(examplesLocation: string, typescript: boolean, test_runner: string) {
     console.error('Generating example files...');
 
     if (fs.existsSync(path.join(this.rootDir, examplesLocation))) {
@@ -362,24 +362,15 @@ export default class NightwatchInit {
     const examplesDestPath = path.join(this.rootDir, examplesLocation);
     fs.mkdirSync(examplesDestPath, {recursive: true});
 
-    try {
-      // Experimental. Only available from v16.7.0
-      fs.cpSync(examplesSrcPath, examplesDestPath);
+    const excludeDir: string[] = [];
+    if (test_runner !== 'cucumber') excludeDir.push('cucumber-js');
 
-      // console.error(`${colors.green(symbols().ok + ' Success!')} Copied the example files to '${examplesLocation}'.\n`);
-      // console.error(`Successfully copied the example files to '${answers.examplesLocation}'.\n`);
-    } catch (err) {
-      // Copy using the method from create-vite.
-      copyFallback(examplesSrcPath, examplesDestPath);
-      // console.error(`Failed to copy the example files to '${examplesLocation}'.\n`);
-      // console.error('You can still access all the examples at "node_modules/nightwatch/examples".\n');
-      // console.error(err);
-    }
+    copy(examplesSrcPath, examplesDestPath, excludeDir);
 
     console.error(`${colors.green(symbols().ok + ' Success!')} Generated the example files at '${examplesLocation}'.\n`);
   }
 
-  postInstructions(answers: ConfigGeneratorAnswers) {
+  postSetupInstructions(answers: ConfigGeneratorAnswers) {
     console.error('Nightwatch setup complete!!\n');
 
     if (this.rootDir !== process.cwd()) {
