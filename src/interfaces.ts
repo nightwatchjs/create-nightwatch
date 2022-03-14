@@ -1,6 +1,7 @@
 interface ConfigGeneratorAnswers {
   rootDir?: string;
   onlyConfig?: boolean;
+  languageRunnerSetup?: string;
   language?: "js" | "ts";
   backend?: 'local' | 'remote' | 'both';
   seleniumServer?: boolean;
@@ -11,6 +12,7 @@ interface ConfigGeneratorAnswers {
   baseUrl?: string;
   runner?: 'nightwatch' | 'mocha' | 'cucumber';
   testsLocation?: string;
+  featurePath?: string;
   addExamples?: boolean;
   examplesLocation?: string;
   additionalHelp?: string;
@@ -31,4 +33,5 @@ interface OtherInfo {
   tsTestScript?: string;
   testsJsSrc?: string;
   examplesJsSrc?: string;
+  cucumberExamplesAdded?: boolean;
 }

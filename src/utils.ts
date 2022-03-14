@@ -31,7 +31,7 @@ export const symbols = () => {
   };
 }
 
-export const copy = (src: string, dest: string, excludeDir: string[]): void => {
+export const copy = (src: string, dest: string, excludeDir: string[] = []): void => {
   const stat = fs.statSync(src);
   if (stat.isDirectory()) {
     copyDir(src, dest, excludeDir);

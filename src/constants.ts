@@ -43,12 +43,23 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
   // JS OR TS
   {
     type: 'list',
-    name: 'language',
-    message: 'Do you want to use JavaScript or TypeScript?',
+    name: 'languageRunnerSetup',
+    message: 'What is your Language - Test Runner setup?',
     choices: [
-      {name: 'JavaScript', value: 'js'},
-      {name: 'TypeScript', value: 'ts'}
-    ]
+      {name: 'JavaScript - Nightwatch Test Runner', value: 'js-nightwatch'},
+      {name: 'JavaScript - Mocha Test Runner', value: 'js-mocha'},
+      {name: 'JavaScript - CucumberJS Test Runner', value: 'js-cucumber'},
+      {name: 'TypeScript - Nightwatch Test Runner', value: 'ts-nightwatch'},
+      {name: 'TypeScript - Mocha Test Runner', value: 'ts-mocha'},
+      // {name: 'TypeScript - CucumberJS Test Runner', value: 'ts-cucumber'}
+    ],
+    filter: (value, answers) => {
+      const [language, runner] = value.split('-');
+      answers.language = language;
+      answers.runner = runner;
+
+      return value;
+    }
   },
 
   // TESTING BACKEND
@@ -120,24 +131,20 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     default: 'tests'
   },
 
+  {
+    type: 'input',
+    name: 'featurePath',
+    message: 'Where do you plan to keep your CucumberJS feature files?',
+    default: (answers: { testsLocation: string; }) => path.join(answers.testsLocation, 'features'),
+    when: (answers) => answers.runner === 'cucumber'
+  },
+
   // BASE URL
   {
     type: 'input',
     name: 'baseUrl',
     message: 'What is the base_url of your project?',
     default: 'http://localhost'
-  },
-
-  // TEST RUNNER
-  {
-    type: 'list',
-    name: 'runner',
-    message: 'Which test runner do you want to use?',
-    choices: [
-      {name: 'Nightwatch', value: 'nightwatch'},
-      {name: 'Mocha', value: 'mocha'},
-      {name: 'Cucumber JS', value: 'cucumber'}
-    ]
   },
 
   // NIGHTWATCH EXAMPLES
@@ -150,7 +157,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
       {name: 'No, thanks!', value: false}
     ],
     default: false,
-    when: (answers) => !answers.onlyConfig
+    when: (answers) => !answers.onlyConfig && answers.runner !== 'cucumber'
   },
 
   // ADDITIONAL HELP
