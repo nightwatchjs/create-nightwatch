@@ -128,7 +128,14 @@ export default class NightwatchInit {
       packages.push('@cucumber/cucumber');
     }
 
-    return packages;
+    // Identify packages already installed and don't install them again
+    const packageJson = JSON.parse(fs.readFileSync(path.join(this.rootDir, 'package.json'), 'utf-8'));
+
+    const packagesToInstall = packages.filter((pack) => {
+      return !packageJson.devDependencies?.hasOwnProperty(pack) && !packageJson.dependencies?.hasOwnProperty(pack)
+    })
+
+    return packagesToInstall;
   }
 
   installPackages(packagesToInstall: string[]): void {
@@ -138,23 +145,17 @@ export default class NightwatchInit {
     }
     console.error();
 
-    const packageJson = JSON.parse(fs.readFileSync(path.join(this.rootDir, 'package.json'), 'utf-8'));
-
     for (const pack of packagesToInstall) {
       console.error(`Installing ${colors.green(pack)}`);
 
-      if (packageJson.devDependencies?.hasOwnProperty(pack) || packageJson.dependencies?.hasOwnProperty(pack)) {
-        console.error(colors.green('Already installed!'), '\n');
-      } else {
-        try {
-          execSync(`npm install ${pack} --save-dev`, {
-            stdio: ['inherit', 'pipe', 'inherit'],
-            cwd: this.rootDir
-          });
-          console.error(colors.green('Done!'), '\n');
-        } catch (err) {
-          console.error(`Failed to install ${pack}. Please run \'npm install ${pack} --save-dev\' later.\n`);
-        }
+      try {
+        execSync(`npm install ${pack} --save-dev`, {
+          stdio: ['inherit', 'pipe', 'inherit'],
+          cwd: this.rootDir
+        });
+        console.error(colors.green('Done!'), '\n');
+      } catch (err) {
+        console.error(`Failed to install ${pack}. Please run \'npm install ${pack} --save-dev\' later.\n`);
       }
     }
   }
