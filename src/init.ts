@@ -4,7 +4,7 @@ import ejs from 'ejs';
 import colors from 'ansi-colors';
 import {prompt} from 'inquirer';
 import {execSync} from 'child_process';
-import { copy, stripControlChars, symbols} from './utils';
+import {copy, stripControlChars, symbols} from './utils';
 
 import {CONFIG_INTRO, BROWSER_CHOICES, QUESTIONAIRRE, CONFIG_DEST_QUES} from './constants';
 import defaultAnswers from './defaults.json';
@@ -28,7 +28,7 @@ export default class NightwatchInit {
     } else {
       console.error(CONFIG_INTRO);
 
-      let onlyConfig: boolean = false;
+      let onlyConfig = false;
       if (this.options.includes('generate-config')) {
         onlyConfig = true;
       }
@@ -47,7 +47,7 @@ export default class NightwatchInit {
     this.installPackages(packagesToInstall);
 
     // Setup TypeScript
-    if (answers.language === 'ts') this.setupTypescript();
+    if (answers.language === 'ts') {this.setupTypescript()}
 
     // Generate configuration file
     const configDestLocation = await this.getConfigDestLocation();
@@ -124,7 +124,7 @@ export default class NightwatchInit {
       packages.push('typescript', '@types/nightwatch');
     }
 
-    if (answers.runner === "cucumber") {
+    if (answers.runner === 'cucumber') {
       packages.push('@cucumber/cucumber');
     }
 
@@ -132,8 +132,9 @@ export default class NightwatchInit {
     const packageJson = JSON.parse(fs.readFileSync(path.join(this.rootDir, 'package.json'), 'utf-8'));
 
     const packagesToInstall = packages.filter((pack) => {
-      return !packageJson.devDependencies?.hasOwnProperty(pack) && !packageJson.dependencies?.hasOwnProperty(pack)
-    })
+      // eslint-disable-next-line
+      return !packageJson.devDependencies?.hasOwnProperty(pack) && !packageJson.dependencies?.hasOwnProperty(pack);
+    });
 
     return packagesToInstall;
   }
@@ -155,7 +156,7 @@ export default class NightwatchInit {
         });
         console.error(colors.green('Done!'), '\n');
       } catch (err) {
-        console.error(`Failed to install ${pack}. Please run \'npm install ${pack} --save-dev\' later.\n`);
+        console.error(`Failed to install ${pack}. Please run 'npm install ${pack} --save-dev' later.\n`);
       }
     }
   }
@@ -175,14 +176,16 @@ export default class NightwatchInit {
 
     // Add script to run nightwatch tests
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
-    if (!packageJson.scripts)
-      packageJson.scripts = {};
-    if (packageJson.scripts['test']?.includes('no test specified'))
-      delete packageJson.scripts['test'];
+    if (!packageJson.scripts) {packageJson.scripts = {}}
+    if (packageJson.scripts['test']?.includes('no test specified')) {delete packageJson.scripts['test']}
 
-    if (packageJson.scripts.hasOwnProperty('test')) this.otherInfo.tsTestScript = 'test';
-    else this.otherInfo.tsTestScript = 'nightwatch:test';
-    packageJson.scripts[this.otherInfo.tsTestScript] = "tsc && nightwatch";
+    // eslint-disable-next-line
+    if (packageJson.scripts.hasOwnProperty('test')) {
+      this.otherInfo.tsTestScript = 'test';
+    } else {
+      this.otherInfo.tsTestScript = 'nightwatch:test';
+    }
+    packageJson.scripts[this.otherInfo.tsTestScript] = 'tsc && nightwatch';
 
     fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
   }
@@ -215,14 +218,14 @@ export default class NightwatchInit {
 
     const src_folders: string[] = [];
 
-    let testsJsSrc: string = path.join(this.otherInfo.tsOutDir || '', answers.testsLocation || '');
-    if (testsJsSrc !== ".") {
+    const testsJsSrc: string = path.join(this.otherInfo.tsOutDir || '', answers.testsLocation || '');
+    if (testsJsSrc !== '.') {
       src_folders.push(testsJsSrc);
       this.otherInfo.testsJsSrc = testsJsSrc;
     }
 
     if (answers.addExamples) {
-      let examplesJsSrc: string = path.join(this.otherInfo.tsOutDir || '', answers.examplesLocation || '');
+      const examplesJsSrc: string = path.join(this.otherInfo.tsOutDir || '', answers.examplesLocation || '');
       if (examplesJsSrc && testsJsSrc && !examplesJsSrc.startsWith(testsJsSrc)) {
         src_folders.push(examplesJsSrc);
       }
@@ -268,9 +271,9 @@ export default class NightwatchInit {
   identifyWebdriversToInstall(answers: ConfigGeneratorAnswers): string[] {
     const webdrivers: string[] = [];
 
-    if (answers.browsers?.includes('firefox')) webdrivers.push('geckodriver');
-    if (answers.browsers?.includes('chrome')) webdrivers.push('chromedriver');
-    if (answers.browsers?.includes('safari')) webdrivers.push('safaridriver');
+    if (answers.browsers?.includes('firefox')) {webdrivers.push('geckodriver')}
+    if (answers.browsers?.includes('chrome')) {webdrivers.push('chromedriver')}
+    if (answers.browsers?.includes('safari')) {webdrivers.push('safaridriver')}
 
     return webdrivers;
   }
@@ -356,7 +359,7 @@ export default class NightwatchInit {
     // If the featurePath contains **, no way of knowing where to put feature files
     // (maybe in the most outside folder by creating a new example dir?)
     // Skipping all paths with '*' for now.
-    if (featurePath.includes('*')) return;
+    if (featurePath.includes('*')) {return}
 
     console.error('Generating example for CucumberJS...');
     this.otherInfo.cucumberExamplesAdded = true;
@@ -365,6 +368,7 @@ export default class NightwatchInit {
     const exampleDestPath = path.join(this.rootDir, exampleDestLocation);
     if (fs.existsSync(exampleDestPath)) {
       console.error(`Example already exists at '${featurePath}'. Skipping...`, '\n');
+
       return;
     }
     fs.mkdirSync(exampleDestPath, {recursive: true});
@@ -381,6 +385,7 @@ export default class NightwatchInit {
 
     if (fs.existsSync(path.join(this.rootDir, examplesLocation))) {
       console.error(`Examples already exists at '${examplesLocation}'. Skipping...`, '\n');
+
       return;
     }
 
@@ -397,7 +402,7 @@ export default class NightwatchInit {
     fs.mkdirSync(examplesDestPath, {recursive: true});
 
     const excludeDir: string[] = [];
-    if (test_runner !== 'cucumber') excludeDir.push('cucumber-js');
+    if (test_runner !== 'cucumber') {excludeDir.push('cucumber-js')}
 
     copy(examplesSrcPath, examplesDestPath, excludeDir);
 
@@ -423,6 +428,7 @@ export default class NightwatchInit {
 
       console.error('For more details on using CucumberJS with Nightwatch, visit:');
       console.error(colors.cyan('  https://nightwatchjs.org/guide/third-party-runners/cucumberjs-nightwatch-integration.html'));
+
       return;
     }
 
@@ -441,7 +447,7 @@ export default class NightwatchInit {
         console.error(colors.cyan(`  npx nightwatch ./${this.otherInfo.examplesJsSrc}/ecosia.js\n`));
       }
     } else {
-      console.error("A few examples are available at 'node_modules/nightwatch/examples'.\n");
+      console.error('A few examples are available at \'node_modules/nightwatch/examples\'.\n');
 
       console.error('To run a single example (ecosia.js), try:');
       console.error(colors.cyan('  npx nightwatch node_modules/nightwatch/examples/tests/ecosia.js'), '\n');

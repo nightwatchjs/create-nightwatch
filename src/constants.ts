@@ -11,7 +11,7 @@ export const NIGHTWATCH_TITLE = `
 \\_| \\_/|_| \\__, ||_| |_| \\__|  \\_/\\_/   \\__,_| \\__| \\___||_| |_|
             __/ |
            |___/
-`
+`;
 
 export const CONFIG_INTRO = 
 `===============================
@@ -50,7 +50,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
       {name: 'JavaScript - Mocha Test Runner', value: 'js-mocha'},
       {name: 'JavaScript - CucumberJS Test Runner', value: 'js-cucumber'},
       {name: 'TypeScript - Nightwatch Test Runner', value: 'ts-nightwatch'},
-      {name: 'TypeScript - Mocha Test Runner', value: 'ts-mocha'},
+      {name: 'TypeScript - Mocha Test Runner', value: 'ts-mocha'}
       // {name: 'TypeScript - CucumberJS Test Runner', value: 'ts-cucumber'}
     ],
     filter: (value, answers) => {
@@ -98,7 +98,8 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     },
     // when: (answers) => ['local', 'both'].includes(answers.backend),
     filter: (value, answers) => {
-      if (value.includes('ie') || value.includes('selenium-server')) answers.seleniumServer = true;
+      if (value.includes('ie') || value.includes('selenium-server')) {answers.seleniumServer = true}
+
       return value;
     }
   },
@@ -111,7 +112,8 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     default: 'localhost',
     when: (answers) => ['remote', 'both'].includes(answers.backend),
     filter: (value, answers) => {
-      if (value.search('browserstack') !== -1) answers.browserstack = true;
+      if (value.search('browserstack') !== -1) {answers.browserstack = true}
+
       return value;
     }
   },

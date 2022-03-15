@@ -1,9 +1,9 @@
 import fs from 'fs';
 import path from 'path';
-import { execSync } from 'child_process';
+import {execSync} from 'child_process';
 import colors from 'ansi-colors';
 import NightwatchInit from './init';
-import { NIGHTWATCH_TITLE } from './constants';
+import {NIGHTWATCH_TITLE} from './constants';
 
 const main = async () => {
   try {
@@ -22,7 +22,7 @@ const main = async () => {
 
     const nightwatchInit = new NightwatchInit(rootDir, options);
     await nightwatchInit.run();
-  } catch(error) {
+  } catch (error) {
     console.error(error);
     process.exit(1);
   }
@@ -32,7 +32,7 @@ const getArgOptions = (argv: string[]): string[] => {
   const options: string[] = [];
 
   const alias: {[key: string]: string} = {
-    'y': 'yes',
+    'y': 'yes'
   };
 
   argv.forEach(arg => {
@@ -41,21 +41,21 @@ const getArgOptions = (argv: string[]): string[] => {
     } else if (arg.startsWith('-') && alias[arg.slice(1)]) {
       options.push(alias[arg.slice(1)]);
     }
-  })
+  });
 
   return options;
-}
+};
 
 const initializeNodeProject = (rootDir: string) => {
-  if (!fs.existsSync(rootDir)) fs.mkdirSync(rootDir, {recursive: true});
+  if (!fs.existsSync(rootDir)) {fs.mkdirSync(rootDir, {recursive: true})}
 
   console.error(`${colors.yellow('package.json')} not found in the root directory. Initializing a new NPM project..\n`);
 
-  execSync("npm init -y", {
-    "stdio": "inherit",
-    "cwd": rootDir,
+  execSync('npm init -y', {
+    'stdio': 'inherit',
+    'cwd': rootDir
   });
-}
+};
 
 
 main();
