@@ -69,6 +69,18 @@ module.exports = {
           // use parallel execution in Cucumber
           // parallel: 2 // set number of workers to use (can also be defined in the cli as --parallel 2
         }
+      }<% } else if (answers.runner === 'mocha') { %>
+      test_runner: {
+        // set mocha as the runner
+        // For more info on using Mocha with Nightwatch, visit:
+        // https://nightwatchjs.org/guide/third-party-runners/using-mocha.html
+        type : 'mocha',
+
+        // define mocha specific options
+        options : {
+          ui : 'bdd',
+          reporter : 'list'
+        }
       }<% } %>
     },
     <% if (answers.browsers.includes('safari')) { %>
