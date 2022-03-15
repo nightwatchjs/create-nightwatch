@@ -148,17 +148,17 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
   },
 
   // NIGHTWATCH EXAMPLES
-  {
-    type: 'list',
-    name: 'addExamples',
-    message: 'Should we generate some examples for you to explore?',
-    choices: [
-      {name: 'Yes, please!', value: true},
-      {name: 'No, thanks!', value: false}
-    ],
-    default: false,
-    when: (answers) => !answers.onlyConfig && answers.runner !== 'cucumber'
-  },
+  // {
+  //   type: 'list',
+  //   name: 'addExamples',
+  //   message: 'Should we generate some examples for you to explore?',
+  //   choices: [
+  //     {name: 'Yes, please!', value: true},
+  //     {name: 'No, thanks!', value: false}
+  //   ],
+  //   default: false,
+  //   when: (answers) => !answers.onlyConfig && answers.runner !== 'cucumber'
+  // },
 
   // ADDITIONAL HELP
   {

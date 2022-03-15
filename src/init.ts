@@ -105,6 +105,8 @@ export default class NightwatchInit {
       answers.defaultBrowser = answers.browsers ? answers.browsers[0] : undefined;
     }
 
+    // Always generate examples (for now)
+    answers.addExamples = true;
     if (answers.addExamples && !answers.examplesLocation) {
       answers.examplesLocation = path.join(answers.testsLocation || '', 'nightwatch-examples');
     }
@@ -385,8 +387,9 @@ export default class NightwatchInit {
     if (typescript) {
       examplesSrcPath = path.join(__dirname, '..', 'assets', 'ts-examples');
     } else {
-      const nightwatchModulePath = path.dirname(require.resolve('nightwatch/package.json', {paths: [this.rootDir]}));
-      examplesSrcPath = path.join(nightwatchModulePath, 'examples');
+      // const nightwatchModulePath = path.dirname(require.resolve('nightwatch/package.json', {paths: [this.rootDir]}));
+      // examplesSrcPath = path.join(nightwatchModulePath, 'examples');
+      examplesSrcPath = path.join(__dirname, '..', 'assets', 'js-examples');
     }
 
     const examplesDestPath = path.join(this.rootDir, examplesLocation);
@@ -434,7 +437,7 @@ export default class NightwatchInit {
         console.error(colors.cyan(`  npx nightwatch ./${this.otherInfo.examplesJsSrc}\n`));
 
         console.error('To run a single example (ecosia.js), run:');
-        console.error(colors.cyan(`  npx nightwatch ./${this.otherInfo.examplesJsSrc}/tests/ecosia.js\n`));
+        console.error(colors.cyan(`  npx nightwatch ./${this.otherInfo.examplesJsSrc}/ecosia.js\n`));
       }
     } else {
       console.error("A few examples are available at 'node_modules/nightwatch/examples'.\n");
