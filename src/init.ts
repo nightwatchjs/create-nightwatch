@@ -145,6 +145,8 @@ export default class NightwatchInit {
   }
 
   installPackages(packagesToInstall: string[]): void {
+    if (packagesToInstall.length === 0) return;
+
     console.error('Installing the following packages:');
     for (const pack of packagesToInstall) {
       console.error(`- ${pack}`);
@@ -185,7 +187,7 @@ export default class NightwatchInit {
     if (packageJson.scripts['test']?.includes('no test specified')) {delete packageJson.scripts['test']}
 
     // eslint-disable-next-line
-    if (packageJson.scripts.hasOwnProperty('test')) {
+    if (!packageJson.scripts.hasOwnProperty('test')) {
       this.otherInfo.tsTestScript = 'test';
     } else {
       this.otherInfo.tsTestScript = 'nightwatch:test';
@@ -478,8 +480,15 @@ export default class NightwatchInit {
         console.error(colors.cyan('  https://www.oracle.com/technetwork/java/javase/downloads/index.html'), '\n');
       }
 
-      console.error('To run tests on your local selenium-server, use command:');
-      console.error(colors.cyan('  npx nightwatch --env selenium_server'), '\n');
+      if (answers.language === 'ts') {
+        console.error(`To run tests on your local selenium-server, build your project (${colors.cyan('tsc')}) and then run:`);
+        console.error(colors.cyan('  npx nightwatch --env selenium_server'), '\n');
+        console.error('Or, run this command:');
+        console.error(colors.cyan(`  npm run ${this.otherInfo.tsTestScript} -- --env selenium_server\n`));
+      } else {
+        console.error('To run tests on your local selenium-server, use command:');
+        console.error(colors.cyan('  npx nightwatch --env selenium_server'), '\n');
+      }
     }
   }
 }
