@@ -46,8 +46,9 @@ export default class NightwatchInit {
     const packagesToInstall = this.identifyPackagesToInstall(answers);
     this.installPackages(packagesToInstall);
 
-    // Setup TypeScript
+    // Setup TypeScript and Selenium Server
     if (answers.language === 'ts') {this.setupTypescript()}
+    if (answers.seleniumServer) {this.setupSeleniumServer()}
 
     // Generate configuration file
     const configDestLocation = await this.getConfigDestLocation();
@@ -128,6 +129,10 @@ export default class NightwatchInit {
       packages.push('@cucumber/cucumber');
     }
 
+    if (answers.seleniumServer) {
+      packages.push('@nightwatch/selenium-server');
+    }
+
     // Identify packages already installed and don't install them again
     const packageJson = JSON.parse(fs.readFileSync(path.join(this.rootDir, 'package.json'), 'utf-8'));
 
@@ -188,6 +193,18 @@ export default class NightwatchInit {
     packageJson.scripts[this.otherInfo.tsTestScript] = 'tsc && nightwatch';
 
     fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+  }
+
+  setupSeleniumServer() {
+    // Check if Java is installed
+    try {
+      execSync('java -version', {
+        stdio: 'pipe',
+        cwd: this.rootDir
+      });
+    } catch(err) {
+      this.otherInfo.javaNotInstalled = true;
+    }
   }
 
   async getConfigDestLocation() {
@@ -429,10 +446,7 @@ export default class NightwatchInit {
       console.error('For more details on using CucumberJS with Nightwatch, visit:');
       console.error(colors.cyan('  https://nightwatchjs.org/guide/third-party-runners/cucumberjs-nightwatch-integration.html'));
 
-      return;
-    }
-
-    if (answers.addExamples) {
+    } else if (answers.addExamples) {
       if (answers.language === 'ts') {
         console.error('To run all examples, run:');
         console.error(colors.cyan(`  npm run ${this.otherInfo.tsTestScript}\n`));
@@ -454,6 +468,18 @@ export default class NightwatchInit {
 
       console.error('To run all examples, try:');
       console.error(colors.cyan('  npx nightwatch node_modules/nightwatch/examples'), '\n');
+    }
+
+    if (answers.seleniumServer) {
+      console.error('[Selenium Server]\n');
+      if (this.otherInfo.javaNotInstalled) {
+        // console.error('It seems like Java is not installed on your system.');
+        console.error('Java Development Kit (minimum v7) is required to run selenium-server locally. Download from here:');
+        console.error(colors.cyan('  https://www.oracle.com/technetwork/java/javase/downloads/index.html'), '\n');
+      }
+
+      console.error('To run tests on your local selenium-server, use command:');
+      console.error(colors.cyan('  npx nightwatch --env selenium_server'), '\n');
     }
   }
 }

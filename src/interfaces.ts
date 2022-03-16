@@ -36,4 +36,5 @@ interface OtherInfo {
   testsJsSrc?: string;
   examplesJsSrc?: string;
   cucumberExamplesAdded?: boolean;
+  javaNotInstalled?: boolean;
 }
