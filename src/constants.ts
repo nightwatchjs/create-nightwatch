@@ -81,19 +81,22 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     name: 'browsers',
     message: 'Where you\'ll be testing on?',
     choices: (answers) => {
-      const browsers = BROWSER_CHOICES;
+      let browsers = BROWSER_CHOICES;
       if (answers.backend === 'local' && process.platform !== 'darwin') {
-        return browsers.filter((browser) => browser.value !== 'safari');
+        browsers =  browsers.filter((browser) => browser.value !== 'safari');
       }
 
       if (['local', 'both'].includes(answers.backend)) {
-        return browsers.concat({name: 'Local selenium-server', value: 'selenium-server'});
+        browsers = browsers.concat({name: 'Local selenium-server', value: 'selenium-server'});
       }
 
       return browsers;
     },
     default: ['firefox'],
     validate: (value) => {
+      if (value.length === 1 && value.includes('selenium-server')) {
+        return 'Please select at least 1 browser.';
+      }
       return !!value.length || 'Please select at least 1 browser.';
     },
     // when: (answers) => ['local', 'both'].includes(answers.backend),
@@ -169,7 +172,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     message: 'Do you need additional help in setting up your configuration file?',
     choices: [
       {name: 'Yes, please!', value: 'yes'},
-      {name: 'Yes, but minimal help.', value: 'minimal'},
+      // {name: 'Yes, but minimal help.', value: 'minimal'},
       {name: 'No, thanks!', value: 'no'}
     ],
     default: 'no',
