@@ -340,11 +340,16 @@ module.exports = {
       selenium: {
         start_process: true,
         port: 4444,
-        server_path: (Services.seleniumServer ? Services.seleniumServer.path : ''),
+        server_path: '', // Leave empty if @nightwatch/selenium-server is installed
+        command: 'standalone', // Selenium 4 only
         cli_args: {
-          'webdriver.gecko.driver': (Services.geckodriver ? Services.geckodriver.path : ''),
-          'webdriver.chrome.driver': (Services.chromedriver ? Services.chromedriver.path : '')
+          //'webdriver.gecko.driver': '',
+          //'webdriver.chrome.driver': ''
         }
+      },
+      webdriver: {
+        start_process: false,
+        default_path_prefix: '/wd/hub'
       }
     },
 
