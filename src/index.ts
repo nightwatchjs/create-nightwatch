@@ -16,6 +16,10 @@ const main = async () => {
     const rootDir = path.resolve(process.cwd(), args[0] || '');
 
     if (!fs.existsSync(path.join(rootDir, 'package.json'))) {
+      if (options.includes('generate-config')) {
+        throw new Error(`package.json not found. Please run this command from your existing Nightwatch project.
+        Or, use \`npm init nightwatch ${args[0] || '.'}\` to initialize a new Nightwatch project instead.`);
+      }
       options.push('new-project');
       initializeNodeProject(rootDir);
     }

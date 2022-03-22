@@ -8,7 +8,5 @@
   "seleniumServer": false,
   "baseUrl": "http://localhost",
   "runner": "nightwatch",
-  "addExamples": true,
-  "examplesLocation": "nightwatch-examples",
   "remoteBrowsers": ["firefox", "chrome", "edge", "ie", "safari"]
 }

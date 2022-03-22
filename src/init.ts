@@ -13,27 +13,28 @@ export default class NightwatchInit {
   rootDir: string;
   options: string[];
   otherInfo: OtherInfo;
+  onlyConfig: boolean;
 
   constructor(rootDir = process.cwd(), options: string[]) {
     this.rootDir = rootDir;
     this.options = options;
     this.otherInfo = {};
+    this.onlyConfig = false;
   }
 
   async run() {
     let answers: ConfigGeneratorAnswers = {};
+
+    if (this.options.includes('generate-config')) {
+      this.onlyConfig = true;
+    }
 
     if (this.options.includes('yes')) {
       answers = defaultAnswers as ConfigGeneratorAnswers;
     } else {
       console.error(CONFIG_INTRO);
 
-      let onlyConfig = false;
-      if (this.options.includes('generate-config')) {
-        onlyConfig = true;
-      }
-
-      answers = await this.askQuestions(onlyConfig);
+      answers = await this.askQuestions(this.onlyConfig);
       // Add a newline after questions.
       console.error();
 
@@ -46,9 +47,11 @@ export default class NightwatchInit {
     const packagesToInstall = this.identifyPackagesToInstall(answers);
     this.installPackages(packagesToInstall);
 
-    // Setup TypeScript and Selenium Server
-    if (answers.language === 'ts') {this.setupTypescript()}
-    if (answers.seleniumServer) {this.setupSeleniumServer()}
+    // Setup TypeScript
+    if (!this.onlyConfig && answers.language === 'ts') {this.setupTypescript()}
+
+    // Check if Java is installed on the system
+    if (answers.seleniumServer) {this.checkJavaInstallation()}
 
     // Generate configuration file
     const configDestLocation = await this.getConfigDestLocation();
@@ -58,20 +61,26 @@ export default class NightwatchInit {
     const webdriversToInstall = this.identifyWebdriversToInstall(answers);
     await this.installWebdrivers(webdriversToInstall);
 
-    // Create tests location
-    if (answers.testsLocation) {this.createTestLocation(answers.testsLocation)}
+    if (!this.onlyConfig) {
+      // Create tests location
+      if (answers.testsLocation) {this.createTestLocation(answers.testsLocation)}
 
-    // Copy examples
-    // For cucumber, only copy the cucumber examples.
-    // For rest, copy all examples but cucumber.
-    if (answers.runner === 'cucumber') {
-      this.copyCucumberExamples(answers.featurePath || '');
-    } else if (answers.examplesLocation) {
-      this.copyExamples(answers.examplesLocation, answers.language === 'ts', answers.runner || '');
+      // Copy examples
+      // For cucumber, only copy the cucumber examples.
+      // For rest, copy all examples but cucumber.
+      if (answers.runner === 'cucumber') {
+        this.copyCucumberExamples(answers.featurePath || '');
+      } else if (answers.examplesLocation) {
+        this.copyExamples(answers.examplesLocation, answers.language === 'ts', answers.runner || '');
+      }
+
+      // Post instructions to run their first test
+      this.postSetupInstructions(answers);
+    } else {
+      // Post config instructions
+      this.postConfigInstructions(answers);
     }
-
-    // Post instructions to run their first test
-    this.postSetupInstructions(answers);
+    
   }
 
   async askQuestions(onlyConfig: boolean) {
@@ -107,7 +116,8 @@ export default class NightwatchInit {
     }
 
     // Always generate examples (for now)
-    answers.addExamples = true;
+    if (!this.onlyConfig) {answers.addExamples = true}
+
     if (answers.addExamples && !answers.examplesLocation) {
       answers.examplesLocation = path.join(answers.testsLocation || '', 'nightwatch-examples');
     }
@@ -197,8 +207,7 @@ export default class NightwatchInit {
     fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
   }
 
-  setupSeleniumServer() {
-    // Check if Java is installed
+  checkJavaInstallation() {
     try {
       execSync('java -version', {
         stdio: 'pipe',
@@ -490,6 +499,20 @@ export default class NightwatchInit {
         console.error(colors.cyan('  npx nightwatch --env selenium_server'), '\n');
       }
     }
+  }
+
+  postConfigInstructions(answers: ConfigGeneratorAnswers) {
+    if (answers.seleniumServer && this.otherInfo.javaNotInstalled) {
+      console.error('Java Development Kit (minimum v7) is required to run selenium-server locally. Download from here:');
+      console.error(colors.cyan('  https://www.oracle.com/technetwork/java/javase/downloads/index.html'), '\n');
+    }
+
+    if (answers.language === 'ts') {
+      console.error(`Since you are using TypeScript, please verify ${colors.magenta('src_folders')} once in your newly generated config file.`);
+      console.error('It should point to the location of your transpiled test files.\n');
+    }
+
+    console.error('Happy Testing!!!');
   }
 }
 
