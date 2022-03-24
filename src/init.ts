@@ -7,6 +7,7 @@ import {execSync} from 'child_process';
 import {copy, stripControlChars, symbols} from './utils';
 
 import {CONFIG_INTRO, BROWSER_CHOICES, QUESTIONAIRRE, CONFIG_DEST_QUES} from './constants';
+import { ConfigGeneratorAnswers, ConfigDestination, OtherInfo } from './interfaces';
 import defaultAnswers from './defaults.json';
 
 export default class NightwatchInit {
@@ -189,7 +190,7 @@ export default class NightwatchInit {
     }
 
     const tsConfig = JSON.parse(fs.readFileSync(tsConfigPath, 'utf-8'));
-    this.otherInfo.tsOutDir = tsConfig.compilerOptions.outDir || '';
+    this.otherInfo.tsOutDir = tsConfig.compilerOptions?.outDir || '';
 
     // Add script to run nightwatch tests
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));

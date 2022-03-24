@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
-interface ConfigGeneratorAnswers {
+export interface ConfigGeneratorAnswers {
   rootDir?: string;
   onlyConfig?: boolean;
   languageRunnerSetup?: string;
@@ -24,13 +22,13 @@ interface ConfigGeneratorAnswers {
   tsOutDir?: string;
 }
 
-interface ConfigDestination {
+export interface ConfigDestination {
   rootDir?: string;
   overwrite?: boolean;
   newFileName?: string;
 }
 
-interface OtherInfo {
+export interface OtherInfo {
   tsOutDir?: string;
   tsTestScript?: string;
   testsJsSrc?: string;
