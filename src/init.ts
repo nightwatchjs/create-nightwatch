@@ -10,7 +10,7 @@ import {CONFIG_INTRO, BROWSER_CHOICES, QUESTIONAIRRE, CONFIG_DEST_QUES} from './
 import { ConfigGeneratorAnswers, ConfigDestination, OtherInfo } from './interfaces';
 import defaultAnswers from './defaults.json';
 
-export default class NightwatchInit {
+export class NightwatchInit {
   rootDir: string;
   options: string[];
   otherInfo: OtherInfo;
@@ -35,7 +35,7 @@ export default class NightwatchInit {
     } else {
       console.error(CONFIG_INTRO);
 
-      answers = await this.askQuestions(this.onlyConfig);
+      answers = await this.askQuestions();
       // Add a newline after questions.
       console.error();
 
@@ -84,10 +84,10 @@ export default class NightwatchInit {
     
   }
 
-  async askQuestions(onlyConfig: boolean) {
+  async askQuestions() {
     const answers = {
       rootDir: this.rootDir,
-      onlyConfig
+      onlyConfig: this.onlyConfig
     };
 
     return await prompt(QUESTIONAIRRE, answers);
@@ -96,20 +96,32 @@ export default class NightwatchInit {
   refineAnswers(answers: ConfigGeneratorAnswers) {
     if (answers.browserstack) {
       answers.remoteName = 'browserstack';
-    } else {
+    } else if (answers.backend && ['remote', 'both'].includes(answers.backend)) {
       answers.remoteName = 'remote';
     }
 
     if (!answers.browsers) {
       answers.browsers = BROWSER_CHOICES.map((browser) => browser.value);
+    } else if (answers.browsers.includes('selenium-server')) {
+      if (!answers.seleniumServer) answers.seleniumServer = true;
+      // Remove selenium-server from browsers
+      const pos = answers.browsers.indexOf('selenium-server');
+      answers.browsers.splice(pos, 1);
     }
 
-    if (!answers.remoteBrowsers) {
+    // Enable seleniumServer if ie present in local browsers.
+    if (answers.browsers.includes('ie') && !answers.seleniumServer) {
+      answers.seleniumServer = true;
+    }
+
+    if (!answers.remoteBrowsers && answers.backend && ['remote', 'both'].includes(answers.backend)) {
       answers.remoteBrowsers = answers.browsers;
     }
 
-    if (process.platform !== 'darwin') {
-      answers.browsers.filter((browser) => browser !== 'safari');
+    if (process.platform !== 'darwin' && answers.browsers.includes('safari')) {
+      // Remove safari from browsers from non-mac users
+      const pos = answers.browsers.indexOf('safari');
+      answers.browsers.splice(pos, 1);
     }
 
     if (!answers.defaultBrowser) {
@@ -200,8 +212,10 @@ export default class NightwatchInit {
     // eslint-disable-next-line
     if (!packageJson.scripts.hasOwnProperty('test')) {
       this.otherInfo.tsTestScript = 'test';
-    } else {
+    } else if (!packageJson.scripts.hasOwnProperty('nightwatch:test')) {
       this.otherInfo.tsTestScript = 'nightwatch:test';
+    } else{
+      this.otherInfo.tsTestScript = 'nightwatch:test:new';
     }
     packageJson.scripts[this.otherInfo.tsTestScript] = 'tsc && nightwatch';
 
