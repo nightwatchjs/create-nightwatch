@@ -58,7 +58,7 @@ export class NightwatchInit {
     // Generate configuration file
     const configDestLocation = await this.getConfigDestLocation();
     this.generateConfig(answers, configDestLocation);
-  
+
     // Install/enable webdrivers
     const webdriversToInstall = this.identifyWebdriversToInstall(answers);
     await this.installWebdrivers(webdriversToInstall);
@@ -71,9 +71,9 @@ export class NightwatchInit {
       // For cucumber, only copy the cucumber examples.
       // For rest, copy all examples but cucumber.
       if (answers.runner === 'cucumber') {
-        this.copyCucumberExamples(answers.featurePath || '');
-      } else if (answers.examplesLocation) {
-        this.copyExamples(answers.examplesLocation, answers.language === 'ts', answers.runner || '');
+        this.copyCucumberExamples(answers.examplesLocation || '');
+      } else if (answers.addExamples) {
+        this.copyExamples(answers.examplesLocation || '', answers.language === 'ts', answers.runner || '');
       }
 
       // Post instructions to run their first test
@@ -139,7 +139,11 @@ export class NightwatchInit {
     if (!this.onlyConfig) {answers.addExamples = true}
 
     if (answers.addExamples && !answers.examplesLocation) {
-      answers.examplesLocation = path.join(answers.testsLocation || '', 'nightwatch-examples');
+      if (answers.runner === 'cucumber') {
+        answers.examplesLocation = path.join(answers.featurePath || '', 'nightwatch-examples');
+      } else {
+        answers.examplesLocation = path.join(answers.testsLocation || '', 'nightwatch-examples');
+      }
     }
   }
 
@@ -274,7 +278,9 @@ export class NightwatchInit {
       this.otherInfo.testsJsSrc = testsJsSrc;
     }
 
-    if (answers.addExamples) {
+    // Add examplesLocation to src_folders, if different from testsLocation.
+    // Don't add for cucumber examples (for now, as addition of examples depends upon featurePath in copyCucumberExamples).
+    if (answers.addExamples && answers.runner !== 'cucumber') {
       const examplesJsSrc: string = path.join(this.otherInfo.tsOutDir || '', answers.examplesLocation || '');
       if (examplesJsSrc && testsJsSrc && !examplesJsSrc.startsWith(testsJsSrc)) {
         src_folders.push(examplesJsSrc);
@@ -406,19 +412,18 @@ export class NightwatchInit {
     }
   }
 
-  copyCucumberExamples(featurePath: string) {
-    // If the featurePath contains **, no way of knowing where to put feature files
-    // (maybe in the most outside folder by creating a new example dir?)
+  copyCucumberExamples(examplesLocation: string) {
+    // If the featurePath (part of examplesLocation) contains **, no way of knowing where to put
+    // example feature files (maybe in the most outside folder by creating a new example dir?)
     // Skipping all paths with '*' for now.
-    if (featurePath.includes('*')) {return}
+    if (examplesLocation.includes('*')) {return}
 
     Logger.error('Generating example for CucumberJS...');
     this.otherInfo.cucumberExamplesAdded = true;
-    
-    const exampleDestLocation = path.join(featurePath, 'nightwatch-example');
-    const exampleDestPath = path.join(this.rootDir, exampleDestLocation);
+
+    const exampleDestPath = path.join(this.rootDir, examplesLocation);
     if (fs.existsSync(exampleDestPath)) {
-      Logger.error(`Example already exists at '${featurePath}'. Skipping...`, '\n');
+      Logger.error(`Example already exists at '${examplesLocation}'. Skipping...`, '\n');
 
       return;
     }
@@ -428,7 +433,7 @@ export class NightwatchInit {
     const exampleSrcPath = path.join(nightwatchModulePath, 'examples', 'cucumber-js', 'features');
 
     copy(exampleSrcPath, exampleDestPath);
-    Logger.error(`${colors.green(symbols().ok + ' Success!')} Generated an example for CucumberJS at "${exampleDestLocation}".\n`);
+    Logger.error(`${colors.green(symbols().ok + ' Success!')} Generated an example for CucumberJS at "${examplesLocation}".\n`);
   }
 
   copyExamples(examplesLocation: string, typescript: boolean, test_runner: string) {

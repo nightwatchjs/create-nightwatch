@@ -19,7 +19,6 @@ export interface ConfigGeneratorAnswers {
   browsers?: string[];
   defaultBrowser?: string;
   remoteBrowsers?: string[];
-  tsOutDir?: string;
 }
 
 export interface ConfigDestination {
