@@ -160,8 +160,8 @@ module.exports = {
 
       webdriver: {
         start_process: true,
-        // Download msedgedriver from https://docs.microsoft.com/en-us/microsoft-edge/webdriver-chromium/
-        //  and set the location below:
+        // Follow https://docs.microsoft.com/en-us/microsoft-edge/webdriver-chromium/?tabs=c-sharp#download-microsoft-edge-webdriver
+        // to download the Edge WebDriver and set the location of extracted `msedgedriver` below:
         server_path: '',
         cli_args: [
           // --verbose
@@ -343,8 +343,9 @@ module.exports = {
         server_path: '', // Leave empty if @nightwatch/selenium-server is installed
         command: 'standalone', // Selenium 4 only
         cli_args: {
-          //'webdriver.gecko.driver': '',
-          //'webdriver.chrome.driver': ''
+          // 'webdriver.gecko.driver': '',
+          // 'webdriver.chrome.driver': '',
+          // 'webdriver.edge.driver': './path/to/msedgedriver'
         }
       },
       webdriver: {
@@ -352,7 +353,7 @@ module.exports = {
         default_path_prefix: '/wd/hub'
       }
     },
-
+    <% if (answers.browsers.includes('chrome')) { %>
     'selenium.chrome': {
       extends: 'selenium_server',
       desiredCapabilities: {
@@ -362,7 +363,7 @@ module.exports = {
         }
       }
     },
-
+    <% } %><% if (answers.browsers.includes('firefox')) { %>
     'selenium.firefox': {
       extends: 'selenium_server',
       desiredCapabilities: {
@@ -374,7 +375,21 @@ module.exports = {
           ]
         }
       }
-    }<% } %>
+    },
+    <% } %><% if (answers.browsers.includes('edge')) { %>
+    'selenium.edge': {
+      extends: 'selenium_server',
+      "desiredCapabilities": {
+        "browserName": "MicrosoftEdge",
+        "ms:edgeOptions": {
+          "w3c": true,
+          "args": [
+            //"--headless"
+          ]
+        },
+        "acceptSslCerts": true
+      },
+    }<% }} %>
   }
 };
 
