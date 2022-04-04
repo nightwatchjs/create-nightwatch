@@ -50,3 +50,19 @@ const copyDir = (srcDir: string, destDir: string, excludeDir: string[]): void =>
     copy(srcFile, destFile, excludeDir);
   }
 };
+
+export const rmDirSync = (dirPath: string) => {
+  if (fs.existsSync(dirPath)) {
+    fs.readdirSync(dirPath).forEach((file) => {
+      const curPath = path.join(dirPath, file);
+      if (fs.lstatSync(curPath).isDirectory()) {
+       // recurse
+        rmDirSync(curPath);
+      } else {
+        // delete file
+        fs.unlinkSync(curPath);
+      }
+    });
+    fs.rmdirSync(dirPath);
+  }
+}

@@ -593,7 +593,7 @@ describe('init tests', () => {
       assert.deepEqual(Object.keys(config.test_settings), ['default', 'firefox', 'chrome']);
       assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox')
 
-      fs.rmSync('test_config.conf.js');
+      fs.unlinkSync('test_config.conf.js');
     });
 
     test('generateConfig with js with testsLocation and examplesLocation', () => {
@@ -627,7 +627,7 @@ describe('init tests', () => {
       assert.deepEqual(Object.keys(config.test_settings), ['default', 'chrome', 'remote', 'remote.chrome', 'remote.firefox', 'selenium_server', 'selenium.chrome']);
       assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome')
 
-      fs.rmSync('test_config.conf.js');
+      fs.unlinkSync('test_config.conf.js');
     });
 
     test('generateConfig with ts with testsLocation and examplesLocation', () => {
@@ -662,7 +662,7 @@ describe('init tests', () => {
       assert.deepEqual(Object.keys(config.test_settings), ['default', 'chrome', 'browserstack', 'browserstack.local', 'browserstack.chrome', 'browserstack.firefox', 'browserstack.local_chrome', 'browserstack.local_firefox']);
       assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome')
 
-      fs.rmSync('test_config.conf.js');
+      fs.unlinkSync('test_config.conf.js');
     });
   });
 });

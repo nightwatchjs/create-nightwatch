@@ -3,6 +3,7 @@ const mockery = require('mockery');
 const fs = require('fs');
 const path = require('path');
 const {execSync} = require('child_process');
+const {rmDirSync} = require('../../lib/utils');
 
 const rootDir = path.join(process.cwd(), 'test_output');
 
@@ -139,7 +140,7 @@ describe('e2e tests for init', () => {
     // console.log(consoleOutput);
     // console.log(commandsExecuted);
 
-    fs.rmSync(rootDir, {recursive: true});
+    rmDirSync(rootDir);
 
     done();
   });
@@ -264,7 +265,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('[Selenium Server]'), true);
     assert.strictEqual(output.includes('To run tests on your local selenium-server, use command:'), true);
 
-    fs.rmSync(rootDir, {recursive: true});
+    rmDirSync(rootDir);
 
     done();
   });
@@ -395,7 +396,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('[Selenium Server]'), true);
     assert.strictEqual(output.includes('To run tests on your local selenium-server, use command:'), true);
 
-    fs.rmSync(rootDir, {recursive: true});
+    rmDirSync(rootDir);
     
     done();
   });
@@ -514,7 +515,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('npm run test'), true);
     assert.strictEqual(output.includes('npm run test -- ./dist/tests/nightwatch-examples/github.js'), true);
 
-    fs.rmSync(rootDir, {recursive: true});
+    rmDirSync(rootDir);
 
     done();
   });
@@ -634,7 +635,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('[Selenium Server]'), true);
     assert.strictEqual(output.includes('To run tests on your local selenium-server, use command:'), true);
 
-    fs.rmSync(rootDir, {recursive: true});
+    rmDirSync(rootDir);
 
     done();
   });
