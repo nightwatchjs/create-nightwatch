@@ -492,22 +492,22 @@ export class NightwatchInit {
         Logger.error(colors.cyan(`  npm run ${this.otherInfo.tsTestScript}\n`));
 
         Logger.error('To run a single example (github.ts), run:');
-        Logger.error(colors.cyan(`  npm run ${this.otherInfo.tsTestScript} -- ./${this.otherInfo.examplesJsSrc}/github.js\n`));
+        Logger.error(colors.cyan(`  npm run ${this.otherInfo.tsTestScript} -- .${path.sep}${path.join(this.otherInfo.examplesJsSrc || '', 'github.js')}\n`));
       } else {
         Logger.error('To run all examples, run:');
-        Logger.error(colors.cyan(`  npx nightwatch ./${this.otherInfo.examplesJsSrc}\n`));
+        Logger.error(colors.cyan(`  npx nightwatch .${path.sep}${this.otherInfo.examplesJsSrc}\n`));
 
         Logger.error('To run a single example (ecosia.js), run:');
-        Logger.error(colors.cyan(`  npx nightwatch ./${this.otherInfo.examplesJsSrc}/ecosia.js\n`));
+        Logger.error(colors.cyan(`  npx nightwatch .${path.sep}${path.join(this.otherInfo.examplesJsSrc || '', 'ecosia.js')}\n`));
       }
     } else {
-      Logger.error('A few examples are available at \'node_modules/nightwatch/examples\'.\n');
+      Logger.error(`A few examples are available at '${path.join('node_modules', 'nightwatch', 'examples')}'.\n`);
 
       Logger.error('To run a single example (ecosia.js), try:');
-      Logger.error(colors.cyan('  npx nightwatch node_modules/nightwatch/examples/tests/ecosia.js'), '\n');
+      Logger.error(colors.cyan(`  npx nightwatch ${path.join('node_modules', 'nightwatch', 'examples', 'tests', 'ecosia.js')}`), '\n');
 
       Logger.error('To run all examples, try:');
-      Logger.error(colors.cyan('  npx nightwatch node_modules/nightwatch/examples'), '\n');
+      Logger.error(colors.cyan(`  npx nightwatch ${path.join('node_modules', 'nightwatch', 'examples')}`), '\n');
     }
 
     if (answers.seleniumServer) {
