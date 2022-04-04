@@ -122,7 +122,7 @@ export class NightwatchInit {
     }
 
     if (!answers.remoteBrowsers && backendHasRemote) {
-      answers.remoteBrowsers = answers.browsers;
+      answers.remoteBrowsers = [...answers.browsers];
     }
 
     if (process.platform !== 'darwin' && answers.browsers.includes('safari')) {
@@ -301,7 +301,8 @@ export class NightwatchInit {
     try {
       fs.writeFileSync(configDestLocation, rendered, {encoding: 'utf-8'});
 
-      const configFileName = configDestLocation.split(path.sep).at(-1);
+      const configFileNameSplit = configDestLocation.split(path.sep);
+      const configFileName = configFileNameSplit[configFileNameSplit.length-1];
       Logger.error(`${colors.green(symbols().ok + ' Success!')} Configuration file generated at: "${configDestLocation}".`);
 
       if (configFileName !== 'nightwatch.conf.js') {

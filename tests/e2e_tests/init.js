@@ -108,13 +108,21 @@ describe('e2e tests for init', () => {
     assert.deepEqual(config.src_folders, ['tests']);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
-    assert.deepEqual(Object.keys(config.test_settings), ['default', 'safari', 'chrome', 'edge']);
+    if (process.platform === 'darwin') {
+      assert.deepEqual(Object.keys(config.test_settings), ['default', 'safari', 'chrome', 'edge']);
+    } else {
+      assert.deepEqual(Object.keys(config.test_settings), ['default', 'chrome', 'edge']);
+    }
 
     // Test Packages and webdrivers installed
-    assert.strictEqual(commandsExecuted.length, 3);
+    if (process.platform === 'darwin') {
+      assert.strictEqual(commandsExecuted.length, 3);
+      assert.strictEqual(commandsExecuted[2], 'sudo safaridriver --enable');
+    } else {
+      assert.strictEqual(commandsExecuted.length, 2);
+    }
     assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[1], 'npm install chromedriver --save-dev');
-    assert.strictEqual(commandsExecuted[2], 'sudo safaridriver --enable');
 
     // Test examples copied
     const examplesPath = path.join(rootDir, answers.examplesLocation);
@@ -128,7 +136,8 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Installing nightwatch'), true);
     assert.strictEqual(output.includes('Success! Configuration file generated at:'), true);
     assert.strictEqual(output.includes('Installing webdriver for Chrome (chromedriver)...'), true);
-    assert.strictEqual(output.includes('Enabling safaridriver...'), true);
+    if (process.platform === 'darwin')
+      assert.strictEqual(output.includes('Enabling safaridriver...'), true);
     assert.strictEqual(output.includes('Generating example files...'), true);
     assert.strictEqual(output.includes('Success! Generated some example files at \'tests/nightwatch-examples\'.'), true);
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
@@ -137,8 +146,6 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('npx nightwatch ./tests/nightwatch-examples'), true);
     assert.strictEqual(output.includes('npx nightwatch ./tests/nightwatch-examples/ecosia.js'), true);
 
-    // console.log(consoleOutput);
-    // console.log(commandsExecuted);
 
     rmDirSync(rootDir);
 
@@ -230,7 +237,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
     assert.strictEqual(config.test_settings.remote.selenium.host, 'localhost');
     assert.strictEqual(config.test_settings.remote.selenium.port, 4444);
-    assert.deepEqual(Object.keys(config.test_settings), ['default', 'chrome', 'edge', 'remote', 'remote.chrome', 'remote.edge', 'selenium_server', 'selenium.chrome']);
+    assert.deepEqual(Object.keys(config.test_settings), ['default', 'chrome', 'edge', 'remote', 'remote.chrome', 'remote.edge', 'selenium_server', 'selenium.chrome', 'selenium.edge']);
 
     // Test Packages and webdrivers installed
     assert.strictEqual(commandsExecuted.length, 5);
@@ -385,7 +392,8 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Installing @nightwatch/selenium-server'), true);
     assert.strictEqual(output.includes('Success! Configuration file generated at:'), true);
     assert.strictEqual(output.includes('Installing webdriver for Chrome (chromedriver)...'), true);
-    assert.strictEqual(output.includes('Please run \'sudo safaridriver --enable\' command to enable safaridriver later.'), true);
+    if (process.platform === 'darwin')
+      assert.strictEqual(output.includes('Please run \'sudo safaridriver --enable\' command to enable safaridriver later.'), true);
     assert.strictEqual(output.includes('Generating example files...'), true);
     assert.strictEqual(output.includes('Success! Generated some example files at \'nightwatch-examples\'.'), true);
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
@@ -596,19 +604,23 @@ describe('e2e tests for init', () => {
     assert.strictEqual(config.test_settings.remote.selenium.host, '<remote-host>');
     assert.strictEqual(config.test_settings.remote.selenium.port, 4444);
     if (process.platform === 'darwin') {
-      assert.deepEqual(Object.keys(config.test_settings), ['default', 'safari', 'firefox', 'chrome', 'edge', 'remote', 'remote.chrome', 'remote.firefox', 'remote.safari', 'remote.edge', 'remote.ie', 'selenium_server', 'selenium.chrome', 'selenium.firefox']);
+      assert.deepEqual(Object.keys(config.test_settings), ['default', 'safari', 'firefox', 'chrome', 'edge', 'remote', 'remote.chrome', 'remote.firefox', 'remote.safari', 'remote.edge', 'remote.ie', 'selenium_server', 'selenium.chrome', 'selenium.firefox', 'selenium.edge']);
     } else {
-      assert.deepEqual(Object.keys(config.test_settings), ['default', 'firefox', 'chrome', 'edge', 'remote', 'remote.chrome', 'remote.firefox', 'remote.safari', 'remote.edge', 'remote.ie', 'selenium_server', 'selenium.chrome', 'selenium.firefox']);
+      assert.deepEqual(Object.keys(config.test_settings), ['default', 'firefox', 'chrome', 'edge', 'remote', 'remote.chrome', 'remote.firefox', 'remote.safari', 'remote.edge', 'remote.ie', 'selenium_server', 'selenium.chrome', 'selenium.firefox', 'selenium.edge']);
     }
 
     // Test Packages and webdrivers installed
-    assert.strictEqual(commandsExecuted.length, 6);
+    if (process.platform === 'darwin') {
+      assert.strictEqual(commandsExecuted.length, 6);
+      assert.strictEqual(commandsExecuted[5], 'sudo safaridriver --enable');
+    } else {
+      assert.strictEqual(commandsExecuted.length, 5);
+    }
     assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[1], 'npm install @nightwatch/selenium-server --save-dev');
     assert.strictEqual(commandsExecuted[2], 'java -version');
     assert.strictEqual(commandsExecuted[3], 'npm install geckodriver --save-dev');
     assert.strictEqual(commandsExecuted[4], 'npm install chromedriver --save-dev');
-    assert.strictEqual(commandsExecuted[5], 'sudo safaridriver --enable');
 
     // Test examples copied
     const examplesPath = path.join(rootDir, answers.examplesLocation);
@@ -624,7 +636,8 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Success! Configuration file generated at:'), true);
     assert.strictEqual(output.includes('Installing webdriver for Firefox (geckodriver)...'), true);
     assert.strictEqual(output.includes('Installing webdriver for Chrome (chromedriver)...'), true);
-    assert.strictEqual(output.includes('Enabling safaridriver...'), true);
+    if (process.platform === 'darwin')
+      assert.strictEqual(output.includes('Enabling safaridriver...'), true);
     assert.strictEqual(output.includes('Generating example files...'), true);
     assert.strictEqual(output.includes('Success! Generated some example files at \'nightwatch-examples\'.'), true);
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
