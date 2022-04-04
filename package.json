@@ -9,7 +9,9 @@
   "scripts": {
     "build": "tsc",
     "create-nightwatch": "tsc && node lib/index.js",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "test:unit": "npx nightwatch tests/unit_tests",
+    "test:e2e": "npx nightwatch tests/e2e_tests"
   },
   "keywords": [],
   "author": "Priyansh Garg",

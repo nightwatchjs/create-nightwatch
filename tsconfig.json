@@ -6,7 +6,7 @@
     "allowJs": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "target": "esnext",
+    "target": "es6",
     "moduleResolution": "node",
     "sourceMap": false,
     "outDir": "lib",
