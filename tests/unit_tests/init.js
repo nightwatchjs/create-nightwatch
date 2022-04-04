@@ -85,7 +85,7 @@ describe('init tests', () => {
       assert.deepEqual(answers["browsers"], ['firefox', 'chrome', 'edge']);
       assert.strictEqual(answers["defaultBrowser"], 'firefox');
       assert.strictEqual(answers["addExamples"], true);
-      assert.strictEqual(answers["examplesLocation"], 'tests/nightwatch-examples');
+      assert.strictEqual(answers["examplesLocation"], path.join('tests', 'nightwatch-examples'));
       assert.strictEqual(answers["seleniumServer"], true);
     });
   
@@ -110,7 +110,7 @@ describe('init tests', () => {
       assert.deepEqual(answers["remoteBrowsers"], ['firefox', 'chrome', 'edge']);
       assert.strictEqual(answers["defaultBrowser"], 'firefox');
       assert.strictEqual(answers["addExamples"], true);
-      assert.strictEqual(answers["examplesLocation"], 'tests/nightwatch-examples');
+      assert.strictEqual(answers["examplesLocation"], path.join('tests', 'nightwatch-examples'));
     });
   
     test('with remote as browserstack in answers and onlyConfig flag', () => {
@@ -612,7 +612,7 @@ describe('init tests', () => {
         'seleniumServer': true,
         'testsLocation': 'tests',
         'addExamples': true,
-        'examplesLocation': 'tests/nightwatch-examples'
+        'examplesLocation': path.join('tests', 'nightwatch-examples')
       }
 
       const {NightwatchInit} = require('../../lib/init');
@@ -622,7 +622,7 @@ describe('init tests', () => {
       const config = require('../../test_config.conf.js');
 
       assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
-      assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'tests/nightwatch-examples');
+      assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, path.join('tests', 'nightwatch-examples'));
       assert.deepEqual(config.src_folders, ['tests']);
       assert.deepEqual(Object.keys(config.test_settings), ['default', 'chrome', 'remote', 'remote.chrome', 'remote.firefox', 'selenium_server', 'selenium.chrome']);
       assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome')
@@ -656,9 +656,9 @@ describe('init tests', () => {
       nightwatchInit.generateConfig(answers, 'test_config.conf.js');
       const config = require('../../test_config.conf.js');
 
-      assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'dist/tests');
-      assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'dist/nightwatch-examples');
-      assert.deepEqual(config.src_folders, ['dist/tests', 'dist/nightwatch-examples']);
+      assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, path.join('dist', 'tests'));
+      assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, path.join('dist', 'nightwatch-examples'));
+      assert.deepEqual(config.src_folders, [path.join('dist', 'tests'), path.join('dist', 'nightwatch-examples')]);
       assert.deepEqual(Object.keys(config.test_settings), ['default', 'chrome', 'browserstack', 'browserstack.local', 'browserstack.chrome', 'browserstack.firefox', 'browserstack.local_chrome', 'browserstack.local_firefox']);
       assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome')
 
