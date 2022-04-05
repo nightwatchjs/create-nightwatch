@@ -350,6 +350,7 @@ export class NightwatchInit {
 
     if (answers.browsers?.includes('firefox')) {webdrivers.push('geckodriver')}
     if (answers.browsers?.includes('chrome')) {webdrivers.push('chromedriver')}
+    if (answers.browsers?.includes('ie')) {webdrivers.push('iedriver')}
     if (answers.browsers?.includes('safari')) {webdrivers.push('safaridriver')}
 
     return webdrivers;
@@ -385,6 +386,19 @@ export class NightwatchInit {
         Logger.error(colors.green('Done!'), '\n');
       } catch (err) {
         Logger.error('Failed to install chromedriver. Please run \'npm install chromedriver --save-dev\' later.\n');
+      }
+    }
+
+    if (webdriversToInstall.includes('iedriver')) {
+      Logger.error('Installing webdriver for IE (iedriver)...');
+      try {
+        execSync('npm install iedriver --save-dev', {
+          stdio: ['inherit', 'pipe', 'inherit'],
+          cwd: this.rootDir
+        });
+        Logger.error(colors.green('Done!'), '\n');
+      } catch (err) {
+        Logger.error('Failed to install iedriver. Please run \'npm install iedriver --save-dev\' later.\n');
       }
     }
 
