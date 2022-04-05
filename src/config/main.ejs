@@ -345,7 +345,8 @@ module.exports = {
         cli_args: {
           // 'webdriver.gecko.driver': '',
           // 'webdriver.chrome.driver': '',
-          // 'webdriver.edge.driver': './path/to/msedgedriver'
+          // 'webdriver.edge.driver': './path/to/msedgedriver',
+          // 'webdriver.ie.driver': ''
         }
       },
       webdriver: {
@@ -389,6 +390,14 @@ module.exports = {
         },
         "acceptSslCerts": true
       },
+    },
+    <% } %><% if (answers.browsers.includes('ie')) { %>
+    'selenium.ie': {
+      extends: 'selenium_server',
+      desiredCapabilities: {
+        browserName: 'internet explorer',
+        browserVersion: '11.0'
+      }
     }<% }} %>
   }
 };
@@ -405,4 +414,9 @@ function loadServices() {
   try {
     Services.geckodriver = require('geckodriver');
   } catch (err) {}
+  <% if (answers.browsers && answers.browsers.includes('ie')) { %>
+  try {
+    Services.iedriver = require('iedriver');
+  } catch (err) {}
+  <% } %>
 }
