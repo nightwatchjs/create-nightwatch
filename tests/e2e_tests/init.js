@@ -197,7 +197,7 @@ describe('e2e tests for init', () => {
       hostname: 'localhost',
       port: 4444,
       testsLocation: 'tests',
-      featurePath: 'tests/features',
+      featurePath: path.join('tests', 'features'),
       baseUrl: 'https://nightwatchjs.org'
     };
 
@@ -237,7 +237,7 @@ describe('e2e tests for init', () => {
     assert.deepEqual(config.src_folders, ['tests']);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.test_runner.type, 'cucumber');
-    assert.strictEqual(config.test_settings.default.test_runner.options.feature_path, answers.featurePath);
+    // assert.strictEqual(config.test_settings.default.test_runner.options.feature_path, path.join('tests', 'features'));
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
     assert.strictEqual(config.test_settings.remote.selenium.host, 'localhost');
     assert.strictEqual(config.test_settings.remote.selenium.port, 4444);
@@ -261,12 +261,14 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Installing @cucumber/cucumber'), true);
     assert.strictEqual(output.includes('Success! Configuration file generated at:'), true);
     assert.strictEqual(output.includes('Generating example for CucumberJS...'), true);
-    assert.strictEqual(output.includes('Success! Generated an example for CucumberJS at'), true);
+    assert.strictEqual(output.includes(`Success! Generated an example for CucumberJS at "${path.join('tests', 'features', 'nightwatch-examples')}"`), true);
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
     assert.strictEqual(output.includes('To run your tests with CucumberJS, simply run:'), true);
+    assert.strictEqual(output.includes('npx nightwatch --env remote'), true);
     assert.strictEqual(output.includes('To run an example test with CucumberJS, run:'), true);
+    assert.strictEqual(output.includes(`npx nightwatch ${path.join('tests', 'features', 'nightwatch-examples')} --env remote`), true);
     assert.strictEqual(output.includes('For more details on using CucumberJS with Nightwatch, visit:'), true);
 
     rmDirSync(rootDir);
@@ -509,14 +511,14 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Installing nightwatch'), true);
     assert.strictEqual(output.includes('Installing typescript'), true);
     assert.strictEqual(output.includes('Installing @types/nightwatch'), true);
-    assert.strictEqual(output.includes('Success! Configuration file generated at:'), true);
+    assert.strictEqual(output.includes(`Success! Configuration file generated at: "${path.join(rootDir, 'nightwatch.conf.js')}"`), true);
     assert.strictEqual(output.includes('Generating example files...'), true);
     assert.strictEqual(output.includes(`Success! Generated some example files at '${path.join('tests', 'nightwatch-examples')}'.`), true);
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
-    assert.strictEqual(output.includes('npm run test'), true);
-    assert.strictEqual(output.includes(`npm run test -- .${path.sep}${path.join('dist', 'tests', 'nightwatch-examples', 'github.js')}`), true);
+    assert.strictEqual(output.includes('npm run test -- --env remote'), true);
+    assert.strictEqual(output.includes(`npm run test -- .${path.sep}${path.join('dist', 'tests', 'nightwatch-examples', 'github.js')} --env remote`), true);
 
     rmDirSync(rootDir);
 
