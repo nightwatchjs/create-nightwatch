@@ -414,4 +414,9 @@ function loadServices() {
   try {
     Services.geckodriver = require('geckodriver');
   } catch (err) {}
+  <% if (answers.browsers && answers.browsers.includes('ie')) { %>
+  try {
+    Services.iedriver = require('iedriver');
+  } catch (err) {}
+  <% } %>
 }
