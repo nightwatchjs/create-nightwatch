@@ -88,6 +88,11 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
 
       if (['local', 'both'].includes(answers.backend)) {
         browsers = browsers.concat({name: 'Local selenium-server', value: 'selenium-server'});
+      } else {
+        // if answers.backend === 'remote', remove selenium-server note from IE.
+        browsers.forEach((browser) => {
+          if (browser.value === 'ie') {browser.name = 'IE'}
+        });
       }
 
       return browsers;
@@ -100,11 +105,11 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
       return !!value.length || 'Please select at least 1 browser.';
     },
     // when: (answers) => ['local', 'both'].includes(answers.backend),
-    filter: (value, answers) => {
-      if (value.includes('ie') || value.includes('selenium-server')) {answers.seleniumServer = true}
+    // filter: (value, answers) => {
+    //   if (value.includes('ie') || value.includes('selenium-server')) {answers.seleniumServer = true}
 
-      return value;
-    }
+    //   return value;
+    // }
   },
 
   // FOR REMOTE
@@ -176,7 +181,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
       {name: 'No, thanks!', value: 'no'}
     ],
     default: 'no',
-    when: (answers) => ['remote', 'both'].includes(answers.backend)
+    when: (answers) => answers.backend === 'both'
   },
 
   // BROWSERS (Remote)
@@ -197,7 +202,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     validate: (value) => {
       return !!value.length || 'Please select at least 1 browser.';
     },
-    when: (answers) => answers.additionalHelp === 'yes' && ['remote', 'both'].includes(answers.backend)
+    when: (answers) => answers.additionalHelp === 'yes' && answers.backend === 'both'
   }
 ];
 

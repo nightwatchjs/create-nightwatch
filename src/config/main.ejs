@@ -46,12 +46,12 @@ module.exports = {
       desiredCapabilities: {
         browserName: '<%- answers.defaultBrowser %>'
       },
-
+      <% if (answers.backend !== 'remote') { %>
       webdriver: {
         start_process: true,
         server_path: ''
       },
-      <% if (answers.runner === 'cucumber') { %>
+      <% } %><% if (answers.runner === 'cucumber') { %>
       test_runner: {
         // set cucumber as the runner
         // For more info on using CucumberJS with Nightwatch, visit:
@@ -83,7 +83,7 @@ module.exports = {
         }
       }<% } %>
     },
-    <% if (answers.browsers.includes('safari')) { %>
+    <% if (answers.backend !== 'remote') { %><% if (answers.browsers.includes('safari')) { %>
     safari: {
       desiredCapabilities: {
         browserName: 'safari',
@@ -168,7 +168,7 @@ module.exports = {
         ]
       }
     },
-    <% } %><% if (answers.browserstack) { %>
+    <% }} %><% if (answers.browserstack) { %>
     //////////////////////////////////////////////////////////////////////////////////
     // Configuration for using the browserstack.com cloud service                    |
     //                                                                               |

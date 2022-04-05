@@ -95,44 +95,64 @@ export class NightwatchInit {
   }
 
   refineAnswers(answers: ConfigGeneratorAnswers) {
+    const backendHasLocal = answers.backend && ['local', 'both'].includes(answers.backend);
     const backendHasRemote = answers.backend && ['remote', 'both'].includes(answers.backend);
 
-    if (backendHasRemote && answers.hostname?.includes('browserstack')) {
-      answers.browserstack = true;
+    if (backendHasRemote) {
+      if (answers.hostname?.includes('browserstack')) {
+        answers.browserstack = true;
+      }
+
+      if (answers.browserstack) {
+        answers.remoteName = 'browserstack';
+      } else {
+        answers.remoteName = 'remote';
+      }
+
+      if (!answers.remoteBrowsers) {
+        if (answers.browsers) {
+          // Copy all browsers, except selenium-server (if present)
+          answers.remoteBrowsers = [...answers.browsers].filter((browser) => browser !== 'selenium-server');
+        } else {
+          answers.remoteBrowsers = BROWSER_CHOICES.map((browser) => browser.value);
+        }
+      }
+
+      // If backend is only remote (no local), delete answers.browsers (if present)
+      // and set the defaultBrowser.
+      if (!backendHasLocal) {
+        if (answers.browsers) delete answers.browsers;
+        answers.defaultBrowser = answers.remoteBrowsers[0];
+      }
     }
 
-    if (answers.browserstack) {
-      answers.remoteName = 'browserstack';
-    } else if (backendHasRemote) {
-      answers.remoteName = 'remote';
-    }
+    if (backendHasLocal) {
+      if (!answers.browsers) {
+        answers.browsers = BROWSER_CHOICES.map((browser) => browser.value);
+      }
 
-    if (!answers.browsers) {
-      answers.browsers = BROWSER_CHOICES.map((browser) => browser.value);
-    } else if (answers.browsers.includes('selenium-server')) {
-      if (!answers.seleniumServer) answers.seleniumServer = true;
-      // Remove selenium-server from browsers
-      const pos = answers.browsers.indexOf('selenium-server');
-      answers.browsers.splice(pos, 1);
-    }
+      if (answers.browsers.includes('selenium-server')) {
+        if (!answers.seleniumServer) answers.seleniumServer = true;
+        // Remove selenium-server from browsers
+        const pos = answers.browsers.indexOf('selenium-server');
+        answers.browsers.splice(pos, 1);
+      }
 
-    // Enable seleniumServer if ie present in local browsers.
-    if (answers.browsers.includes('ie') && !answers.seleniumServer) {
-      answers.seleniumServer = true;
-    }
+      // Enable seleniumServer if ie present in local browsers.
+      if (answers.browsers.includes('ie') && !answers.seleniumServer) {
+        answers.seleniumServer = true;
+      }
 
-    if (!answers.remoteBrowsers && backendHasRemote) {
-      answers.remoteBrowsers = [...answers.browsers];
-    }
+      // Remove safari from answers.browsers from non-mac users
+      if (process.platform !== 'darwin' && answers.browsers.includes('safari')) {
+        const pos = answers.browsers.indexOf('safari');
+        answers.browsers.splice(pos, 1);
+      }
 
-    if (process.platform !== 'darwin' && answers.browsers.includes('safari')) {
-      // Remove safari from browsers from non-mac users
-      const pos = answers.browsers.indexOf('safari');
-      answers.browsers.splice(pos, 1);
-    }
-
-    if (!answers.defaultBrowser) {
-      answers.defaultBrowser = answers.browsers ? answers.browsers[0] : undefined;
+      // Set defaultBrowser
+      if (!answers.defaultBrowser) {
+        answers.defaultBrowser = answers.browsers[0];
+      }
     }
 
     // Always generate examples (for now)

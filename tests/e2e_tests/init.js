@@ -63,7 +63,7 @@ describe('e2e tests for init', () => {
       language: 'js',
       runner: 'nightwatch',
       backend: 'local',
-      browsers: ['chrome', 'edge', 'safari'],
+      browsers: ['chrome', 'edge', 'safari', 'selenium-server'],
       baseUrl: 'https://nightwatchjs.org',
       testsLocation: 'tests'
     };
@@ -90,7 +90,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(answers.remoteBrowsers, undefined);
     assert.strictEqual(answers.remoteName, undefined);
     assert.strictEqual(answers.browserstack, undefined);
-    assert.strictEqual(answers.seleniumServer, undefined);
+    assert.strictEqual(answers.seleniumServer, true);
     assert.strictEqual(answers.defaultBrowser, 'chrome');
     assert.strictEqual(answers.addExamples, true);
     assert.strictEqual(answers.examplesLocation, path.join('tests', 'nightwatch-examples'));
@@ -109,20 +109,22 @@ describe('e2e tests for init', () => {
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
     if (process.platform === 'darwin') {
-      assert.deepEqual(Object.keys(config.test_settings), ['default', 'safari', 'chrome', 'edge']);
+      assert.deepEqual(Object.keys(config.test_settings), ['default', 'safari', 'chrome', 'edge', 'selenium_server', 'selenium.chrome', 'selenium.edge']);
     } else {
-      assert.deepEqual(Object.keys(config.test_settings), ['default', 'chrome', 'edge']);
+      assert.deepEqual(Object.keys(config.test_settings), ['default', 'chrome', 'edge', 'selenium_server', 'selenium.chrome', 'selenium.edge']);
     }
 
     // Test Packages and webdrivers installed
     if (process.platform === 'darwin') {
-      assert.strictEqual(commandsExecuted.length, 3);
-      assert.strictEqual(commandsExecuted[2], 'sudo safaridriver --enable');
+      assert.strictEqual(commandsExecuted.length, 5);
+      assert.strictEqual(commandsExecuted[4], 'sudo safaridriver --enable');
     } else {
-      assert.strictEqual(commandsExecuted.length, 2);
+      assert.strictEqual(commandsExecuted.length, 4);
     }
     assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
-    assert.strictEqual(commandsExecuted[1], 'npm install chromedriver --save-dev');
+    assert.strictEqual(commandsExecuted[1], 'npm install @nightwatch/selenium-server --save-dev');
+    assert.strictEqual(commandsExecuted[2], 'java -version');
+    assert.strictEqual(commandsExecuted[3], 'npm install chromedriver --save-dev');
 
     // Test examples copied
     const examplesPath = path.join(rootDir, answers.examplesLocation);
@@ -134,6 +136,7 @@ describe('e2e tests for init', () => {
     // Test console output
     const output = consoleOutput.toString();
     assert.strictEqual(output.includes('Installing nightwatch'), true);
+    assert.strictEqual(output.includes('Installing @nightwatch/selenium-server'), true);
     assert.strictEqual(output.includes('Success! Configuration file generated at:'), true);
     assert.strictEqual(output.includes('Installing webdriver for Chrome (chromedriver)...'), true);
     if (process.platform === 'darwin')
@@ -145,7 +148,8 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('cd test_output'), true);
     assert.strictEqual(output.includes(`npx nightwatch .${path.sep}${path.join('tests', 'nightwatch-examples')}`), true);
     assert.strictEqual(output.includes(`npx nightwatch .${path.sep}${path.join('tests', 'nightwatch-examples', 'ecosia.js')}`), true);
-
+    assert.strictEqual(output.includes('[Selenium Server]'), true);
+    assert.strictEqual(output.includes('To run tests on your local selenium-server, use command:'), true);
 
     rmDirSync(rootDir);
 
@@ -211,11 +215,11 @@ describe('e2e tests for init', () => {
     await nightwatchInit.run();
 
     // Test answers
-    assert.deepEqual(answers.browsers, ['chrome', 'edge']);
+    assert.deepEqual(answers.browsers, undefined);
     assert.deepEqual(answers.remoteBrowsers, ['chrome', 'edge']);
     assert.strictEqual(answers.browserstack, undefined);
     assert.strictEqual(answers.remoteName, 'remote');
-    assert.strictEqual(answers.seleniumServer, true);
+    assert.strictEqual(answers.seleniumServer, undefined);
     assert.strictEqual(answers.defaultBrowser, 'chrome');
     assert.strictEqual(answers.addExamples, true);
     assert.strictEqual(answers.examplesLocation, path.join('tests', 'features', 'nightwatch-examples'));
@@ -237,15 +241,12 @@ describe('e2e tests for init', () => {
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
     assert.strictEqual(config.test_settings.remote.selenium.host, 'localhost');
     assert.strictEqual(config.test_settings.remote.selenium.port, 4444);
-    assert.deepEqual(Object.keys(config.test_settings), ['default', 'chrome', 'edge', 'remote', 'remote.chrome', 'remote.edge', 'selenium_server', 'selenium.chrome', 'selenium.edge']);
+    assert.deepEqual(Object.keys(config.test_settings), ['default', 'remote', 'remote.chrome', 'remote.edge']);
 
     // Test Packages and webdrivers installed
-    assert.strictEqual(commandsExecuted.length, 5);
+    assert.strictEqual(commandsExecuted.length, 2);
     assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[1], 'npm install @cucumber/cucumber --save-dev');
-    assert.strictEqual(commandsExecuted[2], 'npm install @nightwatch/selenium-server --save-dev');
-    assert.strictEqual(commandsExecuted[3], 'java -version');
-    assert.strictEqual(commandsExecuted[4], 'npm install chromedriver --save-dev');
 
     // Test examples copied
     const examplesPath = path.join(rootDir, answers.examplesLocation);
@@ -258,9 +259,7 @@ describe('e2e tests for init', () => {
     const output = consoleOutput.toString();
     assert.strictEqual(output.includes('Installing nightwatch'), true);
     assert.strictEqual(output.includes('Installing @cucumber/cucumber'), true);
-    assert.strictEqual(output.includes('Installing @nightwatch/selenium-server'), true);
     assert.strictEqual(output.includes('Success! Configuration file generated at:'), true);
-    assert.strictEqual(output.includes('Installing webdriver for Chrome (chromedriver)...'), true);
     assert.strictEqual(output.includes('Generating example for CucumberJS...'), true);
     assert.strictEqual(output.includes('Success! Generated an example for CucumberJS at'), true);
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
@@ -269,8 +268,6 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('To run your tests with CucumberJS, simply run:'), true);
     assert.strictEqual(output.includes('To run an example test with CucumberJS, run:'), true);
     assert.strictEqual(output.includes('For more details on using CucumberJS with Nightwatch, visit:'), true);
-    assert.strictEqual(output.includes('[Selenium Server]'), true);
-    assert.strictEqual(output.includes('To run tests on your local selenium-server, use command:'), true);
 
     rmDirSync(rootDir);
 
@@ -447,7 +444,7 @@ describe('e2e tests for init', () => {
       runner: 'nightwatch',
       backend: 'remote',
       browsers: ['firefox'],
-      remoteBrowsers: ['firefox', 'edge', 'safari'],
+      remoteBrowsers: ['chrome', 'edge', 'safari'],
       hostname: 'localhost',
       port: 4444,
       baseUrl: 'https://nightwatchjs.org',
@@ -468,12 +465,12 @@ describe('e2e tests for init', () => {
     await nightwatchInit.run();
 
     // Test answers
-    assert.deepEqual(answers.browsers, ['firefox']);
-    assert.deepEqual(answers.remoteBrowsers, ['firefox', 'edge', 'safari']);
+    assert.deepEqual(answers.browsers, undefined);
+    assert.deepEqual(answers.remoteBrowsers, ['chrome', 'edge', 'safari']);
     assert.strictEqual(answers.remoteName, 'remote');
     assert.strictEqual(answers.browserstack, undefined);
     assert.strictEqual(answers.seleniumServer, undefined);
-    assert.strictEqual(answers.defaultBrowser, 'firefox');
+    assert.strictEqual(answers.defaultBrowser, 'chrome');
     assert.strictEqual(answers.addExamples, true);
     assert.strictEqual(answers.examplesLocation, path.join('tests', 'nightwatch-examples'));
 
@@ -489,17 +486,16 @@ describe('e2e tests for init', () => {
     const config = require(configPath);
     assert.deepEqual(config.src_folders, [path.join('dist', 'tests')]);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
-    assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox');
+    assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
     assert.strictEqual(config.test_settings.remote.selenium.host, 'localhost');
     assert.strictEqual(config.test_settings.remote.selenium.port, 4444);
-    assert.deepEqual(Object.keys(config.test_settings), ['default', 'firefox', 'remote', 'remote.firefox', 'remote.safari', 'remote.edge']);
+    assert.deepEqual(Object.keys(config.test_settings), ['default', 'remote', 'remote.chrome', 'remote.safari', 'remote.edge']);
 
     // Test Packages and webdrivers installed
-    assert.strictEqual(commandsExecuted.length, 4);
+    assert.strictEqual(commandsExecuted.length, 3);
     assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[1], 'npm install typescript --save-dev');
     assert.strictEqual(commandsExecuted[2], 'npm install @types/nightwatch --save-dev');
-    assert.strictEqual(commandsExecuted[3], 'npm install geckodriver --save-dev');
 
     // Test examples copied
     const examplesPath = path.join(rootDir, answers.examplesLocation);
@@ -514,7 +510,6 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Installing typescript'), true);
     assert.strictEqual(output.includes('Installing @types/nightwatch'), true);
     assert.strictEqual(output.includes('Success! Configuration file generated at:'), true);
-    assert.strictEqual(output.includes('Installing webdriver for Firefox (geckodriver)...'), true);
     assert.strictEqual(output.includes('Generating example files...'), true);
     assert.strictEqual(output.includes(`Success! Generated some example files at '${path.join('tests', 'nightwatch-examples')}'.`), true);
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);

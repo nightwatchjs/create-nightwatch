@@ -42,22 +42,26 @@ describe('init tests', () => {
   describe('test refineAnswers', () => {
     const {NightwatchInit} = require('../../lib/init');
   
-    test('with nothing in answers', () => {
+    test('with just both in answers', () => {
       const nightwatchInit = new NightwatchInit(rootDir, []);
   
-      let answers = {};
+      let answers = {backend: 'both'};
       nightwatchInit.refineAnswers(answers);
-      assert.strictEqual("remoteName" in answers, false);
+      assert.strictEqual("remoteName" in answers, true);
       assert.strictEqual("browsers" in answers, true);
-      assert.strictEqual("remoteBrowsers" in answers, false);
+      assert.strictEqual("remoteBrowsers" in answers, true);
       assert.strictEqual("defaultBrowser" in answers, true);
+      assert.strictEqual("seleniumServer" in answers, true);
       assert.strictEqual("addExamples" in answers, true);
       assert.strictEqual("examplesLocation" in answers, true);
-  
+
   
       const browsers = ['firefox', 'chrome', 'edge', 'safari', 'ie'];
+      assert.deepEqual(answers["remoteBrowsers"], browsers);
       if (process.platform !== 'darwin') browsers.splice(3, 1);
       assert.deepEqual(answers["browsers"], browsers);
+
+      assert.strictEqual(answers["remoteName"], 'remote');
       assert.strictEqual(answers["defaultBrowser"], 'firefox');
       assert.strictEqual(answers["addExamples"], true);
       assert.strictEqual(answers["examplesLocation"], 'nightwatch-examples');
@@ -70,7 +74,7 @@ describe('init tests', () => {
   
       answers = {
         'backend': 'local',
-        'browsers': ['firefox', 'chrome', 'edge', 'selenium-server'],
+        'browsers': ['firefox', 'chrome', 'edge'],
         'testsLocation': 'tests',
       }
       nightwatchInit.refineAnswers(answers);
@@ -80,21 +84,20 @@ describe('init tests', () => {
       assert.strictEqual("defaultBrowser" in answers, true);
       assert.strictEqual("addExamples" in answers, true);
       assert.strictEqual("examplesLocation" in answers, true);
-      assert.strictEqual("seleniumServer" in answers, true);
+      assert.strictEqual("seleniumServer" in answers, false);
   
       assert.deepEqual(answers["browsers"], ['firefox', 'chrome', 'edge']);
       assert.strictEqual(answers["defaultBrowser"], 'firefox');
       assert.strictEqual(answers["addExamples"], true);
       assert.strictEqual(answers["examplesLocation"], path.join('tests', 'nightwatch-examples'));
-      assert.strictEqual(answers["seleniumServer"], true);
     });
   
-    test('with remote without browserstack in answers', () => {
+    test('with both without browserstack in answers', () => {
       const nightwatchInit = new NightwatchInit(rootDir, []);
   
       answers = {
-        'backend': 'remote',
-        'browsers': ['firefox', 'chrome', 'edge'],
+        'backend': 'both',
+        'browsers': ['firefox', 'chrome', 'edge', 'selenium-server'],
         'testsLocation': 'tests',
       }
       nightwatchInit.refineAnswers(answers);
@@ -102,13 +105,15 @@ describe('init tests', () => {
       assert.strictEqual("browsers" in answers, true);
       assert.strictEqual("remoteBrowsers" in answers, true);
       assert.strictEqual("defaultBrowser" in answers, true);
+      assert.strictEqual("seleniumServer" in answers, true);
       assert.strictEqual("addExamples" in answers, true);
       assert.strictEqual("examplesLocation" in answers, true);
-  
+
       assert.strictEqual(answers["remoteName"], 'remote');
       assert.deepEqual(answers["browsers"], ['firefox', 'chrome', 'edge']);
       assert.deepEqual(answers["remoteBrowsers"], ['firefox', 'chrome', 'edge']);
       assert.strictEqual(answers["defaultBrowser"], 'firefox');
+      assert.strictEqual(answers["seleniumServer"], true);
       assert.strictEqual(answers["addExamples"], true);
       assert.strictEqual(answers["examplesLocation"], path.join('tests', 'nightwatch-examples'));
     });
@@ -118,23 +123,23 @@ describe('init tests', () => {
   
       answers = {
         'backend': 'remote',
-        'browserstack': true,
-        'browsers': ['firefox', 'chrome', 'edge'],
+        'hostname': 'hub.browserstack.com',
+        'browsers': ['firefox', 'chrome', 'edge', 'ie'],
         'testsLocation': 'tests'
       }
       nightwatchInit.onlyConfig = true;
   
       nightwatchInit.refineAnswers(answers);
       assert.strictEqual("remoteName" in answers, true);
-      assert.strictEqual("browsers" in answers, true);
+      assert.strictEqual("browsers" in answers, false);
       assert.strictEqual("remoteBrowsers" in answers, true);
       assert.strictEqual("defaultBrowser" in answers, true);
+      assert.strictEqual("seleniumServer" in answers, false);
       assert.strictEqual("addExamples" in answers, false);
       assert.strictEqual("examplesLocation" in answers, false);
   
       assert.strictEqual(answers["remoteName"], 'browserstack');
-      assert.deepEqual(answers["browsers"], ['firefox', 'chrome', 'edge']);
-      assert.deepEqual(answers["remoteBrowsers"], ['firefox', 'chrome', 'edge']);
+      assert.deepEqual(answers["remoteBrowsers"], ['firefox', 'chrome', 'edge', 'ie']);
       assert.strictEqual(answers["defaultBrowser"], 'firefox');
     });
   });
@@ -659,7 +664,7 @@ describe('init tests', () => {
       assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, path.join('dist', 'tests'));
       assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, path.join('dist', 'nightwatch-examples'));
       assert.deepEqual(config.src_folders, [path.join('dist', 'tests'), path.join('dist', 'nightwatch-examples')]);
-      assert.deepEqual(Object.keys(config.test_settings), ['default', 'chrome', 'browserstack', 'browserstack.local', 'browserstack.chrome', 'browserstack.firefox', 'browserstack.local_chrome', 'browserstack.local_firefox']);
+      assert.deepEqual(Object.keys(config.test_settings), ['default', 'browserstack', 'browserstack.local', 'browserstack.chrome', 'browserstack.firefox', 'browserstack.local_chrome', 'browserstack.local_firefox']);
       assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome')
 
       fs.unlinkSync('test_config.conf.js');
