@@ -1,12 +1,9 @@
 {
   "language": "js",
+  "runner": "nightwatch",
   "backend": "both",
-  "browsers": ["firefox", "chrome", "edge", "ie", "safari"],
+  "browsers": ["firefox", "chrome", "selenium-server"],
   "hostname": "<remote-host>",
   "port": 4444,
-  "browserstack": false,
-  "seleniumServer": false,
-  "baseUrl": "http://localhost",
-  "runner": "nightwatch",
-  "remoteBrowsers": ["firefox", "chrome", "edge", "ie", "safari"]
+  "baseUrl": "http://localhost"
 }
