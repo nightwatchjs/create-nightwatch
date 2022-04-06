@@ -31,12 +31,6 @@ export const BROWSER_CHOICES = [
   {name: 'IE (requires selenium-server)', value: 'ie'}
 ];
 
-// const WEBDRIVERS = {
-//     'firefox': 'geckodriver',
-//     'chrome': 'chromium',
-
-// }
-
 export const QUESTIONAIRRE: inquirer.QuestionCollection = [
   // answers.rootDir is available to all the questions (passed in Inquirer.prompt()).
 
@@ -105,12 +99,6 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
 
       return !!value.length || 'Please select at least 1 browser.';
     }
-    // when: (answers) => ['local', 'both'].includes(answers.backend),
-    // filter: (value, answers) => {
-    //   if (value.includes('ie') || value.includes('selenium-server')) {answers.seleniumServer = true}
-
-    //   return value;
-    // }
   },
 
   // FOR REMOTE
@@ -158,19 +146,6 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     default: 'http://localhost'
   },
 
-  // NIGHTWATCH EXAMPLES
-  // {
-  //   type: 'list',
-  //   name: 'addExamples',
-  //   message: 'Should we generate some examples for you to explore?',
-  //   choices: [
-  //     {name: 'Yes, please!', value: true},
-  //     {name: 'No, thanks!', value: false}
-  //   ],
-  //   default: false,
-  //   when: (answers) => !answers.onlyConfig && answers.runner !== 'cucumber'
-  // },
-
   // ADDITIONAL HELP
   {
     type: 'list',
@@ -178,7 +153,6 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     message: 'Do you need additional help in setting up your configuration file?',
     choices: [
       {name: 'Yes, please!', value: 'yes'},
-      // {name: 'Yes, but minimal help.', value: 'minimal'},
       {name: 'No, thanks!', value: 'no'}
     ],
     default: 'no',
@@ -225,9 +199,6 @@ export const CONFIG_DEST_QUES: inquirer.QuestionCollection = [
     validate: (value, answers) => {
       if (!value.length) {
         return 'File name cannot be empty.';
-        // } else if (value.split('.').length > 1) {
-        //   return `Please input the file name without any file-extensions.
-        //   An extension of '.conf.js' will automatically be added to your file name.`;
       } else if (answers && fs.existsSync(path.join(answers.rootDir, `${value}.conf.js`))) {
         return `File with name "${value}.conf.js" already exists.`;
       }
@@ -235,8 +206,6 @@ export const CONFIG_DEST_QUES: inquirer.QuestionCollection = [
       return true;
     },
     transformer: (value) => value + '.conf.js',
-    // transformer: (value, answers, { isFinal }) => isFinal ? value : value + '.conf.js',
-    // filter: (value) => value + '.conf.js',
     when: (answers) => !answers.overwrite
   }
 ];

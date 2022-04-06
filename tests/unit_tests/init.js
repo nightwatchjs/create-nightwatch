@@ -465,7 +465,7 @@ describe('init tests', () => {
     });
   });
 
-  describe('test getConfigDestLocation', () => {
+  describe('test getConfigDestPath', () => {
     beforeEach(() => {
       mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
     });
@@ -492,11 +492,11 @@ describe('init tests', () => {
 
       const {NightwatchInit} = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
-      const configDestLocation = await nightwatchInit.getConfigDestLocation();
+      const configDestPath = await nightwatchInit.getConfigDestPath();
 
-      const configExpLocation = path.join(rootDir, 'nightwatch.conf.js');
+      const configExpPath = path.join(rootDir, 'nightwatch.conf.js');
 
-      assert.strictEqual(configDestLocation, configExpLocation);
+      assert.strictEqual(configDestPath, configExpPath);
 
       done();
     });
@@ -523,11 +523,11 @@ describe('init tests', () => {
 
       const {NightwatchInit} = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
-      const configDestLocation = await nightwatchInit.getConfigDestLocation();
+      const configDestPath = await nightwatchInit.getConfigDestPath();
 
-      const configExpLocation = path.join(rootDir, 'nightwatch.conf.js');
+      const configExpPath = path.join(rootDir, 'nightwatch.conf.js');
 
-      assert.strictEqual(configDestLocation, configExpLocation);
+      assert.strictEqual(configDestPath, configExpPath);
 
       done();
     });
@@ -554,11 +554,11 @@ describe('init tests', () => {
 
       const {NightwatchInit} = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
-      const configDestLocation = await nightwatchInit.getConfigDestLocation();
+      const configDestPath = await nightwatchInit.getConfigDestPath();
 
-      const configExpLocation = path.join(rootDir, 'new-config.conf.js');
+      const configExpPath = path.join(rootDir, 'new-config.conf.js');
 
-      assert.strictEqual(configDestLocation, configExpLocation);
+      assert.strictEqual(configDestPath, configExpPath);
 
       done();
     });

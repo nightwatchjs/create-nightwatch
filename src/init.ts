@@ -39,8 +39,6 @@ export class NightwatchInit {
       answers = await this.askQuestions();
       // Add a newline after questions.
       Logger.error();
-
-      // this.mergeWithDefaults(answers);
     }
 
     this.refineAnswers(answers);
@@ -56,10 +54,10 @@ export class NightwatchInit {
     if (answers.seleniumServer) {this.checkJavaInstallation()}
 
     // Generate configuration file
-    const configDestLocation = await this.getConfigDestLocation();
-    this.generateConfig(answers, configDestLocation);
+    const configDestPath = await this.getConfigDestPath();
+    this.generateConfig(answers, configDestPath);
 
-    // Install/enable webdrivers
+    // Install/Update webdrivers
     const webdriversToInstall = this.identifyWebdriversToInstall(answers);
     await this.installWebdrivers(webdriversToInstall);
 
@@ -73,7 +71,7 @@ export class NightwatchInit {
       if (answers.runner === 'cucumber') {
         this.copyCucumberExamples(answers.examplesLocation || '');
       } else if (answers.addExamples) {
-        this.copyExamples(answers.examplesLocation || '', answers.language === 'ts', answers.runner || '');
+        this.copyExamples(answers.examplesLocation || '', answers.language === 'ts');
       }
 
       // Post instructions to run their first test
@@ -82,7 +80,6 @@ export class NightwatchInit {
       // Post config instructions
       this.postConfigInstructions(answers);
     }
-    
   }
 
   async askQuestions() {
@@ -167,11 +164,6 @@ export class NightwatchInit {
     }
   }
 
-  // mergeWithDefaults(answers: ConfigGeneratorAnswers) {
-  //   // iterate over all the defaults and if it is not present in
-  //   // answers, implement it.
-  // }
-
   identifyPackagesToInstall(answers: ConfigGeneratorAnswers): string[] {
     const packages: string[] = ['nightwatch'];
 
@@ -226,12 +218,14 @@ export class NightwatchInit {
     const tsConfigPath = path.join(this.rootDir, 'tsconfig.json');
     const packageJsonPath = path.join(this.rootDir, 'package.json');
 
+    // Generate a new tsconfig.json file if not already present.
     if (!fs.existsSync(tsConfigPath)) {
       const sampleTsConfigPath = path.join(__dirname, '..', 'assets', 'tsconfig.json');
       const destPath = path.join(this.rootDir, 'tsconfig.json');
       fs.copyFileSync(sampleTsConfigPath, destPath);
     }
 
+    // Read outDir property from tsconfig.json file.
     const tsConfig = JSON.parse(fs.readFileSync(tsConfigPath, 'utf-8'));
     this.otherInfo.tsOutDir = tsConfig.compilerOptions?.outDir || '';
 
@@ -265,17 +259,17 @@ export class NightwatchInit {
     }
   }
 
-  async getConfigDestLocation() {
+  async getConfigDestPath() {
     if (this.options.includes('yes')) {
       Logger.error('Auto-generating a configuration file...\n');
     } else {
       Logger.error('Generting a configuration file based on your responses...\n');
     }
 
-    const destFileName = path.join(this.rootDir, 'nightwatch.conf.js');
+    const configDestPath = path.join(this.rootDir, 'nightwatch.conf.js');
 
-    if (fs.existsSync(destFileName)) {
-      Logger.error(colors.yellow(`There seems to be another config file located at "${destFileName}".\n`));
+    if (fs.existsSync(configDestPath)) {
+      Logger.error(colors.yellow(`There seems to be another config file located at "${configDestPath}".\n`));
 
       const answers: ConfigDestination = await prompt(CONFIG_DEST_QUES, {rootDir: this.rootDir});
       // Adding a newline after questions.
@@ -284,14 +278,13 @@ export class NightwatchInit {
       if (!answers.overwrite) {return path.join(this.rootDir, `${answers.newFileName}.conf.js`)}
     }
 
-    return destFileName;
+    return configDestPath;
   }
 
-  generateConfig(answers: ConfigGeneratorAnswers, configDestLocation: string) {
+  generateConfig(answers: ConfigGeneratorAnswers, configDestPath: string) {
     const templateFile = path.join(__dirname, '..', 'src', 'config', 'main.ejs');
-    // const templateFile = path.join(__dirname, '../runner/cli/nightwatch.conf.ejs');
 
-    const src_folders: string[] = [];
+    const src_folders: string[] = [];  // to go into the config file as the value of src_folders property.
 
     const testsJsSrc: string = path.join(this.otherInfo.tsOutDir || '', answers.testsLocation || '');
     if (testsJsSrc !== '.') {
@@ -320,16 +313,15 @@ export class NightwatchInit {
     rendered = stripControlChars(rendered);
 
     try {
-      fs.writeFileSync(configDestLocation, rendered, {encoding: 'utf-8'});
+      fs.writeFileSync(configDestPath, rendered, {encoding: 'utf-8'});
 
-      const configFileNameSplit = configDestLocation.split(path.sep);
+      const configFileNameSplit = configDestPath.split(path.sep);
       const configFileName = configFileNameSplit[configFileNameSplit.length-1];
-      Logger.error(`${colors.green(symbols().ok + ' Success!')} Configuration file generated at: "${configDestLocation}".`);
+      Logger.error(`${colors.green(symbols().ok + ' Success!')} Configuration file generated at: "${configDestPath}".`);
 
       if (configFileName !== 'nightwatch.conf.js') {
         Logger.error(`To use this configuration file, run the tests using ${colors.magenta('--config')} flag.`);
       }
-
       // Add a newline
       Logger.error();
 
@@ -341,11 +333,6 @@ export class NightwatchInit {
       return false;
     }
   }
-
-  // installPackages() {
-  //   const requiredPackages = this.requiredPackages();
-  //   const packagesToInstall = this.packagesToInstall(requiredPackages);
-  // }
 
   identifyWebdriversToInstall(answers: ConfigGeneratorAnswers): string[] {
     const webdrivers: string[] = [];
@@ -359,56 +346,35 @@ export class NightwatchInit {
   }
 
   async installWebdrivers(webdriversToInstall: string[]) {
-    Logger.error('Installing/enabling the following webdrivers:');
+    Logger.error('Installing/Updating the following webdrivers:');
     for (const webdriver of webdriversToInstall) {
       Logger.error(`- ${webdriver}`);
     }
     Logger.error();
 
-    if (webdriversToInstall.includes('geckodriver')) {
-      Logger.error('Installing webdriver for Firefox (geckodriver)...');
-      try {
-        execSync('npm install geckodriver --save-dev', {
-          stdio: ['inherit', 'pipe', 'inherit'],
-          cwd: this.rootDir
-        });
-        Logger.error(colors.green('Done!'), '\n');
-      } catch (err) {
-        Logger.error('Failed to install geckodriver. Please run \'npm install geckodriver --save-dev\' later.\n');
-      }
-    }
+    const driversDownloadedFromNPM: {[key: string]: string} = {
+      'geckodriver': 'Firefox',
+      'chromedriver': 'Chrome',
+      'iedriver': 'IE'
+    };
 
-    if (webdriversToInstall.includes('chromedriver')) {
-      Logger.error('Installing webdriver for Chrome (chromedriver)...');
-      try {
-        execSync('npm install chromedriver --save-dev', {
-          stdio: ['inherit', 'pipe', 'inherit'],
-          cwd: this.rootDir
-        });
-        Logger.error(colors.green('Done!'), '\n');
-      } catch (err) {
-        Logger.error('Failed to install chromedriver. Please run \'npm install chromedriver --save-dev\' later.\n');
-      }
-    }
-
-    if (webdriversToInstall.includes('iedriver')) {
-      Logger.error('Installing webdriver for IE (iedriver)...');
-      try {
-        execSync('npm install iedriver --save-dev', {
-          stdio: ['inherit', 'pipe', 'inherit'],
-          cwd: this.rootDir
-        });
-        Logger.error(colors.green('Done!'), '\n');
-      } catch (err) {
-        Logger.error('Failed to install iedriver. Please run \'npm install iedriver --save-dev\' later.\n');
+    for (const webdriver of webdriversToInstall) {
+      if (webdriver in driversDownloadedFromNPM) {
+        Logger.error(`Installing webdriver for ${driversDownloadedFromNPM[webdriver]} (${webdriver})...`);
+        try {
+          execSync(`npm install ${webdriver} --save-dev`, {
+            stdio: ['inherit', 'pipe', 'inherit'],
+            cwd: this.rootDir
+          });
+          Logger.error(colors.green('Done!'), '\n');
+        } catch (err) {
+          Logger.error(`Failed to install ${webdriver}. Please run 'npm install ${webdriver} --save-dev' later.\n`);
+        }
       }
     }
 
     if (webdriversToInstall.includes('safaridriver')) {
-      // Logger.error("Enabling Safari Webdriver...");
       try {
-        // Logger.error('Enabling safaridriver requires you to enter your sudo password.');
-        // Logger.error('If you don\'t have that now, you can enable safaridriver later.\n');
         const answers = await prompt([
           {
             type: 'list',
@@ -421,7 +387,6 @@ export class NightwatchInit {
             default: 1
           }
         ]);
-        // Logger.error();
 
         if (answers.safaridriver) {
           Logger.error();
@@ -443,10 +408,8 @@ export class NightwatchInit {
   createTestLocation(testsLocation: string) {
     try {
       fs.mkdirSync(path.join(this.rootDir, testsLocation), {recursive: true});
-      // Logger.error(`Successfully created a new test specs directory at: '${testsLocation}'\n`);
-    } catch (err) {
-      // Logger.error('Failed to create the test specs directory. Please create it by yourself.');
-    }
+      // eslint-disable-next-line
+    } catch (err) {}
   }
 
   copyCucumberExamples(examplesLocation: string) {
@@ -473,7 +436,7 @@ export class NightwatchInit {
     Logger.error(`${colors.green(symbols().ok + ' Success!')} Generated an example for CucumberJS at "${examplesLocation}".\n`);
   }
 
-  copyExamples(examplesLocation: string, typescript: boolean, test_runner: string) {
+  copyExamples(examplesLocation: string, typescript: boolean) {
     Logger.error('Generating example files...');
 
     if (fs.existsSync(path.join(this.rootDir, examplesLocation))) {
@@ -486,18 +449,13 @@ export class NightwatchInit {
     if (typescript) {
       examplesSrcPath = path.join(__dirname, '..', 'assets', 'ts-examples');
     } else {
-      // const nightwatchModulePath = path.dirname(require.resolve('nightwatch/package.json', {paths: [this.rootDir]}));
-      // examplesSrcPath = path.join(nightwatchModulePath, 'examples');
       examplesSrcPath = path.join(__dirname, '..', 'assets', 'js-examples');
     }
 
     const examplesDestPath = path.join(this.rootDir, examplesLocation);
     fs.mkdirSync(examplesDestPath, {recursive: true});
 
-    const excludeDir: string[] = [];
-    if (test_runner !== 'cucumber') {excludeDir.push('cucumber-js')}
-
-    copy(examplesSrcPath, examplesDestPath, excludeDir);
+    copy(examplesSrcPath, examplesDestPath);
 
     Logger.error(`${colors.green(symbols().ok + ' Success!')} Generated some example files at '${examplesLocation}'.\n`);
   }
@@ -556,7 +514,6 @@ export class NightwatchInit {
     if (answers.seleniumServer) {
       Logger.error('[Selenium Server]\n');
       if (this.otherInfo.javaNotInstalled) {
-        // Logger.error('It seems like Java is not installed on your system.');
         Logger.error('Java Development Kit (minimum v7) is required to run selenium-server locally. Download from here:');
         Logger.error(colors.cyan('  https://www.oracle.com/technetwork/java/javase/downloads/index.html'), '\n');
       }

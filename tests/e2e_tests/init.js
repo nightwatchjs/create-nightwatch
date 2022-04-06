@@ -75,7 +75,7 @@ describe('e2e tests for init', () => {
       return answers;
     }
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestLocation = () => {
+    nightwatchInit.getConfigDestPath = () => {
       return configPath;
     }
 
@@ -208,7 +208,7 @@ describe('e2e tests for init', () => {
       return answers;
     }
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestLocation = () => {
+    nightwatchInit.getConfigDestPath = () => {
       return configPath;
     }
 
@@ -329,7 +329,7 @@ describe('e2e tests for init', () => {
       return answers;
     }
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestLocation = () => {
+    nightwatchInit.getConfigDestPath = () => {
       return configPath;
     }
 
@@ -462,7 +462,7 @@ describe('e2e tests for init', () => {
       return answers;
     }
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestLocation = () => {
+    nightwatchInit.getConfigDestPath = () => {
       return configPath;
     }
 
@@ -567,7 +567,7 @@ describe('e2e tests for init', () => {
     const nightwatchInit = new NightwatchInit(rootDir, ['yes']);
 
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestLocation = () => {
+    nightwatchInit.getConfigDestPath = () => {
       return configPath;
     }
 
