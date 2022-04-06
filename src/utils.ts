@@ -56,7 +56,7 @@ export const rmDirSync = (dirPath: string) => {
     fs.readdirSync(dirPath).forEach((file) => {
       const curPath = path.join(dirPath, file);
       if (fs.lstatSync(curPath).isDirectory()) {
-       // recurse
+        // recurse
         rmDirSync(curPath);
       } else {
         // delete file
@@ -65,4 +65,4 @@ export const rmDirSync = (dirPath: string) => {
     });
     fs.rmdirSync(dirPath);
   }
-}
+};

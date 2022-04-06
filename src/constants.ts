@@ -102,8 +102,9 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
       if (value.length === 1 && value.includes('selenium-server')) {
         return 'Please select at least 1 browser.';
       }
+
       return !!value.length || 'Please select at least 1 browser.';
-    },
+    }
     // when: (answers) => ['local', 'both'].includes(answers.backend),
     // filter: (value, answers) => {
     //   if (value.includes('ie') || value.includes('selenium-server')) {answers.seleniumServer = true}
