@@ -73,7 +73,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
   {
     type: 'checkbox',
     name: 'browsers',
-    message: 'Where you\'ll be testing on?',
+    message: (answers) => `${answers.backend === 'both' ? '(Local) ' : ''}Where you\'ll be testing on?`,
     choices: (answers) => {
       let browsers = BROWSER_CHOICES;
       if (answers.backend === 'local' && process.platform !== 'darwin') {
@@ -102,6 +102,26 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
   },
 
   // FOR REMOTE
+  {
+    type: 'checkbox',
+    name: 'remoteBrowsers',
+    message: '(Remote) Where you\'ll be testing on?',
+    choices: () => {
+      const browsers = BROWSER_CHOICES;
+      // Remove selenium-server note from IE.
+      browsers.forEach((browser) => {
+        if (browser.value === 'ie') {browser.name = 'IE'}
+      });
+
+      return browsers;
+    },
+    default: (answers: { browsers: string[]; }) => answers.browsers,
+    validate: (value) => {
+      return !!value.length || 'Please select at least 1 browser.';
+    },
+    when: (answers) => answers.backend === 'both'
+  },
+
   {
     type: 'input',
     name: 'hostname',
@@ -144,40 +164,6 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     name: 'baseUrl',
     message: 'What is the base_url of your project?',
     default: 'http://localhost'
-  },
-
-  // ADDITIONAL HELP
-  {
-    type: 'list',
-    name: 'additionalHelp',
-    message: 'Do you need additional help in setting up your configuration file?',
-    choices: [
-      {name: 'Yes, please!', value: 'yes'},
-      {name: 'No, thanks!', value: 'no'}
-    ],
-    default: 'no',
-    when: (answers) => answers.backend === 'both'
-  },
-
-  // BROWSERS (Remote)
-  {
-    type: 'checkbox',
-    name: 'remoteBrowsers',
-    message: '(Remote) Browsers you\'ll be testing on on your remote machine?',
-    choices: () => {
-      const browsers = BROWSER_CHOICES;
-      // Remove selenium-server note from IE.
-      browsers.forEach((browser) => {
-        if (browser.value === 'ie') {browser.name = 'IE'}
-      });
-
-      return browsers;
-    },
-    default: (answers: { browsers: string[]; }) => answers.browsers,
-    validate: (value) => {
-      return !!value.length || 'Please select at least 1 browser.';
-    },
-    when: (answers) => answers.additionalHelp === 'yes' && answers.backend === 'both'
   }
 ];
 

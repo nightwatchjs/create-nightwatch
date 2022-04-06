@@ -15,7 +15,6 @@ export interface ConfigGeneratorAnswers {
   featurePath?: string;
   addExamples?: boolean;
   examplesLocation?: string;
-  additionalHelp?: string;
   browsers?: string[];
   defaultBrowser?: string;
   remoteBrowsers?: string[];
