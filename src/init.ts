@@ -8,7 +8,7 @@ import {copy, stripControlChars, symbols} from './utils';
 import Logger from './logger';
 
 import {CONFIG_INTRO, BROWSER_CHOICES, QUESTIONAIRRE, CONFIG_DEST_QUES} from './constants';
-import { ConfigGeneratorAnswers, ConfigDestination, OtherInfo } from './interfaces';
+import {ConfigGeneratorAnswers, ConfigDestination, OtherInfo} from './interfaces';
 import defaultAnswers from './defaults.json';
 
 export class NightwatchInit {
@@ -121,7 +121,7 @@ export class NightwatchInit {
       // If backend is only remote (no local), delete answers.browsers (if present)
       // and set the defaultBrowser.
       if (!backendHasLocal) {
-        if (answers.browsers) delete answers.browsers;
+        if (answers.browsers) {delete answers.browsers}
         answers.defaultBrowser = answers.remoteBrowsers[0];
       }
     }
@@ -132,7 +132,7 @@ export class NightwatchInit {
       }
 
       if (answers.browsers.includes('selenium-server')) {
-        if (!answers.seleniumServer) answers.seleniumServer = true;
+        if (!answers.seleniumServer) {answers.seleniumServer = true}
         // Remove selenium-server from browsers
         const pos = answers.browsers.indexOf('selenium-server');
         answers.browsers.splice(pos, 1);
@@ -199,7 +199,7 @@ export class NightwatchInit {
   }
 
   installPackages(packagesToInstall: string[]): void {
-    if (packagesToInstall.length === 0) return;
+    if (packagesToInstall.length === 0) {return}
 
     Logger.error('Installing the following packages:');
     for (const pack of packagesToInstall) {
@@ -243,9 +243,10 @@ export class NightwatchInit {
     // eslint-disable-next-line
     if (!packageJson.scripts.hasOwnProperty('test')) {
       this.otherInfo.tsTestScript = 'test';
+      // eslint-disable-next-line
     } else if (!packageJson.scripts.hasOwnProperty('nightwatch:test')) {
       this.otherInfo.tsTestScript = 'nightwatch:test';
-    } else{
+    } else {
       this.otherInfo.tsTestScript = 'nightwatch:test:new';
     }
     packageJson.scripts[this.otherInfo.tsTestScript] = 'tsc && nightwatch';
@@ -259,7 +260,7 @@ export class NightwatchInit {
         stdio: 'pipe',
         cwd: this.rootDir
       });
-    } catch(err) {
+    } catch (err) {
       this.otherInfo.javaNotInstalled = true;
     }
   }
@@ -335,7 +336,8 @@ export class NightwatchInit {
       return true;
     } catch (err) {
       Logger.error('Failed to generate Nightwatch config.');
-      Logger.error('Please run the init command again, or a config file will be auto-generated when you run your first test.')
+      Logger.error('Please run the init command again, or a config file will be auto-generated when you run your first test.');
+
       return false;
     }
   }
