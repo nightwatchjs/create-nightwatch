@@ -527,6 +527,7 @@ describe('init tests', () => {
 
       const configExpPath = path.join(rootDir, 'nightwatch.conf.js');
 
+      assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, undefined);
       assert.strictEqual(configDestPath, configExpPath);
 
       done();
@@ -546,9 +547,11 @@ describe('init tests', () => {
         }
       });
 
+      const configFileNameInitials = 'new-config';
+      const configFileName = `${configFileNameInitials}.conf.js`;
       mockery.registerMock('inquirer', {
         async prompt() {
-          return {overwrite: false, newFileName: 'new-config'};
+          return {overwrite: false, newFileName: configFileNameInitials};
         }
       })
 
@@ -556,8 +559,9 @@ describe('init tests', () => {
       const nightwatchInit = new NightwatchInit(rootDir, []);
       const configDestPath = await nightwatchInit.getConfigDestPath();
 
-      const configExpPath = path.join(rootDir, 'new-config.conf.js');
+      const configExpPath = path.join(rootDir, configFileName);
 
+      assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, configFileName);
       assert.strictEqual(configDestPath, configExpPath);
 
       done();
