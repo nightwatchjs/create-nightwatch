@@ -275,7 +275,11 @@ export class NightwatchInit {
       // Adding a newline after questions.
       Logger.error();
 
-      if (!answers.overwrite) {return path.join(this.rootDir, `${answers.newFileName}.conf.js`)}
+      if (!answers.overwrite) {
+        const configFileName = `${answers.newFileName}.conf.js`;
+        this.otherInfo.nonDefaultConfigName = configFileName;
+        return path.join(this.rootDir, configFileName);
+      }
     }
 
     return configDestPath;
@@ -315,11 +319,9 @@ export class NightwatchInit {
     try {
       fs.writeFileSync(configDestPath, rendered, {encoding: 'utf-8'});
 
-      const configFileNameSplit = configDestPath.split(path.sep);
-      const configFileName = configFileNameSplit[configFileNameSplit.length-1];
       Logger.error(`${colors.green(symbols().ok + ' Success!')} Configuration file generated at: "${configDestPath}".`);
 
-      if (configFileName !== 'nightwatch.conf.js') {
+      if (this.otherInfo.nonDefaultConfigName) {
         Logger.error(`To use this configuration file, run the tests using ${colors.magenta('--config')} flag.`);
       }
       // Add a newline
@@ -469,19 +471,27 @@ export class NightwatchInit {
     }
 
     let envFlag = '';
-    let tsEnvFlag = '';
     if (answers.backend === 'remote') {
       envFlag = ` --env ${answers.remoteName}`;
-      tsEnvFlag = ' --' + envFlag;
+    }
+
+    let configFlag = '';
+    if (this.otherInfo.nonDefaultConfigName) {
+      configFlag = ` --config ${this.otherInfo.nonDefaultConfigName}`;
+    }
+
+    let tsExtraDash = '';
+    if (envFlag || configFlag) {
+      tsExtraDash = ' --';
     }
 
     if (answers.runner === 'cucumber') {
       Logger.error('To run your tests with CucumberJS, simply run:');
-      Logger.error(colors.cyan(`  npx nightwatch${envFlag}`), '\n');
+      Logger.error(colors.cyan(`  npx nightwatch${envFlag}${configFlag}`), '\n');
 
       if (this.otherInfo.cucumberExamplesAdded) {
         Logger.error('To run an example test with CucumberJS, run:');
-        Logger.error(colors.cyan(`  npx nightwatch ${answers.examplesLocation}${envFlag}`), '\n');
+        Logger.error(colors.cyan(`  npx nightwatch ${answers.examplesLocation}${envFlag}${configFlag}`), '\n');
       }
 
       Logger.error('For more details on using CucumberJS with Nightwatch, visit:');
@@ -490,25 +500,25 @@ export class NightwatchInit {
     } else if (answers.addExamples) {
       if (answers.language === 'ts') {
         Logger.error('To run all examples, run:');
-        Logger.error(colors.cyan(`  npm run ${this.otherInfo.tsTestScript}${tsEnvFlag}\n`));
+        Logger.error(colors.cyan(`  npm run ${this.otherInfo.tsTestScript}${tsExtraDash}${envFlag}${configFlag}\n`));
 
         Logger.error('To run a single example (github.ts), run:');
-        Logger.error(colors.cyan(`  npm run ${this.otherInfo.tsTestScript} -- .${path.sep}${path.join(this.otherInfo.examplesJsSrc || '', 'github.js')}${envFlag}\n`));
+        Logger.error(colors.cyan(`  npm run ${this.otherInfo.tsTestScript} -- .${path.sep}${path.join(this.otherInfo.examplesJsSrc || '', 'github.js')}${envFlag}${configFlag}\n`));
       } else {
         Logger.error('To run all examples, run:');
-        Logger.error(colors.cyan(`  npx nightwatch .${path.sep}${this.otherInfo.examplesJsSrc}${envFlag}\n`));
+        Logger.error(colors.cyan(`  npx nightwatch .${path.sep}${this.otherInfo.examplesJsSrc}${envFlag}${configFlag}\n`));
 
         Logger.error('To run a single example (ecosia.js), run:');
-        Logger.error(colors.cyan(`  npx nightwatch .${path.sep}${path.join(this.otherInfo.examplesJsSrc || '', 'ecosia.js')}${envFlag}\n`));
+        Logger.error(colors.cyan(`  npx nightwatch .${path.sep}${path.join(this.otherInfo.examplesJsSrc || '', 'ecosia.js')}${envFlag}${configFlag}\n`));
       }
     } else {
       Logger.error(`A few examples are available at '${path.join('node_modules', 'nightwatch', 'examples')}'.\n`);
 
       Logger.error('To run a single example (ecosia.js), try:');
-      Logger.error(colors.cyan(`  npx nightwatch ${path.join('node_modules', 'nightwatch', 'examples', 'tests', 'ecosia.js')}${envFlag}`), '\n');
+      Logger.error(colors.cyan(`  npx nightwatch ${path.join('node_modules', 'nightwatch', 'examples', 'tests', 'ecosia.js')}${envFlag}${configFlag}`), '\n');
 
       Logger.error('To run all examples, try:');
-      Logger.error(colors.cyan(`  npx nightwatch ${path.join('node_modules', 'nightwatch', 'examples')}${envFlag}`), '\n');
+      Logger.error(colors.cyan(`  npx nightwatch ${path.join('node_modules', 'nightwatch', 'examples')}${envFlag}${configFlag}`), '\n');
     }
 
     if (answers.seleniumServer) {
@@ -520,12 +530,12 @@ export class NightwatchInit {
 
       if (answers.language === 'ts') {
         Logger.error(`To run tests on your local selenium-server, build your project (${colors.cyan('tsc')}) and then run:`);
-        Logger.error(colors.cyan('  npx nightwatch --env selenium_server'), '\n');
+        Logger.error(colors.cyan(`  npx nightwatch --env selenium_server${configFlag}`), '\n');
         Logger.error('Or, run this command:');
-        Logger.error(colors.cyan(`  npm run ${this.otherInfo.tsTestScript} -- --env selenium_server\n`));
+        Logger.error(colors.cyan(`  npm run ${this.otherInfo.tsTestScript} -- --env selenium_server${configFlag}\n`));
       } else {
         Logger.error('To run tests on your local selenium-server, use command:');
-        Logger.error(colors.cyan('  npx nightwatch --env selenium_server'), '\n');
+        Logger.error(colors.cyan(`  npx nightwatch --env selenium_server${configFlag}`), '\n');
       }
     }
   }

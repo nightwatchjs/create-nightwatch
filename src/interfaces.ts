@@ -33,4 +33,5 @@ export interface OtherInfo {
   examplesJsSrc?: string;
   cucumberExamplesAdded?: boolean;
   javaNotInstalled?: boolean;
+  nonDefaultConfigName?: string;
 }
