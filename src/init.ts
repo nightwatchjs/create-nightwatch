@@ -538,7 +538,7 @@ export class NightwatchInit {
 
     if (answers.language === 'ts') {
       Logger.error(`Since you are using TypeScript, please verify ${colors.magenta('src_folders')} once in your newly generated config file.`);
-      Logger.error('It should point to the location of your transpiled test files.\n');
+      Logger.error('It should point to the location of your transpiled (JS) test files.\n');
     }
 
     Logger.error('Happy Testing!!!');

@@ -636,4 +636,231 @@ describe('e2e tests for init', () => {
 
     done();
   });
+
+  test('generate-config with js-nightwatch-local', async (done) => {
+    const consoleOutput = [];
+    mockery.registerMock('./logger', class {
+      static error(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+    });
+
+    const commandsExecuted = [];
+    mockery.registerMock('child_process', {
+      execSync(command, options) {
+        commandsExecuted.push(command);
+      }
+    });
+
+    mockery.registerMock('inquirer', {
+      prompt(questions) {
+        if (questions[0].name === 'safaridriver') {
+          return {safaridriver: true};
+        } else {
+          return {};
+        }
+      }
+    });
+
+    const colorFn = (arg) => arg;
+    mockery.registerMock('ansi-colors', {
+      green: colorFn,
+      yellow: colorFn,
+      magenta: colorFn,
+      cyan: colorFn
+    })
+
+    const answers = {
+      language: 'js',
+      runner: 'nightwatch',
+      backend: 'local',
+      browsers: ['chrome', 'edge', 'safari', 'selenium-server'],
+      baseUrl: 'https://nightwatchjs.org',
+      testsLocation: 'tests'
+    };
+
+    const {NightwatchInit} = require('../../lib/init');
+    const nightwatchInit = new NightwatchInit(rootDir, ['generate-config']);
+
+    nightwatchInit.askQuestions = () => {
+      return answers;
+    }
+    const configPath = path.join(rootDir, 'nightwatch.conf.js');
+    nightwatchInit.getConfigDestPath = () => {
+      return configPath;
+    }
+
+    await nightwatchInit.run();
+
+    assert.strictEqual(nightwatchInit.onlyConfig, true);
+
+    // Test answers
+    if (process.platform === 'darwin') {
+      assert.deepEqual(answers.browsers, ['chrome', 'edge', 'safari']);
+    } else {
+      assert.deepEqual(answers.browsers, ['chrome', 'edge']);
+    }
+    assert.strictEqual(answers.remoteBrowsers, undefined);
+    assert.strictEqual(answers.remoteName, undefined);
+    assert.strictEqual(answers.browserstack, undefined);
+    assert.strictEqual(answers.seleniumServer, true);
+    assert.strictEqual(answers.defaultBrowser, 'chrome');
+    assert.strictEqual(answers.addExamples, undefined);
+    assert.strictEqual(answers.examplesLocation, undefined);
+
+    // Test otherInfo
+    assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, undefined);
+    assert.strictEqual(nightwatchInit.otherInfo.tsTestScript, undefined);
+    assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
+    assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, undefined);
+    assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
+
+    // Test generated config
+    assert.strictEqual(fs.existsSync(configPath), true);
+    const config = require(configPath);
+    assert.deepEqual(config.src_folders, ['tests']);
+    assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
+    assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
+    if (process.platform === 'darwin') {
+      assert.deepEqual(Object.keys(config.test_settings), ['default', 'safari', 'chrome', 'edge', 'selenium_server', 'selenium.chrome', 'selenium.edge']);
+    } else {
+      assert.deepEqual(Object.keys(config.test_settings), ['default', 'chrome', 'edge', 'selenium_server', 'selenium.chrome', 'selenium.edge']);
+    }
+
+    // Test Packages and webdrivers installed
+    if (process.platform === 'darwin') {
+      assert.strictEqual(commandsExecuted.length, 5);
+      assert.strictEqual(commandsExecuted[4], 'sudo safaridriver --enable');
+    } else {
+      assert.strictEqual(commandsExecuted.length, 4);
+    }
+    assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
+    assert.strictEqual(commandsExecuted[1], 'npm install @nightwatch/selenium-server --save-dev');
+    assert.strictEqual(commandsExecuted[2], 'java -version');
+    assert.strictEqual(commandsExecuted[3], 'npm install chromedriver --save-dev');
+
+    // Test console output
+    const output = consoleOutput.toString();
+    assert.strictEqual(output.includes('Installing nightwatch'), true);
+    assert.strictEqual(output.includes('Installing @nightwatch/selenium-server'), true);
+    assert.strictEqual(output.includes('Success! Configuration file generated at:'), true);
+    assert.strictEqual(output.includes('Installing webdriver for Chrome (chromedriver)...'), true);
+    if (process.platform === 'darwin')
+      assert.strictEqual(output.includes('Enabling safaridriver...'), true);
+    assert.strictEqual(output.includes('Happy Testing!!!'), true);
+
+    rmDirSync(rootDir);
+
+    done();
+  });
+
+  test('generate-config with ts-nightwatch-both', async (done) => {
+    const consoleOutput = [];
+    mockery.registerMock('./logger', class {
+      static error(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+    });
+
+    const commandsExecuted = [];
+    mockery.registerMock('child_process', {
+      execSync(command, options) {
+        commandsExecuted.push(command);
+      }
+    });
+
+    mockery.registerMock('inquirer', {
+      prompt(questions) {
+        if (questions[0].name === 'safaridriver') {
+          return {safaridriver: true};
+        } else {
+          return {};
+        }
+      }
+    });
+
+    const colorFn = (arg) => arg;
+    mockery.registerMock('ansi-colors', {
+      green: colorFn,
+      yellow: colorFn,
+      magenta: colorFn,
+      cyan: colorFn
+    })
+
+    const answers = {
+      language: 'ts',
+      runner: 'nightwatch',
+      backend: 'both',
+      browsers: ['firefox'],
+      remoteBrowsers: ['chrome', 'edge', 'safari'],
+      hostname: 'localhost',
+      port: 4444,
+      baseUrl: 'https://nightwatchjs.org',
+      testsLocation: 'tests'
+    };
+
+    const {NightwatchInit} = require('../../lib/init');
+    const nightwatchInit = new NightwatchInit(rootDir, ['generate-config']);
+
+    nightwatchInit.askQuestions = () => {
+      return answers;
+    }
+    const configPath = path.join(rootDir, 'nightwatch.conf.js');
+    nightwatchInit.getConfigDestPath = () => {
+      return configPath;
+    }
+
+    await nightwatchInit.run();
+
+    assert.strictEqual(nightwatchInit.onlyConfig, true);
+
+    // Test answers
+    assert.deepEqual(answers.browsers, ['firefox']);
+    assert.deepEqual(answers.remoteBrowsers, ['chrome', 'edge', 'safari']);
+    assert.strictEqual(answers.remoteName, 'remote');
+    assert.strictEqual(answers.browserstack, undefined);
+    assert.strictEqual(answers.seleniumServer, undefined);
+    assert.strictEqual(answers.defaultBrowser, 'firefox');
+    assert.strictEqual(answers.addExamples, undefined);
+    assert.strictEqual(answers.examplesLocation, undefined);
+
+    // Test otherInfo
+    assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, undefined);
+    assert.strictEqual(nightwatchInit.otherInfo.tsTestScript, undefined);
+    assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
+    assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, undefined);
+    assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
+
+    // Test generated config
+    assert.strictEqual(fs.existsSync(configPath), true);
+    const config = require(configPath);
+    assert.deepEqual(config.src_folders, ['tests']);
+    assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
+    assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox');
+    assert.strictEqual(config.test_settings.remote.selenium.host, 'localhost');
+    assert.strictEqual(config.test_settings.remote.selenium.port, 4444);
+    assert.deepEqual(Object.keys(config.test_settings), ['default', 'firefox', 'remote', 'remote.chrome', 'remote.safari', 'remote.edge']);
+
+    // Test Packages and webdrivers installed
+    assert.strictEqual(commandsExecuted.length, 4);
+    assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
+    assert.strictEqual(commandsExecuted[1], 'npm install typescript --save-dev');
+    assert.strictEqual(commandsExecuted[2], 'npm install @types/nightwatch --save-dev');
+    assert.strictEqual(commandsExecuted[3], 'npm install geckodriver --save-dev');
+
+    // Test console output
+    const output = consoleOutput.toString();
+    assert.strictEqual(output.includes('Installing nightwatch'), true);
+    assert.strictEqual(output.includes('Installing typescript'), true);
+    assert.strictEqual(output.includes('Installing @types/nightwatch'), true);
+    assert.strictEqual(output.includes(`Success! Configuration file generated at: "${path.join(rootDir, 'nightwatch.conf.js')}"`), true);
+    assert.strictEqual(output.includes('Installing webdriver for Firefox (geckodriver)...'), true);
+    assert.strictEqual(output.includes('Since you are using TypeScript, please verify src_folders'), true);
+    assert.strictEqual(output.includes('It should point to the location of your transpiled (JS) test files.'), true);
+    assert.strictEqual(output.includes('Happy Testing!!!'), true);
+
+    rmDirSync(rootDir);
+
+    done();
+  });
 });
