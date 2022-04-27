@@ -1,6 +1,6 @@
 {
   "name": "create-nightwatch",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "description": "A single-command tool to setup Nightwatch.js",
   "main": "index.js",
   "bin": {
@@ -18,7 +18,7 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/garg3133/create-nightwatch"
+    "url": "git+https://github.com/nightwatchjs/create-nightwatch"
   },
   "devDependencies": {
     "@types/ejs": "^3.1.0",
