@@ -1,33 +1,17 @@
 # create-nightwatch
 
-A single-command tool to setup Nightwatch.js
+This CLI tool lets you setup Nightwatch.js in your new or existing project, with all the required configs and dependencies, with just one command.
 
 ## Usage
 
-### npm init
+All you need to do is, run:
 
-To setup Nightwatch based on your answers to a few questions:
-```js
-npm init nightwatch <root-dir>
+```bash
+# from your existing project's root dir
+npm init nightwatch
+
+# if you want to initialize a new project
+npm init nightwatch path/to/new/project
 ```
 
-To skip all the questions (we'll assume best defaults for you):
-```js
-npm init nightwatch <root-dir> -- --yes
-// or
-npm init nightwatch <root-dir> -- -y
-```
-
-### npx
-
-To setup Nightwatch based on your answers to a few questions:
-```js
-npx create-nightwatch <root-dir>
-```
-
-To skip all the questions (we'll assume best defaults for you):
-```js
-npx create-nightwatch <root-dir> --yes
-// or
-npx create-nightwatch <root-dir> -y
-```
+and answer a few questons. It'll setup everything for you based on your preferences.
