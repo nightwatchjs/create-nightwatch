@@ -538,6 +538,12 @@ export class NightwatchInit {
         Logger.error(colors.cyan(`  npx nightwatch --env selenium_server${configFlag}`), '\n');
       }
     }
+
+    if (answers.browsers?.includes('edge')) {
+      Logger.error(`${colors.red('Note:')} Microsoft Edge Webdriver is not installed automatically.`);
+      Logger.error('Please follow the below link ("Download" and "Standalone Usage" sections) to setup EdgeDriver manually:');
+      Logger.error(colors.cyan('  https://nightwatchjs.org/guide/browser-drivers-setup/edgedriver.html'), '\n');
+    }
   }
 
   postConfigInstructions(answers: ConfigGeneratorAnswers) {

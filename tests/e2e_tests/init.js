@@ -56,7 +56,8 @@ describe('e2e tests for init', () => {
       green: colorFn,
       yellow: colorFn,
       magenta: colorFn,
-      cyan: colorFn
+      cyan: colorFn,
+      red: colorFn
     })
 
     const answers = {
@@ -151,6 +152,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes(`npx nightwatch .${path.sep}${path.join('tests', 'nightwatch-examples', 'ecosia.js')}`), true);
     assert.strictEqual(output.includes('[Selenium Server]'), true);
     assert.strictEqual(output.includes('To run tests on your local selenium-server, use command:'), true);
+    assert.strictEqual(output.includes('Note: Microsoft Edge Webdriver is not installed automatically.'), true);
 
     rmDirSync(rootDir);
 
@@ -187,7 +189,8 @@ describe('e2e tests for init', () => {
       green: colorFn,
       yellow: colorFn,
       magenta: colorFn,
-      cyan: colorFn
+      cyan: colorFn,
+      red: colorFn
     })
 
     const answers = {
@@ -272,6 +275,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('To run an example test with CucumberJS, run:'), true);
     assert.strictEqual(output.includes(`npx nightwatch ${path.join('tests', 'features', 'nightwatch-examples')} --env remote`), true);
     assert.strictEqual(output.includes('For more details on using CucumberJS with Nightwatch, visit:'), true);
+    assert.strictEqual(output.includes('Note: Microsoft Edge Webdriver is not installed automatically.'), false);
 
     rmDirSync(rootDir);
 
@@ -308,7 +312,8 @@ describe('e2e tests for init', () => {
       green: colorFn,
       yellow: colorFn,
       magenta: colorFn,
-      cyan: colorFn
+      cyan: colorFn,
+      red: colorFn
     })
 
     const answers = {
@@ -443,7 +448,8 @@ describe('e2e tests for init', () => {
       green: colorFn,
       yellow: colorFn,
       magenta: colorFn,
-      cyan: colorFn
+      cyan: colorFn,
+      red: colorFn
     })
 
     const answers = {
@@ -525,6 +531,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('cd test_output'), true);
     assert.strictEqual(output.includes('npm run test -- --env remote'), true);
     assert.strictEqual(output.includes(`npm run test -- .${path.sep}${path.join('dist', 'tests', 'nightwatch-examples', 'github.js')} --env remote`), true);
+    assert.strictEqual(output.includes('Note: Microsoft Edge Webdriver is not installed automatically.'), false);
 
     rmDirSync(rootDir);
 
@@ -561,7 +568,8 @@ describe('e2e tests for init', () => {
       green: colorFn,
       yellow: colorFn,
       magenta: colorFn,
-      cyan: colorFn
+      cyan: colorFn,
+      red: colorFn
     })
 
     const answers = {
@@ -692,7 +700,8 @@ describe('e2e tests for init', () => {
       green: colorFn,
       yellow: colorFn,
       magenta: colorFn,
-      cyan: colorFn
+      cyan: colorFn,
+      red: colorFn
     });
 
     const answers = require('../../lib/defaults.json');
@@ -803,7 +812,8 @@ describe('e2e tests for init', () => {
       green: colorFn,
       yellow: colorFn,
       magenta: colorFn,
-      cyan: colorFn
+      cyan: colorFn,
+      red: colorFn
     })
 
     const answers = {
@@ -920,7 +930,8 @@ describe('e2e tests for init', () => {
       green: colorFn,
       yellow: colorFn,
       magenta: colorFn,
-      cyan: colorFn
+      cyan: colorFn,
+      red: colorFn
     })
 
     const answers = {
