@@ -2,9 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import {execSync} from 'child_process';
 import colors from 'ansi-colors';
+import {prompt} from 'inquirer';
 import {NightwatchInit} from './init';
 import {NIGHTWATCH_TITLE} from './constants';
 import Logger from './logger';
+import {isNodeProject} from './utils';
 
 export const run = async () => {
   try {
@@ -14,13 +16,20 @@ export const run = async () => {
 
     Logger.error(NIGHTWATCH_TITLE);
 
-    const rootDir = path.resolve(process.cwd(), args[0] || '');
+    let rootDir = path.resolve(process.cwd(), args[0] || '');
 
-    if (!fs.existsSync(path.join(rootDir, 'package.json'))) {
-      if (options.includes('generate-config')) {
-        throw new Error(`package.json not found. Please run this command from your existing Nightwatch project.
-        Or, use \`npm init nightwatch ${args[0] || '.'}\` to initialize a new Nightwatch project instead.`);
-      }
+    if (options.includes('generate-config') && !isNodeProject(rootDir)) {
+      throw new Error(`package.json not found. Please run this command from your existing Nightwatch project.
+      Or, use \`npm init nightwatch ${args[0] || '.'}\` to initialize a new Nightwatch project instead.`);
+    }
+
+    if (!args[0] && !isNodeProject(rootDir) && fs.readdirSync(rootDir).length) {
+      // `npm init nightwatch` is used and the cwd is not a node project
+      // but contains some files (might be a mistake)
+      rootDir = await confirmRootDir(rootDir);
+    }
+
+    if (!isNodeProject(rootDir)) {
       initializeNodeProject(rootDir);
     }
 
@@ -48,6 +57,38 @@ const getArgOptions = (argv: string[]): string[] => {
   });
 
   return options;
+};
+
+const confirmRootDir = async (rootDir: string): Promise<string> => {
+  Logger.error(`${colors.yellow('Warning:')} Current working directory is not a node project and contains some files.`);
+
+  const answers = await prompt([
+    {
+      type: 'list',
+      name: 'confirm',
+      message: 'Do you wish to initialize your Nightwatch project here?',
+      choices: [
+        {name: 'Yes', value: true},
+        {name: 'No', value: false}
+      ],
+      default: false
+    },
+    {
+      type: 'input',
+      name: 'newRoot',
+      message: 'Relative/absolute path to your existing/new project\'s root directory?',
+      default: '.',
+      when: (answers) => !answers.confirm
+    }
+  ]);
+  // Insert a blank line after prompt.
+  Logger.error();
+
+  if (answers.confirm) {
+    return rootDir;
+  } else {
+    return path.resolve(rootDir, answers.newRoot);
+  }
 };
 
 export const initializeNodeProject = (rootDir: string) => {
