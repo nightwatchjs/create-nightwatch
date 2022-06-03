@@ -31,6 +31,8 @@ export const symbols = () => {
   };
 };
 
+export const isNodeProject = (rootDir: string): boolean => fs.existsSync(path.join(rootDir, 'package.json'));
+
 export const copy = (src: string, dest: string, excludeDir: string[] = []): void => {
   const stat = fs.statSync(src);
   if (stat.isDirectory()) {
