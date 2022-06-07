@@ -50,7 +50,7 @@ const getArgOptions = (argv: string[]): string[] => {
   return options;
 };
 
-const initializeNodeProject = (rootDir: string) => {
+export const initializeNodeProject = (rootDir: string) => {
   if (!fs.existsSync(rootDir)) {fs.mkdirSync(rootDir, {recursive: true})}
 
   Logger.error(`${colors.yellow('package.json')} not found in the root directory. Initializing a new NPM project..\n`);
