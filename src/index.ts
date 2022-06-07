@@ -5,7 +5,7 @@ import colors from 'ansi-colors';
 import {NightwatchInit} from './init';
 import {NIGHTWATCH_TITLE} from './constants';
 
-const main = async () => {
+export const run = async () => {
   try {
     const argv = process.argv.slice(2);
     const args = argv.filter(arg => !arg.startsWith('-'));
@@ -59,6 +59,3 @@ const initializeNodeProject = (rootDir: string) => {
     'cwd': rootDir
   });
 };
-
-
-main();
