@@ -4,6 +4,7 @@ import {execSync} from 'child_process';
 import colors from 'ansi-colors';
 import {NightwatchInit} from './init';
 import {NIGHTWATCH_TITLE} from './constants';
+import Logger from './logger';
 
 export const run = async () => {
   try {
@@ -11,7 +12,7 @@ export const run = async () => {
     const args = argv.filter(arg => !arg.startsWith('-'));
     const options = getArgOptions(argv);
 
-    console.error(NIGHTWATCH_TITLE);
+    Logger.error(NIGHTWATCH_TITLE);
 
     const rootDir = path.resolve(process.cwd(), args[0] || '');
 
@@ -25,8 +26,8 @@ export const run = async () => {
 
     const nightwatchInit = new NightwatchInit(rootDir, options);
     await nightwatchInit.run();
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    Logger.error(err as string);
     process.exit(1);
   }
 };
@@ -52,7 +53,7 @@ const getArgOptions = (argv: string[]): string[] => {
 const initializeNodeProject = (rootDir: string) => {
   if (!fs.existsSync(rootDir)) {fs.mkdirSync(rootDir, {recursive: true})}
 
-  console.error(`${colors.yellow('package.json')} not found in the root directory. Initializing a new NPM project..\n`);
+  Logger.error(`${colors.yellow('package.json')} not found in the root directory. Initializing a new NPM project..\n`);
 
   execSync('npm init -y', {
     'stdio': 'inherit',
