@@ -23,8 +23,8 @@ describe('index tests', () => {
         static error() {}
       });
 
-      mockery.registerMock('fs', {
-        existsSync() {
+      mockery.registerMock('./utils', {
+        isNodeProject() {
           return true;
         },
       });
@@ -49,7 +49,7 @@ describe('index tests', () => {
       assert.deepEqual(optionsPassed, []);
     });
 
-    test('works with no argument and package.json not present', () => {
+    test('works with no argument, package.json not present, and root dir empty', () => {
       process.argv = ['node', 'filename.js'];
 
       const consoleOutput = [];
@@ -59,10 +59,16 @@ describe('index tests', () => {
         }
       });
 
-      mockery.registerMock('fs', {
-        existsSync(path) {
+      mockery.registerMock('./utils', {
+        isNodeProject() {
           return false;
         },
+      });
+
+      mockery.registerMock('fs', {
+        readdirSync() {
+          return [];
+        }
       });
 
       let rootDirPassed;
@@ -91,6 +97,70 @@ describe('index tests', () => {
       // Check the arguments passed to NightwatchInit
       assert.strictEqual(rootDirPassed, process.cwd());
       assert.deepEqual(optionsPassed, []);
+
+      // Check if new node project initialized in correct dir
+      assert.strictEqual(newNodeProjectInitialized, true);
+      assert.strictEqual(newNodeProjectRootDir, process.cwd());
+    });
+
+    test('works with no argument, package.json not present, and root dir not empty', async () => {
+      process.argv = ['node', 'filename.js'];
+
+      const consoleOutput = [];
+      mockery.registerMock('./logger', class {
+        static error(...msgs) {
+          consoleOutput.push(...msgs);
+        }
+      });
+
+      mockery.registerMock('./utils', {
+        isNodeProject() {
+          return false;
+        },
+      });
+
+      mockery.registerMock('fs', {
+        readdirSync() {
+          return ['sample.txt'];
+        }
+      });
+
+      let rootDirPassed;
+      let optionsPassed;
+      mockery.registerMock('./init', {
+        NightwatchInit: class {
+          constructor(rootDir, options) {
+            rootDirPassed = rootDir;
+            optionsPassed = options;
+          }
+          run() {}
+        }
+      });
+
+      const index = require('../../lib/index');
+
+      let rootDirConfirmationPrompted = false;
+      index.confirmRootDir = (rootDir) => {
+        rootDirConfirmationPrompted = true;
+
+        return rootDir;
+      }
+
+      let newNodeProjectInitialized = false;
+      let newNodeProjectRootDir;
+      index.initializeNodeProject = (rootDir) => {
+        newNodeProjectInitialized = true;
+        newNodeProjectRootDir = rootDir;
+      }
+
+      await index.run();
+
+      // Check the arguments passed to NightwatchInit
+      assert.strictEqual(rootDirPassed, process.cwd());
+      assert.deepEqual(optionsPassed, []);
+
+      // Check if root dir confirmation prompted
+      assert.strictEqual(rootDirConfirmationPrompted, true);
 
       // Check if new node project initialized in correct dir
       assert.strictEqual(newNodeProjectInitialized, true);
@@ -300,6 +370,71 @@ describe('index tests', () => {
       // Check the arguments passed to NightwatchInit
       assert.strictEqual(rootDirPassed, expectedRootDir);
       assert.deepEqual(optionsPassed, ['yes', 'hello', 'there=hi','generate-config']);
+    });
+  });
+
+  describe('test confirmRootDir', async () => {
+    beforeEach(() => {
+      mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
+    });
+
+    afterEach(() => {
+      mockery.deregisterAll();
+      mockery.resetCache();
+      mockery.disable();
+    });
+
+    test('when given root dir is confirmed', async () => {
+      const consoleOutput = [];
+      mockery.registerMock('./logger', class {
+        static error(...msgs) {
+          consoleOutput.push(...msgs);
+        }
+      });
+
+      mockery.registerMock('inquirer', {
+        prompt() {
+          return {confirm: true};
+        }
+      });
+
+      const index = require('../../lib/index');
+      const rootDirPassed = 'someDirPath';
+      const rootDirReturned = await index.confirmRootDir(rootDirPassed);
+
+      // Check root dir not modified
+      assert.strictEqual(rootDirReturned, rootDirPassed);
+
+      // Check console output
+      const output = consoleOutput.toString();
+      assert.strictEqual(output.includes('Current working directory is not a node project'), true);
+    });
+
+    test('when given root dir is not confirmed and new path is provided', async () => {
+      const consoleOutput = [];
+      mockery.registerMock('./logger', class {
+        static error(...msgs) {
+          consoleOutput.push(...msgs);
+        }
+      });
+
+      mockery.registerMock('inquirer', {
+        prompt() {
+          return {confirm: false, newRoot: 'new-project'};
+        }
+      });
+
+      const index = require('../../lib/index');
+      const rootDirPassed = 'someDirPath';
+      const rootDirReturned = await index.confirmRootDir(rootDirPassed);
+
+      // Check root dir not modified
+      assert.notStrictEqual(rootDirReturned, rootDirPassed);
+      assert.strictEqual(rootDirReturned, path.resolve(rootDirPassed, 'new-project'));
+
+      // Check console output
+      const output = consoleOutput.toString();
+      assert.strictEqual(output.includes('Current working directory is not a node project'), true);
     });
   });
 
