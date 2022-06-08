@@ -59,7 +59,7 @@ const getArgOptions = (argv: string[]): string[] => {
   return options;
 };
 
-const confirmRootDir = async (rootDir: string): Promise<string> => {
+export const confirmRootDir = async (rootDir: string): Promise<string> => {
   Logger.error(`${colors.yellow('Warning:')} Current working directory is not a node project and contains some files.`);
 
   const answers = await prompt([
