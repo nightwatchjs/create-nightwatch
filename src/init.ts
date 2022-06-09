@@ -308,6 +308,7 @@ export class NightwatchInit {
     const templateFile = path.join(__dirname, '..', 'src', 'config', 'main.ejs');
 
     const src_folders: string[] = []; // to go into the config file as the value of src_folders property.
+    const page_objects_path: string[] = []; // to go as the value of page_objects_configs property.
 
     const testsJsSrc: string = path.join(this.otherInfo.tsOutDir || '', answers.testsLocation || '');
     if (testsJsSrc !== '.') {
@@ -315,14 +316,20 @@ export class NightwatchInit {
       this.otherInfo.testsJsSrc = testsJsSrc;
     }
 
-    // Add examplesLocation to src_folders, if different from testsLocation.
-    // Don't add for cucumber examples (for now, as addition of examples depends upon featurePath in copyCucumberExamples).
     if (answers.addExamples && answers.runner !== 'cucumber') {
+      // Add examplesLocation to src_folders, if different from testsLocation.
+      // Don't add for cucumber examples (for now, as addition of examples depends upon featurePath in copyCucumberExamples).
       const examplesJsSrc: string = path.join(this.otherInfo.tsOutDir || '', answers.examplesLocation || '');
       if (examplesJsSrc && testsJsSrc && !examplesJsSrc.startsWith(testsJsSrc)) {
         src_folders.push(examplesJsSrc);
       }
       this.otherInfo.examplesJsSrc = examplesJsSrc;
+
+      // Add page_objects_path
+      if (answers.language === 'js') {
+        // Right now, we only ship page-objects examples with JS (Nightwatch and Mocha runner).
+        page_objects_path.push(`${path.join(examplesJsSrc, 'page-objects')}`);
+      }
     }
 
     const tplData = fs.readFileSync(templateFile).toString();
@@ -330,6 +337,7 @@ export class NightwatchInit {
     let rendered = ejs.render(tplData, {
       plugins: false,
       src_folders: JSON.stringify(src_folders),
+      page_objects_path: JSON.stringify(page_objects_path),
       answers
     });
 
@@ -484,7 +492,7 @@ export class NightwatchInit {
     if (typescript) {
       examplesSrcPath = path.join(__dirname, '..', 'assets', 'ts-examples');
     } else {
-      examplesSrcPath = path.join(__dirname, '..', 'assets', 'js-examples');
+      examplesSrcPath = path.join(__dirname, '..', 'assets', 'js-examples-new');
     }
 
     const examplesDestPath = path.join(this.rootDir, examplesLocation);
@@ -550,7 +558,12 @@ export class NightwatchInit {
       } else {
         Logger.error('To run all examples, run:');
         Logger.error(
-          colors.cyan(`  npx nightwatch .${path.sep}${this.otherInfo.examplesJsSrc}${envFlag}${configFlag}\n`)
+          colors.cyan(
+            `  npx nightwatch .${path.sep}${path.join(
+              this.otherInfo.examplesJsSrc || '',
+              'specs'
+            )}${envFlag}${configFlag}\n`
+          )
         );
 
         Logger.error('To run a single example (ecosia.js), run:');
@@ -558,6 +571,8 @@ export class NightwatchInit {
           colors.cyan(
             `  npx nightwatch .${path.sep}${path.join(
               this.otherInfo.examplesJsSrc || '',
+              'specs',
+              'basic',
               'ecosia.js'
             )}${envFlag}${configFlag}\n`
           )
