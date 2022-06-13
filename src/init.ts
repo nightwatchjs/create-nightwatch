@@ -33,7 +33,12 @@ export class NightwatchInit {
     }
 
     if (this.options?.yes) {
-      answers = defaultAnswers as ConfigGeneratorAnswers;
+      if (this.options?.browsers) {
+        defaultAnswers.browsers = this.options.browsers;
+        answers = defaultAnswers as ConfigGeneratorAnswers ;
+      } else {
+        answers = defaultAnswers as ConfigGeneratorAnswers;
+      }
     } else {
       Logger.error(CONFIG_INTRO);
 
@@ -92,7 +97,8 @@ export class NightwatchInit {
   async askQuestions() {
     const answers = {
       rootDir: this.rootDir,
-      onlyConfig: this.onlyConfig
+      onlyConfig: this.onlyConfig,
+      browsers: this.options?.browsers
     };
 
     return await prompt(QUESTIONAIRRE, answers);
