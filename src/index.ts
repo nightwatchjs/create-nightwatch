@@ -42,24 +42,6 @@ export const run = async () => {
   }
 };
 
-// const getArgOptions = (argv: string[]): string[] => {
-//   const options: string[] = [];
-
-//   const alias: { [key: string]: string } = {
-//     y: 'yes'
-//   };
-
-//   argv.forEach((arg) => {
-//     if (arg.startsWith('--')) {
-//       options.push(arg.slice(2));
-//     } else if (arg.startsWith('-') && alias[arg.slice(1)]) {
-//       options.push(alias[arg.slice(1)]);
-//     }
-//   });
-
-//   return options;
-// };
-
 export const confirmRootDir = async (rootDir: string): Promise<string> => {
   Logger.error(`${colors.yellow('Warning:')} Current working directory is not a node project and contains some files.`);
 
