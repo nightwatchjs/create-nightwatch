@@ -2,17 +2,20 @@ import fs from 'fs';
 import path from 'path';
 
 /**
-   * Strips out all control characters from a string
-   * However, excludes newline and carriage return
-   *
-   * @param {string} input String to remove invisible chars from
-   * @returns {string} Initial input string but without invisible chars
-   */
+ * Strips out all control characters from a string
+ * However, excludes newline and carriage return
+ *
+ * @param {string} input String to remove invisible chars from
+ * @returns {string} Initial input string but without invisible chars
+ */
 export const stripControlChars = (input: string): string => {
-  return input && input.replace(
-    // eslint-disable-next-line no-control-regex
-    /[\x00-\x09\x0B-\x0C\x0E-\x1F\x7F-\x9F]/g,
-    ''
+  return (
+    input &&
+    input.replace(
+      // eslint-disable-next-line no-control-regex
+      /[\x00-\x09\x0B-\x0C\x0E-\x1F\x7F-\x9F]/g,
+      ''
+    )
   );
 };
 
@@ -43,7 +46,9 @@ export const copy = (src: string, dest: string, excludeDir: string[] = []): void
 };
 
 const copyDir = (srcDir: string, destDir: string, excludeDir: string[]): void => {
-  if (excludeDir.some((dir) => srcDir.endsWith(dir))) {return}
+  if (excludeDir.some((dir) => srcDir.endsWith(dir))) {
+    return;
+  }
 
   fs.mkdirSync(destDir, {recursive: true});
   for (const file of fs.readdirSync(srcDir)) {

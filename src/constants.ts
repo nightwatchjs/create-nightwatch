@@ -13,8 +13,7 @@ export const NIGHTWATCH_TITLE = `
            |___/
 `;
 
-export const CONFIG_INTRO = 
-`===============================
+export const CONFIG_INTRO = `===============================
 Nightwatch Configuration Wizard
 ===============================
 
@@ -77,7 +76,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     choices: (answers) => {
       let browsers = BROWSER_CHOICES;
       if (answers.backend === 'local' && process.platform !== 'darwin') {
-        browsers =  browsers.filter((browser) => browser.value !== 'safari');
+        browsers = browsers.filter((browser) => browser.value !== 'safari');
       }
 
       if (['local', 'both'].includes(answers.backend)) {
@@ -85,7 +84,9 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
       } else {
         // if answers.backend === 'remote', remove selenium-server note from IE.
         browsers.forEach((browser) => {
-          if (browser.value === 'ie') {browser.name = 'IE'}
+          if (browser.value === 'ie') {
+            browser.name = 'IE';
+          }
         });
       }
 
@@ -110,12 +111,14 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
       const browsers = BROWSER_CHOICES;
       // Remove selenium-server note from IE.
       browsers.forEach((browser) => {
-        if (browser.value === 'ie') {browser.name = 'IE'}
+        if (browser.value === 'ie') {
+          browser.name = 'IE';
+        }
       });
 
       return browsers;
     },
-    default: (answers: { browsers: string[]; }) => answers.browsers,
+    default: (answers: { browsers: string[] }) => answers.browsers,
     validate: (value) => {
       return !!value.length || 'Please select at least 1 browser.';
     },
@@ -129,7 +132,9 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     default: 'localhost',
     when: (answers) => ['remote', 'both'].includes(answers.backend),
     filter: (value, answers) => {
-      if (value.search('browserstack') !== -1) {answers.browserstack = true}
+      if (value.search('browserstack') !== -1) {
+        answers.browserstack = true;
+      }
 
       return value;
     }
@@ -154,7 +159,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     type: 'input',
     name: 'featurePath',
     message: 'Where do you plan to keep your CucumberJS feature files?',
-    default: (answers: { testsLocation: string; }) => path.join(answers.testsLocation, 'features'),
+    default: (answers: { testsLocation: string }) => path.join(answers.testsLocation, 'features'),
     when: (answers) => answers.runner === 'cucumber'
   },
 

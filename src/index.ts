@@ -11,7 +11,7 @@ import {isNodeProject} from './utils';
 export const run = async () => {
   try {
     const argv = process.argv.slice(2);
-    const args = argv.filter(arg => !arg.startsWith('-'));
+    const args = argv.filter((arg) => !arg.startsWith('-'));
     const options = getArgOptions(argv);
 
     Logger.error(NIGHTWATCH_TITLE);
@@ -44,11 +44,11 @@ export const run = async () => {
 const getArgOptions = (argv: string[]): string[] => {
   const options: string[] = [];
 
-  const alias: {[key: string]: string} = {
-    'y': 'yes'
+  const alias: { [key: string]: string } = {
+    y: 'yes'
   };
 
-  argv.forEach(arg => {
+  argv.forEach((arg) => {
     if (arg.startsWith('--')) {
       options.push(arg.slice(2));
     } else if (arg.startsWith('-') && alias[arg.slice(1)]) {
@@ -92,12 +92,14 @@ export const confirmRootDir = async (rootDir: string): Promise<string> => {
 };
 
 export const initializeNodeProject = (rootDir: string) => {
-  if (!fs.existsSync(rootDir)) {fs.mkdirSync(rootDir, {recursive: true})}
+  if (!fs.existsSync(rootDir)) {
+    fs.mkdirSync(rootDir, {recursive: true});
+  }
 
   Logger.error(`${colors.yellow('package.json')} not found in the root directory. Initializing a new NPM project..\n`);
 
   execSync('npm init -y', {
-    'stdio': 'inherit',
-    'cwd': rootDir
+    stdio: 'inherit',
+    cwd: rootDir
   });
 };
