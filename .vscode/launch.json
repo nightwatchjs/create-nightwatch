@@ -18,7 +18,8 @@
       "outFiles": [
         "${workspaceFolder}/lib/**/*.js"
       ],
-      "preLaunchTask": "npm: build"
+      "preLaunchTask": "npm: build",
+      "console": "integratedTerminal"
     }
   ]
 }
