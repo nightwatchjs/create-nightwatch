@@ -317,6 +317,7 @@ export class NightwatchInit {
 
     const src_folders: string[] = []; // to go into the config file as the value of src_folders property.
     const page_objects_path: string[] = []; // to go as the value of page_objects_configs property.
+    const custom_commands_path: string[] = []; // to go as the value of custom_commands_path property.
 
     const testsJsSrc: string = path.join(this.otherInfo.tsOutDir || '', answers.testsLocation || '');
     if (testsJsSrc !== '.') {
@@ -335,8 +336,10 @@ export class NightwatchInit {
 
       // Add page_objects_path
       if (answers.language === 'js') {
-        // Right now, we only ship page-objects examples with JS (Nightwatch and Mocha runner).
+        // Right now, we only ship page-objects/custom-commands examples 
+        // with JS (Nightwatch and Mocha test runner) only.
         page_objects_path.push(`${path.join(examplesJsSrc, 'page-objects')}`);
+        custom_commands_path.push(`${path.join(examplesJsSrc, 'custom-commands')}`);
       }
     }
 
@@ -344,8 +347,9 @@ export class NightwatchInit {
 
     let rendered = ejs.render(tplData, {
       plugins: false,
-      src_folders: JSON.stringify(src_folders),
-      page_objects_path: JSON.stringify(page_objects_path),
+      src_folders: JSON.stringify(src_folders).replace(/"/g, '\''),
+      page_objects_path: JSON.stringify(page_objects_path).replace(/"/g, '\''),
+      custom_commands_path: JSON.stringify(custom_commands_path).replace(/"/g, '\''),
       answers
     });
 
