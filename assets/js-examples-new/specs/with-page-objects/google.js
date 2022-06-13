@@ -1,5 +1,15 @@
+/**
+ * This example uses the page-objects defined at:
+ *   page-objects/google/search.js
+ *   page-objects/google/searchResults.js
+ *
+ *  For more information on working with page objects, see:
+ *   https://nightwatchjs.org/guide/concepts/page-object-model.html
+ *
+ */
+
 describe('google search with consent form - page objects', function() {
-  const homePage = browser.page.google.search();
+  const homePage = browser.page.google.search(); // first page-object
 
   before(async () => homePage.navigate());
 
@@ -9,7 +19,7 @@ describe('google search with consent form - page objects', function() {
     homePage.setValue('@searchBar', 'Nightwatch.js');
     homePage.submit();
 
-    const resultsPage = browser.page.google.searchResults();
+    const resultsPage = browser.page.google.searchResults(); // second page-object
     resultsPage.expect.element('@results').to.be.present;
 
     resultsPage.expect.element('@results').text.to.contain('Nightwatch.js');

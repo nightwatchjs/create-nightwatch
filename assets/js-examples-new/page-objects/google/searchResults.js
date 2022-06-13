@@ -7,8 +7,8 @@
  * See the example test using this object:
  *   specs/with-page-objects/google.js
  *
- * For more information on working with page objects see:
- *   https://nightwatchjs.org/guide/working-with-page-objects/
+ * For more information on working with page objects, see:
+ *   https://nightwatchjs.org/guide/concepts/page-object-model.html
  *
  */
 
