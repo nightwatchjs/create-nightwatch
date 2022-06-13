@@ -10,14 +10,15 @@ import Logger from './logger';
 import {CONFIG_INTRO, BROWSER_CHOICES, QUESTIONAIRRE, CONFIG_DEST_QUES} from './constants';
 import {ConfigGeneratorAnswers, ConfigDestination, OtherInfo} from './interfaces';
 import defaultAnswers from './defaults.json';
+import {ParsedArgs} from 'minimist';
 
 export class NightwatchInit {
   rootDir: string;
-  options: string[];
+  options: ParsedArgs;
   otherInfo: OtherInfo;
   onlyConfig: boolean;
 
-  constructor(rootDir = process.cwd(), options: string[]) {
+  constructor(rootDir = process.cwd(), options: ParsedArgs) {
     this.rootDir = rootDir;
     this.options = options;
     this.otherInfo = {};
@@ -27,11 +28,11 @@ export class NightwatchInit {
   async run() {
     let answers: ConfigGeneratorAnswers = {};
 
-    if (this.options.includes('generate-config')) {
+    if (this.options?.['generate-config']) {
       this.onlyConfig = true;
     }
 
-    if (this.options.includes('yes')) {
+    if (this.options?.yes) {
       answers = defaultAnswers as ConfigGeneratorAnswers;
     } else {
       Logger.error(CONFIG_INTRO);
@@ -278,7 +279,7 @@ export class NightwatchInit {
   }
 
   async getConfigDestPath() {
-    if (this.options.includes('yes')) {
+    if (this.options?.yes) {
       Logger.error('Auto-generating a configuration file...\n');
     } else {
       Logger.error('Generting a configuration file based on your responses...\n');

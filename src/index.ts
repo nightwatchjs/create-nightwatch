@@ -7,18 +7,19 @@ import {NightwatchInit} from './init';
 import {NIGHTWATCH_TITLE} from './constants';
 import Logger from './logger';
 import {isNodeProject} from './utils';
+import minimist from 'minimist';
 
 export const run = async () => {
   try {
     const argv = process.argv.slice(2);
     const args = argv.filter((arg) => !arg.startsWith('-'));
-    const options = getArgOptions(argv);
+    const options = minimist(argv);
 
     Logger.error(NIGHTWATCH_TITLE);
 
     let rootDir = path.resolve(process.cwd(), args[0] || '');
 
-    if (options.includes('generate-config') && !isNodeProject(rootDir)) {
+    if (options?.['generate-config'] && !isNodeProject(rootDir)) {
       throw new Error(`package.json not found. Please run this command from your existing Nightwatch project.
       Or, use \`npm init nightwatch ${args[0] || '.'}\` to initialize a new Nightwatch project instead.`);
     }
@@ -41,23 +42,23 @@ export const run = async () => {
   }
 };
 
-const getArgOptions = (argv: string[]): string[] => {
-  const options: string[] = [];
+// const getArgOptions = (argv: string[]): string[] => {
+//   const options: string[] = [];
 
-  const alias: { [key: string]: string } = {
-    y: 'yes'
-  };
+//   const alias: { [key: string]: string } = {
+//     y: 'yes'
+//   };
 
-  argv.forEach((arg) => {
-    if (arg.startsWith('--')) {
-      options.push(arg.slice(2));
-    } else if (arg.startsWith('-') && alias[arg.slice(1)]) {
-      options.push(alias[arg.slice(1)]);
-    }
-  });
+//   argv.forEach((arg) => {
+//     if (arg.startsWith('--')) {
+//       options.push(arg.slice(2));
+//     } else if (arg.startsWith('-') && alias[arg.slice(1)]) {
+//       options.push(alias[arg.slice(1)]);
+//     }
+//   });
 
-  return options;
-};
+//   return options;
+// };
 
 export const confirmRootDir = async (rootDir: string): Promise<string> => {
   Logger.error(`${colors.yellow('Warning:')} Current working directory is not a node project and contains some files.`);

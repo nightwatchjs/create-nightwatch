@@ -14,7 +14,7 @@
         "<node_internals>/**"
       ],
       "program": "${workspaceFolder}/index.js",
-      "args": ["--yes --browser=chrome --browser=firefox"],
+      "args": ["${cwd}", "--yes", "--browser=chrome", "--browser=firefox", "--generate-config"],
       "outFiles": [
         "${workspaceFolder}/lib/**/*.js"
       ],
