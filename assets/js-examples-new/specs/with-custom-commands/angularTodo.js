@@ -1,6 +1,10 @@
 /**
  * This example uses the custom-command defined at:
  *   custom-commands/angular/getElementsInList.js
+ *
+ * For more information on working with custom-commands, see:
+ *   https://nightwatchjs.org/guide/extending-nightwatch/adding-custom-commands.html
+ *
  */
 
 describe('angularjs homepage todo list', function() {
