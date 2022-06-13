@@ -78,6 +78,7 @@ export class NightwatchInit {
         this.copyCucumberExamples(answers.examplesLocation || '');
       } else if (answers.addExamples) {
         this.copyExamples(answers.examplesLocation || '', answers.language === 'ts');
+        this.copyTemplates(answers.testsLocation || '');
       }
 
       // Post instructions to run their first test
@@ -167,14 +168,19 @@ export class NightwatchInit {
       answers.addExamples = true;
     }
 
+    // Set testsLocation to default if not present
+    if (!answers.testsLocation) {
+      answers.testsLocation = defaultAnswers.testsLocation;
+    }
+
     if (answers.addExamples && !answers.examplesLocation) {
       if (answers.runner === 'cucumber') {
         answers.examplesLocation = path.join(answers.featurePath || '', 'nightwatch-examples');
       } else {
         // Put examples directly into testsLocation, to be used as boilerplate.
-        answers.examplesLocation = answers.testsLocation || '';
+        answers.examplesLocation = answers.testsLocation;
         
-        // But if the chosen testsLocation already contains some files, shift the examples
+        // But if the chosen examplesLocation already contains some files, shift the examples
         // to a sub-folder named 'nightwatch-examples'.
         const examplesDestPath = path.join(this.rootDir, answers.examplesLocation);
         if (fs.existsSync(examplesDestPath) && fs.readdirSync(examplesDestPath).length) {
@@ -520,6 +526,34 @@ export class NightwatchInit {
     );
   }
 
+
+  copyTemplates(testsLocation: string) {
+    Logger.error('Generating template files...');
+
+    const templatesLocation = path.join(testsLocation, 'templates');
+
+    const templatesDestPath = path.join(this.rootDir, templatesLocation);
+
+    try {
+      fs.mkdirSync(templatesDestPath, {recursive: true});
+      // eslint-disable-next-line
+    } catch (err) {}
+
+    if (fs.readdirSync(templatesDestPath).length) {
+      Logger.error(`Templates already exists at '${templatesLocation}'. Skipping...`, '\n');
+
+      return;
+    }
+
+    const templatesSrcPath = path.join(__dirname, '..', 'assets', 'templates');
+    
+    copy(templatesSrcPath, templatesDestPath);
+
+    Logger.error(
+      `${colors.green(symbols().ok + ' Success!')} Generated some templates files at '${templatesLocation}'.\n`
+    );
+  }
+
   postSetupInstructions(answers: ConfigGeneratorAnswers) {
     Logger.error('Nightwatch setup complete!!\n');
 
@@ -645,6 +679,14 @@ export class NightwatchInit {
         'Please follow the below link ("Download" and "Standalone Usage" sections) to setup EdgeDriver manually:'
       );
       Logger.error(colors.cyan('  https://nightwatchjs.org/guide/browser-drivers-setup/edgedriver.html'), '\n');
+    }
+
+    // For now the templates added only for JS
+    if (answers.runner !== 'cucumber' && answers.language !== 'ts') {
+      Logger.error(colors.green('Nightwatch has added the following template tests:'));
+      Logger.error(colors.cyan(`  1. Title Assertion (${path.join(answers.testsLocation || '', 'templates', 'titleAssertions.js')})`));
+      Logger.error(colors.cyan(`  2. Login (${path.join(answers.testsLocation || '', 'templates', 'login.js')})`));
+      Logger.error(colors.green('Please open the files in your favourite text editor to get started. You can also skip & delete the tests in case you are an experienced user.\n'));
     }
   }
 

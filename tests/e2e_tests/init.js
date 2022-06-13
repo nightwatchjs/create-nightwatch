@@ -98,14 +98,15 @@ describe('e2e tests for init', () => {
     assert.strictEqual(answers.browserstack, undefined);
     assert.strictEqual(answers.seleniumServer, true);
     assert.strictEqual(answers.defaultBrowser, 'chrome');
+    assert.strictEqual(answers.testsLocation, 'tests');
     assert.strictEqual(answers.addExamples, true);
-    assert.strictEqual(answers.examplesLocation, path.join('tests', 'nightwatch-examples'));
+    assert.strictEqual(answers.examplesLocation, 'tests');
 
     // Test otherInfo
     assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.tsTestScript, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
-    assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, path.join('tests', 'nightwatch-examples'));
+    assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'tests');
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, undefined);
 
@@ -113,6 +114,8 @@ describe('e2e tests for init', () => {
     assert.strictEqual(fs.existsSync(configPath), true);
     const config = require(configPath);
     assert.deepEqual(config.src_folders, ['tests']);
+    assert.deepEqual(config.page_objects_path, [path.join('tests', 'page-objects')]);
+    assert.deepEqual(config.custom_commands_path, [path.join('tests', 'custom-commands')]);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
     if (process.platform === 'darwin') {
@@ -153,7 +156,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(fs.existsSync(examplesPath), true);
     const exampleFiles = fs.readdirSync(examplesPath);
     assert.strictEqual(exampleFiles.length, 3);
-    assert.deepEqual(exampleFiles, ['duckDuckGo.js', 'ecosia.js', 'vueTodoList.js']);
+    assert.deepEqual(exampleFiles, ['custom-commands', 'page-objects', 'specs']);
 
     // Test console output
     const output = consoleOutput.toString();
@@ -163,19 +166,16 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Installing webdriver for Chrome (chromedriver)...'), true);
     if (process.platform === 'darwin') {assert.strictEqual(output.includes('Enabling safaridriver...'), true)}
     assert.strictEqual(output.includes('Generating example files...'), true);
-    assert.strictEqual(
-      output.includes(`Success! Generated some example files at '${path.join('tests', 'nightwatch-examples')}'.`),
-      true
-    );
+    assert.strictEqual(output.includes('Success! Generated some example files at \'tests\'.'), true);
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
     assert.strictEqual(
-      output.includes(`npx nightwatch .${path.sep}${path.join('tests', 'nightwatch-examples')}`),
+      output.includes(`npx nightwatch .${path.sep}${path.join('tests', 'specs')}`),
       true
     );
     assert.strictEqual(
-      output.includes(`npx nightwatch .${path.sep}${path.join('tests', 'nightwatch-examples', 'ecosia.js')}`),
+      output.includes(`npx nightwatch .${path.sep}${path.join('tests', 'specs', 'basic', 'ecosia.js')}`),
       true
     );
     assert.strictEqual(output.includes('[Selenium Server]'), true);
@@ -271,6 +271,8 @@ describe('e2e tests for init', () => {
     assert.strictEqual(fs.existsSync(configPath), true);
     const config = require(configPath);
     assert.deepEqual(config.src_folders, ['tests']);
+    assert.deepEqual(config.page_objects_path, []);
+    assert.deepEqual(config.custom_commands_path, []);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.test_runner.type, 'cucumber');
     // assert.strictEqual(config.test_settings.default.test_runner.options.feature_path, path.join('tests', 'features'));
@@ -358,6 +360,9 @@ describe('e2e tests for init', () => {
       red: colorFn
     });
 
+    // Create a folder in the 'tests' folder, to make it non-empty.
+    fs.mkdirSync(path.join(rootDir, 'tests', 'sample'), {recursive: true});
+
     const answers = {
       language: 'js',
       runner: 'mocha',
@@ -366,9 +371,7 @@ describe('e2e tests for init', () => {
       hostname: 'hub.browserstack.com',
       port: 4444,
       testsLocation: 'tests',
-      baseUrl: 'https://nightwatchjs.org',
-      addExamples: true,
-      examplesLocation: 'nightwatch-examples'
+      baseUrl: 'https://nightwatchjs.org'
     };
 
     const {NightwatchInit} = require('../../lib/init');
@@ -396,20 +399,22 @@ describe('e2e tests for init', () => {
     assert.strictEqual(answers.defaultBrowser, 'chrome');
     assert.strictEqual(answers.browserstack, true);
     assert.strictEqual(answers.addExamples, true);
-    assert.strictEqual(answers.examplesLocation, 'nightwatch-examples');
+    assert.strictEqual(answers.examplesLocation, path.join('tests', 'nightwatch-examples'));
 
     // Test otherInfo
     assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.tsTestScript, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
-    assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'nightwatch-examples');
+    assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, path.join('tests', 'nightwatch-examples'));
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, undefined);
 
     // Test generated config
     assert.strictEqual(fs.existsSync(configPath), true);
     const config = require(configPath);
-    assert.deepEqual(config.src_folders, ['tests', 'nightwatch-examples']);
+    assert.deepEqual(config.src_folders, ['tests']);
+    assert.deepEqual(config.page_objects_path, [path.join('tests', 'nightwatch-examples', 'page-objects')]);
+    assert.deepEqual(config.custom_commands_path, [path.join('tests', 'nightwatch-examples', 'custom-commands')]);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.test_runner.type, 'mocha');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
@@ -459,7 +464,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(fs.existsSync(examplesPath), true);
     const exampleFiles = fs.readdirSync(examplesPath);
     assert.strictEqual(exampleFiles.length, 3);
-    assert.deepEqual(exampleFiles, ['duckDuckGo.js', 'ecosia.js', 'vueTodoList.js']);
+    assert.deepEqual(exampleFiles, ['custom-commands', 'page-objects', 'specs']);
 
     // Test console output
     const output = consoleOutput.toString();
@@ -475,13 +480,13 @@ describe('e2e tests for init', () => {
       );
     }
     assert.strictEqual(output.includes('Generating example files...'), true);
-    assert.strictEqual(output.includes('Success! Generated some example files at \'nightwatch-examples\'.'), true);
+    assert.strictEqual(output.includes(`Success! Generated some example files at '${path.join('tests', 'nightwatch-examples')}'.`), true);
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
-    assert.strictEqual(output.includes(`npx nightwatch .${path.sep}nightwatch-examples`), true);
+    assert.strictEqual(output.includes(`npx nightwatch .${path.sep}${path.join('tests', 'nightwatch-examples', 'specs')}`), true);
     assert.strictEqual(
-      output.includes(`npx nightwatch .${path.sep}${path.join('nightwatch-examples', 'ecosia.js')}`),
+      output.includes(`npx nightwatch .${path.sep}${path.join('tests', 'nightwatch-examples', 'specs', 'basic', 'ecosia.js')}`),
       true
     );
     assert.strictEqual(output.includes('[Selenium Server]'), true);
@@ -529,6 +534,9 @@ describe('e2e tests for init', () => {
       red: colorFn
     });
 
+    // Create an empty 'tests' folder in the rootDir.
+    fs.mkdirSync(path.join(rootDir, 'tests'), {recursive: true});
+
     const answers = {
       language: 'ts',
       runner: 'nightwatch',
@@ -562,13 +570,13 @@ describe('e2e tests for init', () => {
     assert.strictEqual(answers.seleniumServer, undefined);
     assert.strictEqual(answers.defaultBrowser, 'chrome');
     assert.strictEqual(answers.addExamples, true);
-    assert.strictEqual(answers.examplesLocation, path.join('tests', 'nightwatch-examples'));
+    assert.strictEqual(answers.examplesLocation, 'tests');
 
     // Test otherInfo
     assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, 'dist');
     assert.strictEqual(nightwatchInit.otherInfo.tsTestScript, 'test');
     assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, path.join('dist', 'tests'));
-    assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, path.join('dist', 'tests', 'nightwatch-examples'));
+    assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, path.join('dist', 'tests'));
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, undefined);
 
@@ -576,6 +584,8 @@ describe('e2e tests for init', () => {
     assert.strictEqual(fs.existsSync(configPath), true);
     const config = require(configPath);
     assert.deepEqual(config.src_folders, [path.join('dist', 'tests')]);
+    assert.deepEqual(config.page_objects_path, []);
+    assert.deepEqual(config.custom_commands_path, []);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
     assert.strictEqual(config.test_settings.remote.selenium.host, 'localhost');
@@ -612,7 +622,7 @@ describe('e2e tests for init', () => {
     );
     assert.strictEqual(output.includes('Generating example files...'), true);
     assert.strictEqual(
-      output.includes(`Success! Generated some example files at '${path.join('tests', 'nightwatch-examples')}'.`),
+      output.includes('Success! Generated some example files at \'tests\'.'),
       true
     );
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
@@ -621,7 +631,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('npm run test -- --env remote'), true);
     assert.strictEqual(
       output.includes(
-        `npm run test -- .${path.sep}${path.join('dist', 'tests', 'nightwatch-examples', 'github.js')} --env remote`
+        `npm run test -- .${path.sep}${path.join('dist', 'tests', 'github.js')} --env remote`
       ),
       true
     );
@@ -668,6 +678,9 @@ describe('e2e tests for init', () => {
       cyan: colorFn,
       red: colorFn
     });
+
+    // Create an non-empty 'tests/nightwatch-examples' folder in the rootDir.
+    fs.mkdirSync(path.join(rootDir, 'tests', 'nightwatch-examples', 'sample'), {recursive: true});
 
     const answers = {
       language: 'ts',
@@ -720,6 +733,8 @@ describe('e2e tests for init', () => {
     assert.strictEqual(fs.existsSync(configPath), true);
     const config = require(configPath);
     assert.deepEqual(config.src_folders, [path.join('dist', 'tests')]);
+    assert.deepEqual(config.page_objects_path, []);
+    assert.deepEqual(config.custom_commands_path, []);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox');
     assert.strictEqual(config.test_settings.browserstack.selenium.host, 'hub.browserstack.com');
@@ -748,8 +763,9 @@ describe('e2e tests for init', () => {
     const examplesPath = path.join(rootDir, answers.examplesLocation);
     assert.strictEqual(fs.existsSync(examplesPath), true);
     const exampleFiles = fs.readdirSync(examplesPath);
-    assert.strictEqual(exampleFiles.length, 2);
-    assert.deepEqual(exampleFiles, ['github.ts', 'google.ts']);
+    // examples not copied
+    assert.strictEqual(exampleFiles.length, 1);
+    assert.deepEqual(exampleFiles, ['sample']);
 
     // Test console output
     const output = consoleOutput.toString();
@@ -764,7 +780,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Installing webdriver for Firefox (geckodriver)...'), true);
     assert.strictEqual(output.includes('Generating example files...'), true);
     assert.strictEqual(
-      output.includes(`Success! Generated some example files at '${path.join('tests', 'nightwatch-examples')}'.`),
+      output.includes(`Examples already exists at '${path.join('tests', 'nightwatch-examples')}'. Skipping...`),
       true
     );
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
@@ -853,21 +869,24 @@ describe('e2e tests for init', () => {
     assert.strictEqual(answers.browserstack, undefined);
     assert.strictEqual(answers.seleniumServer, true);
     assert.strictEqual(answers.defaultBrowser, 'firefox');
+    assert.strictEqual(answers.testsLocation, 'nightwatch-e2e');
     assert.strictEqual(answers.addExamples, true);
-    assert.strictEqual(answers.examplesLocation, 'nightwatch-examples');
+    assert.strictEqual(answers.examplesLocation, 'nightwatch-e2e');
 
     // Test otherInfo
     assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.tsTestScript, undefined);
-    assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, undefined);
-    assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'nightwatch-examples');
+    assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'nightwatch-e2e');
+    assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'nightwatch-e2e');
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, undefined);
 
     // Test generated config
     assert.strictEqual(fs.existsSync(configPath), true);
     const config = require(configPath);
-    assert.deepEqual(config.src_folders, ['nightwatch-examples']);
+    assert.deepEqual(config.src_folders, ['nightwatch-e2e']);
+    assert.deepEqual(config.page_objects_path, [path.join('nightwatch-e2e', 'page-objects')]);
+    assert.deepEqual(config.custom_commands_path, [path.join('nightwatch-e2e', 'custom-commands')]);
     assert.strictEqual(config.test_settings.default.launch_url, 'http://localhost');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox');
     assert.strictEqual(config.test_settings.remote.selenium.host, '<remote-host>');
@@ -897,7 +916,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(fs.existsSync(examplesPath), true);
     const exampleFiles = fs.readdirSync(examplesPath);
     assert.strictEqual(exampleFiles.length, 3);
-    assert.deepEqual(exampleFiles, ['duckDuckGo.js', 'ecosia.js', 'vueTodoList.js']);
+    assert.deepEqual(exampleFiles, ['custom-commands', 'page-objects', 'specs']);
 
     // Test console output
     const output = consoleOutput.toString();
@@ -907,13 +926,13 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Installing webdriver for Firefox (geckodriver)...'), true);
     assert.strictEqual(output.includes('Installing webdriver for Chrome (chromedriver)...'), true);
     assert.strictEqual(output.includes('Generating example files...'), true);
-    assert.strictEqual(output.includes('Success! Generated some example files at \'nightwatch-examples\'.'), true);
+    assert.strictEqual(output.includes('Success! Generated some example files at \'nightwatch-e2e\'.'), true);
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
-    assert.strictEqual(output.includes(`npx nightwatch .${path.sep}nightwatch-examples`), true);
+    assert.strictEqual(output.includes(`npx nightwatch .${path.sep}${path.join('nightwatch-e2e', 'specs')}`), true);
     assert.strictEqual(
-      output.includes(`npx nightwatch .${path.sep}${path.join('nightwatch-examples', 'ecosia.js')}`),
+      output.includes(`npx nightwatch .${path.sep}${path.join('nightwatch-e2e', 'specs', 'basic', 'ecosia.js')}`),
       true
     );
     assert.strictEqual(output.includes('[Selenium Server]'), true);
@@ -1010,6 +1029,8 @@ describe('e2e tests for init', () => {
     assert.strictEqual(fs.existsSync(configPath), true);
     const config = require(configPath);
     assert.deepEqual(config.src_folders, ['tests']);
+    assert.deepEqual(config.page_objects_path, []);
+    assert.deepEqual(config.custom_commands_path, []);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
     if (process.platform === 'darwin') {
@@ -1144,6 +1165,8 @@ describe('e2e tests for init', () => {
     assert.strictEqual(fs.existsSync(configPath), true);
     const config = require(configPath);
     assert.deepEqual(config.src_folders, ['tests']);
+    assert.deepEqual(config.page_objects_path, []);
+    assert.deepEqual(config.custom_commands_path, []);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox');
     assert.strictEqual(config.test_settings.remote.selenium.host, 'localhost');
