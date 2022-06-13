@@ -2,7 +2,11 @@
   "language": "js",
   "runner": "nightwatch",
   "backend": "both",
-  "browsers": ["firefox", "chrome", "selenium-server"],
+  "browsers": [
+    "firefox",
+    "chrome",
+    "selenium-server"
+  ],
   "hostname": "<remote-host>",
   "port": 4444,
   "baseUrl": "http://localhost"

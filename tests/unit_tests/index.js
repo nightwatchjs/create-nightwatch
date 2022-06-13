@@ -19,14 +19,17 @@ describe('index tests', () => {
     test('works with no argument and package.json present', () => {
       process.argv = ['node', 'filename.js'];
 
-      mockery.registerMock('./logger', class {
-        static error() {}
-      });
+      mockery.registerMock(
+        './logger',
+        class {
+          static error() {}
+        }
+      );
 
       mockery.registerMock('./utils', {
         isNodeProject() {
           return true;
-        },
+        }
       });
 
       let rootDirPassed;
@@ -53,16 +56,19 @@ describe('index tests', () => {
       process.argv = ['node', 'filename.js'];
 
       const consoleOutput = [];
-      mockery.registerMock('./logger', class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
+      mockery.registerMock(
+        './logger',
+        class {
+          static error(...msgs) {
+            consoleOutput.push(...msgs);
+          }
         }
-      });
+      );
 
       mockery.registerMock('./utils', {
         isNodeProject() {
           return false;
-        },
+        }
       });
 
       mockery.registerMock('fs', {
@@ -90,7 +96,7 @@ describe('index tests', () => {
       index.initializeNodeProject = (rootDir) => {
         newNodeProjectInitialized = true;
         newNodeProjectRootDir = rootDir;
-      }
+      };
 
       index.run();
 
@@ -107,16 +113,19 @@ describe('index tests', () => {
       process.argv = ['node', 'filename.js'];
 
       const consoleOutput = [];
-      mockery.registerMock('./logger', class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
+      mockery.registerMock(
+        './logger',
+        class {
+          static error(...msgs) {
+            consoleOutput.push(...msgs);
+          }
         }
-      });
+      );
 
       mockery.registerMock('./utils', {
         isNodeProject() {
           return false;
-        },
+        }
       });
 
       mockery.registerMock('fs', {
@@ -144,14 +153,14 @@ describe('index tests', () => {
         rootDirConfirmationPrompted = true;
 
         return rootDir;
-      }
+      };
 
       let newNodeProjectInitialized = false;
       let newNodeProjectRootDir;
       index.initializeNodeProject = (rootDir) => {
         newNodeProjectInitialized = true;
         newNodeProjectRootDir = rootDir;
-      }
+      };
 
       await index.run();
 
@@ -171,9 +180,12 @@ describe('index tests', () => {
       process.argv = ['node', 'filename.js', 'new-project', 'some', 'random', 'args'];
       const expectedRootDir = path.join(process.cwd(), 'new-project');
 
-      mockery.registerMock('./logger', class {
-        static error() {}
-      });
+      mockery.registerMock(
+        './logger',
+        class {
+          static error() {}
+        }
+      );
 
       mockery.registerMock('fs', {
         existsSync() {
@@ -206,11 +218,14 @@ describe('index tests', () => {
       const expectedRootDir = path.join(process.cwd(), 'new-project');
 
       const consoleOutput = [];
-      mockery.registerMock('./logger', class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
+      mockery.registerMock(
+        './logger',
+        class {
+          static error(...msgs) {
+            consoleOutput.push(...msgs);
+          }
         }
-      });
+      );
 
       let newDirCreatedRecursively = false;
       mockery.registerMock('fs', {
@@ -238,7 +253,7 @@ describe('index tests', () => {
       index.initializeNodeProject = (rootDir) => {
         newNodeProjectInitialized = true;
         newNodeProjectRootDir = rootDir;
-      }
+      };
 
       index.run();
 
@@ -255,14 +270,17 @@ describe('index tests', () => {
       process.argv = ['node', 'filename.js', 'new-project', 'random', '--generate-config', 'args'];
       const expectedRootDir = path.join(process.cwd(), 'new-project');
 
-      mockery.registerMock('./logger', class {
-        static error() {}
-      });
+      mockery.registerMock(
+        './logger',
+        class {
+          static error() {}
+        }
+      );
 
       mockery.registerMock('fs', {
         existsSync() {
           return true;
-        },
+        }
       });
 
       let rootDirPassed;
@@ -293,19 +311,22 @@ describe('index tests', () => {
       let processExitCode;
       process.exit = (code) => {
         processExitCode = code;
-      }
+      };
 
       const consoleOutput = [];
-      mockery.registerMock('./logger', class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
+      mockery.registerMock(
+        './logger',
+        class {
+          static error(...msgs) {
+            consoleOutput.push(...msgs);
+          }
         }
-      });
+      );
 
       mockery.registerMock('fs', {
         existsSync() {
           return false;
-        },
+        }
       });
 
       let rootDirPassed;
@@ -332,8 +353,14 @@ describe('index tests', () => {
 
       // Check console output (error)
       const output = consoleOutput.toString();
-      assert.strictEqual(output.includes('package.json not found. Please run this command from your existing Nightwatch project.'), true);
-      assert.strictEqual(output.includes('use `npm init nightwatch new-project` to initialize a new Nightwatch project instead.'), true);
+      assert.strictEqual(
+        output.includes('package.json not found. Please run this command from your existing Nightwatch project.'),
+        true
+      );
+      assert.strictEqual(
+        output.includes('use `npm init nightwatch new-project` to initialize a new Nightwatch project instead.'),
+        true
+      );
 
       process.exit = origProcessExit;
     });
@@ -342,14 +369,17 @@ describe('index tests', () => {
       process.argv = ['node', 'filename.js', 'new-project', '-y', '--hello', '--there=hi', '-d', '--generate-config'];
       const expectedRootDir = path.join(process.cwd(), 'new-project');
 
-      mockery.registerMock('./logger', class {
-        static error() {}
-      });
+      mockery.registerMock(
+        './logger',
+        class {
+          static error() {}
+        }
+      );
 
       mockery.registerMock('fs', {
         existsSync() {
           return true;
-        },
+        }
       });
 
       let rootDirPassed;
@@ -369,7 +399,7 @@ describe('index tests', () => {
 
       // Check the arguments passed to NightwatchInit
       assert.strictEqual(rootDirPassed, expectedRootDir);
-      assert.deepEqual(optionsPassed, ['yes', 'hello', 'there=hi','generate-config']);
+      assert.deepEqual(optionsPassed, ['yes', 'hello', 'there=hi', 'generate-config']);
     });
   });
 
@@ -386,11 +416,14 @@ describe('index tests', () => {
 
     test('when given root dir is confirmed', async () => {
       const consoleOutput = [];
-      mockery.registerMock('./logger', class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
+      mockery.registerMock(
+        './logger',
+        class {
+          static error(...msgs) {
+            consoleOutput.push(...msgs);
+          }
         }
-      });
+      );
 
       mockery.registerMock('inquirer', {
         prompt() {
@@ -412,11 +445,14 @@ describe('index tests', () => {
 
     test('when given root dir is not confirmed and new path is provided', async () => {
       const consoleOutput = [];
-      mockery.registerMock('./logger', class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
+      mockery.registerMock(
+        './logger',
+        class {
+          static error(...msgs) {
+            consoleOutput.push(...msgs);
+          }
         }
-      });
+      );
 
       mockery.registerMock('inquirer', {
         prompt() {
@@ -451,11 +487,14 @@ describe('index tests', () => {
 
     test('when rootDir exists', () => {
       const consoleOutput = [];
-      mockery.registerMock('./logger', class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
+      mockery.registerMock(
+        './logger',
+        class {
+          static error(...msgs) {
+            consoleOutput.push(...msgs);
+          }
         }
-      });
+      );
 
       let newDirCreated = false;
       mockery.registerMock('fs', {
@@ -499,11 +538,14 @@ describe('index tests', () => {
       const rootDir = 'someDirPath';
 
       const consoleOutput = [];
-      mockery.registerMock('./logger', class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
+      mockery.registerMock(
+        './logger',
+        class {
+          static error(...msgs) {
+            consoleOutput.push(...msgs);
+          }
         }
-      });
+      );
 
       let newDirCreatedRecursively = false;
       mockery.registerMock('fs', {

@@ -48,10 +48,14 @@ export class NightwatchInit {
     this.installPackages(packagesToInstall);
 
     // Setup TypeScript
-    if (!this.onlyConfig && answers.language === 'ts') {this.setupTypescript()}
+    if (!this.onlyConfig && answers.language === 'ts') {
+      this.setupTypescript();
+    }
 
     // Check if Java is installed on the system
-    if (answers.seleniumServer) {this.checkJavaInstallation()}
+    if (answers.seleniumServer) {
+      this.checkJavaInstallation();
+    }
 
     // Generate configuration file
     const configDestPath = await this.getConfigDestPath();
@@ -63,7 +67,9 @@ export class NightwatchInit {
 
     if (!this.onlyConfig) {
       // Create tests location
-      if (answers.testsLocation) {this.createTestLocation(answers.testsLocation)}
+      if (answers.testsLocation) {
+        this.createTestLocation(answers.testsLocation);
+      }
 
       // Copy examples
       // For cucumber, only copy the cucumber examples.
@@ -118,7 +124,9 @@ export class NightwatchInit {
       // If backend is only remote (no local), delete answers.browsers (if present)
       // and set the defaultBrowser.
       if (!backendHasLocal) {
-        if (answers.browsers) {delete answers.browsers}
+        if (answers.browsers) {
+          delete answers.browsers;
+        }
         answers.defaultBrowser = answers.remoteBrowsers[0];
       }
     }
@@ -129,7 +137,9 @@ export class NightwatchInit {
       }
 
       if (answers.browsers.includes('selenium-server')) {
-        if (!answers.seleniumServer) {answers.seleniumServer = true}
+        if (!answers.seleniumServer) {
+          answers.seleniumServer = true;
+        }
         // Remove selenium-server from browsers
         const pos = answers.browsers.indexOf('selenium-server');
         answers.browsers.splice(pos, 1);
@@ -153,7 +163,9 @@ export class NightwatchInit {
     }
 
     // Always generate examples (for now)
-    if (!this.onlyConfig) {answers.addExamples = true}
+    if (!this.onlyConfig) {
+      answers.addExamples = true;
+    }
 
     if (answers.addExamples && !answers.examplesLocation) {
       if (answers.runner === 'cucumber') {
@@ -191,7 +203,9 @@ export class NightwatchInit {
   }
 
   installPackages(packagesToInstall: string[]): void {
-    if (packagesToInstall.length === 0) {return}
+    if (packagesToInstall.length === 0) {
+      return;
+    }
 
     Logger.error('Installing the following packages:');
     for (const pack of packagesToInstall) {
@@ -231,8 +245,12 @@ export class NightwatchInit {
 
     // Add script to run nightwatch tests
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
-    if (!packageJson.scripts) {packageJson.scripts = {}}
-    if (packageJson.scripts['test']?.includes('no test specified')) {delete packageJson.scripts['test']}
+    if (!packageJson.scripts) {
+      packageJson.scripts = {};
+    }
+    if (packageJson.scripts['test']?.includes('no test specified')) {
+      delete packageJson.scripts['test'];
+    }
 
     // eslint-disable-next-line
     if (!packageJson.scripts.hasOwnProperty('test')) {
@@ -278,6 +296,7 @@ export class NightwatchInit {
       if (!answers.overwrite) {
         const configFileName = `${answers.newFileName}.conf.js`;
         this.otherInfo.nonDefaultConfigName = configFileName;
+
         return path.join(this.rootDir, configFileName);
       }
     }
@@ -288,7 +307,7 @@ export class NightwatchInit {
   generateConfig(answers: ConfigGeneratorAnswers, configDestPath: string) {
     const templateFile = path.join(__dirname, '..', 'src', 'config', 'main.ejs');
 
-    const src_folders: string[] = [];  // to go into the config file as the value of src_folders property.
+    const src_folders: string[] = []; // to go into the config file as the value of src_folders property.
 
     const testsJsSrc: string = path.join(this.otherInfo.tsOutDir || '', answers.testsLocation || '');
     if (testsJsSrc !== '.') {
@@ -330,7 +349,9 @@ export class NightwatchInit {
       return true;
     } catch (err) {
       Logger.error('Failed to generate Nightwatch config.');
-      Logger.error('Please run the init command again, or a config file will be auto-generated when you run your first test.');
+      Logger.error(
+        'Please run the init command again, or a config file will be auto-generated when you run your first test.'
+      );
 
       return false;
     }
@@ -339,10 +360,18 @@ export class NightwatchInit {
   identifyWebdriversToInstall(answers: ConfigGeneratorAnswers): string[] {
     const webdrivers: string[] = [];
 
-    if (answers.browsers?.includes('firefox')) {webdrivers.push('geckodriver')}
-    if (answers.browsers?.includes('chrome')) {webdrivers.push('chromedriver')}
-    if (answers.browsers?.includes('ie')) {webdrivers.push('iedriver')}
-    if (answers.browsers?.includes('safari')) {webdrivers.push('safaridriver')}
+    if (answers.browsers?.includes('firefox')) {
+      webdrivers.push('geckodriver');
+    }
+    if (answers.browsers?.includes('chrome')) {
+      webdrivers.push('chromedriver');
+    }
+    if (answers.browsers?.includes('ie')) {
+      webdrivers.push('iedriver');
+    }
+    if (answers.browsers?.includes('safari')) {
+      webdrivers.push('safaridriver');
+    }
 
     return webdrivers;
   }
@@ -354,10 +383,10 @@ export class NightwatchInit {
     }
     Logger.error();
 
-    const driversDownloadedFromNPM: {[key: string]: string} = {
-      'geckodriver': 'Firefox',
-      'chromedriver': 'Chrome',
-      'iedriver': 'IE'
+    const driversDownloadedFromNPM: { [key: string]: string } = {
+      geckodriver: 'Firefox',
+      chromedriver: 'Chrome',
+      iedriver: 'IE'
     };
 
     for (const webdriver of webdriversToInstall) {
@@ -418,7 +447,9 @@ export class NightwatchInit {
     // If the featurePath (part of examplesLocation) contains **, no way of knowing where to put
     // example feature files (maybe in the most outside folder by creating a new example dir?)
     // Skipping all paths with '*' for now.
-    if (examplesLocation.includes('*')) {return}
+    if (examplesLocation.includes('*')) {
+      return;
+    }
 
     Logger.error('Generating example for CucumberJS...');
     this.otherInfo.cucumberExamplesAdded = true;
@@ -435,7 +466,9 @@ export class NightwatchInit {
     const exampleSrcPath = path.join(nightwatchModulePath, 'examples', 'cucumber-js', 'features');
 
     copy(exampleSrcPath, exampleDestPath);
-    Logger.error(`${colors.green(symbols().ok + ' Success!')} Generated an example for CucumberJS at "${examplesLocation}".\n`);
+    Logger.error(
+      `${colors.green(symbols().ok + ' Success!')} Generated an example for CucumberJS at "${examplesLocation}".\n`
+    );
   }
 
   copyExamples(examplesLocation: string, typescript: boolean) {
@@ -459,7 +492,9 @@ export class NightwatchInit {
 
     copy(examplesSrcPath, examplesDestPath);
 
-    Logger.error(`${colors.green(symbols().ok + ' Success!')} Generated some example files at '${examplesLocation}'.\n`);
+    Logger.error(
+      `${colors.green(symbols().ok + ' Success!')} Generated some example files at '${examplesLocation}'.\n`
+    );
   }
 
   postSetupInstructions(answers: ConfigGeneratorAnswers) {
@@ -495,41 +530,76 @@ export class NightwatchInit {
       }
 
       Logger.error('For more details on using CucumberJS with Nightwatch, visit:');
-      Logger.error(colors.cyan('  https://nightwatchjs.org/guide/third-party-runners/cucumberjs-nightwatch-integration.html'));
-
+      Logger.error(
+        colors.cyan('  https://nightwatchjs.org/guide/third-party-runners/cucumberjs-nightwatch-integration.html')
+      );
     } else if (answers.addExamples) {
       if (answers.language === 'ts') {
         Logger.error('To run all examples, run:');
         Logger.error(colors.cyan(`  npm run ${this.otherInfo.tsTestScript}${tsExtraDash}${envFlag}${configFlag}\n`));
 
         Logger.error('To run a single example (github.ts), run:');
-        Logger.error(colors.cyan(`  npm run ${this.otherInfo.tsTestScript} -- .${path.sep}${path.join(this.otherInfo.examplesJsSrc || '', 'github.js')}${envFlag}${configFlag}\n`));
+        Logger.error(
+          colors.cyan(
+            `  npm run ${this.otherInfo.tsTestScript} -- .${path.sep}${path.join(
+              this.otherInfo.examplesJsSrc || '',
+              'github.js'
+            )}${envFlag}${configFlag}\n`
+          )
+        );
       } else {
         Logger.error('To run all examples, run:');
-        Logger.error(colors.cyan(`  npx nightwatch .${path.sep}${this.otherInfo.examplesJsSrc}${envFlag}${configFlag}\n`));
+        Logger.error(
+          colors.cyan(`  npx nightwatch .${path.sep}${this.otherInfo.examplesJsSrc}${envFlag}${configFlag}\n`)
+        );
 
         Logger.error('To run a single example (ecosia.js), run:');
-        Logger.error(colors.cyan(`  npx nightwatch .${path.sep}${path.join(this.otherInfo.examplesJsSrc || '', 'ecosia.js')}${envFlag}${configFlag}\n`));
+        Logger.error(
+          colors.cyan(
+            `  npx nightwatch .${path.sep}${path.join(
+              this.otherInfo.examplesJsSrc || '',
+              'ecosia.js'
+            )}${envFlag}${configFlag}\n`
+          )
+        );
       }
     } else {
       Logger.error(`A few examples are available at '${path.join('node_modules', 'nightwatch', 'examples')}'.\n`);
 
       Logger.error('To run a single example (ecosia.js), try:');
-      Logger.error(colors.cyan(`  npx nightwatch ${path.join('node_modules', 'nightwatch', 'examples', 'tests', 'ecosia.js')}${envFlag}${configFlag}`), '\n');
+      Logger.error(
+        colors.cyan(
+          `  npx nightwatch ${path.join(
+            'node_modules',
+            'nightwatch',
+            'examples',
+            'tests',
+            'ecosia.js'
+          )}${envFlag}${configFlag}`
+        ),
+        '\n'
+      );
 
       Logger.error('To run all examples, try:');
-      Logger.error(colors.cyan(`  npx nightwatch ${path.join('node_modules', 'nightwatch', 'examples')}${envFlag}${configFlag}`), '\n');
+      Logger.error(
+        colors.cyan(`  npx nightwatch ${path.join('node_modules', 'nightwatch', 'examples')}${envFlag}${configFlag}`),
+        '\n'
+      );
     }
 
     if (answers.seleniumServer) {
       Logger.error('[Selenium Server]\n');
       if (this.otherInfo.javaNotInstalled) {
-        Logger.error('Java Development Kit (minimum v7) is required to run selenium-server locally. Download from here:');
+        Logger.error(
+          'Java Development Kit (minimum v7) is required to run selenium-server locally. Download from here:'
+        );
         Logger.error(colors.cyan('  https://www.oracle.com/technetwork/java/javase/downloads/index.html'), '\n');
       }
 
       if (answers.language === 'ts') {
-        Logger.error(`To run tests on your local selenium-server, build your project (${colors.cyan('tsc')}) and then run:`);
+        Logger.error(
+          `To run tests on your local selenium-server, build your project (${colors.cyan('tsc')}) and then run:`
+        );
         Logger.error(colors.cyan(`  npx nightwatch --env selenium_server${configFlag}`), '\n');
         Logger.error('Or, run this command:');
         Logger.error(colors.cyan(`  npm run ${this.otherInfo.tsTestScript} -- --env selenium_server${configFlag}\n`));
@@ -541,7 +611,9 @@ export class NightwatchInit {
 
     if (answers.browsers?.includes('edge')) {
       Logger.error(`${colors.red('Note:')} Microsoft Edge Webdriver is not installed automatically.`);
-      Logger.error('Please follow the below link ("Download" and "Standalone Usage" sections) to setup EdgeDriver manually:');
+      Logger.error(
+        'Please follow the below link ("Download" and "Standalone Usage" sections) to setup EdgeDriver manually:'
+      );
       Logger.error(colors.cyan('  https://nightwatchjs.org/guide/browser-drivers-setup/edgedriver.html'), '\n');
     }
   }
@@ -553,11 +625,14 @@ export class NightwatchInit {
     }
 
     if (answers.language === 'ts') {
-      Logger.error(`Since you are using TypeScript, please verify ${colors.magenta('src_folders')} once in your newly generated config file.`);
+      Logger.error(
+        `Since you are using TypeScript, please verify ${colors.magenta(
+          'src_folders'
+        )} once in your newly generated config file.`
+      );
       Logger.error('It should point to the location of your transpiled (JS) test files.\n');
     }
 
     Logger.error('Happy Testing!!!');
   }
 }
-

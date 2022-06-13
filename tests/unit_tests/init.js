@@ -29,11 +29,11 @@ describe('init tests', () => {
       nightwatchInit.onlyConfig = true;
       const answers = await nightwatchInit.askQuestions();
 
-      assert.strictEqual("rootDir" in answers, true);
-      assert.strictEqual("onlyConfig" in answers, true);
+      assert.strictEqual('rootDir' in answers, true);
+      assert.strictEqual('onlyConfig' in answers, true);
 
-      assert.equal(answers["rootDir"], rootDir);
-      assert.equal(answers["onlyConfig"], true);
+      assert.equal(answers['rootDir'], rootDir);
+      assert.equal(answers['onlyConfig'], true);
 
       done();
     });
@@ -41,106 +41,105 @@ describe('init tests', () => {
 
   describe('test refineAnswers', () => {
     const {NightwatchInit} = require('../../lib/init');
-  
+
     test('with just both in answers', () => {
       const nightwatchInit = new NightwatchInit(rootDir, []);
-  
+
       let answers = {backend: 'both'};
       nightwatchInit.refineAnswers(answers);
-      assert.strictEqual("remoteName" in answers, true);
-      assert.strictEqual("browsers" in answers, true);
-      assert.strictEqual("remoteBrowsers" in answers, true);
-      assert.strictEqual("defaultBrowser" in answers, true);
-      assert.strictEqual("seleniumServer" in answers, true);
-      assert.strictEqual("addExamples" in answers, true);
-      assert.strictEqual("examplesLocation" in answers, true);
+      assert.strictEqual('remoteName' in answers, true);
+      assert.strictEqual('browsers' in answers, true);
+      assert.strictEqual('remoteBrowsers' in answers, true);
+      assert.strictEqual('defaultBrowser' in answers, true);
+      assert.strictEqual('seleniumServer' in answers, true);
+      assert.strictEqual('addExamples' in answers, true);
+      assert.strictEqual('examplesLocation' in answers, true);
 
-  
       const browsers = ['firefox', 'chrome', 'edge', 'safari', 'ie'];
-      assert.deepEqual(answers["remoteBrowsers"], browsers);
-      if (process.platform !== 'darwin') browsers.splice(3, 1);
-      assert.deepEqual(answers["browsers"], browsers);
+      assert.deepEqual(answers['remoteBrowsers'], browsers);
+      if (process.platform !== 'darwin') {browsers.splice(3, 1)}
+      assert.deepEqual(answers['browsers'], browsers);
 
-      assert.strictEqual(answers["remoteName"], 'remote');
-      assert.strictEqual(answers["defaultBrowser"], 'firefox');
-      assert.strictEqual(answers["addExamples"], true);
-      assert.strictEqual(answers["examplesLocation"], 'nightwatch-examples');
+      assert.strictEqual(answers['remoteName'], 'remote');
+      assert.strictEqual(answers['defaultBrowser'], 'firefox');
+      assert.strictEqual(answers['addExamples'], true);
+      assert.strictEqual(answers['examplesLocation'], 'nightwatch-examples');
       // since ie is present in browsers
-      assert.strictEqual(answers["seleniumServer"], true);
+      assert.strictEqual(answers['seleniumServer'], true);
     });
-  
+
     test('with local and testsLocation in answers', () => {
       const nightwatchInit = new NightwatchInit(rootDir, []);
-  
+
       answers = {
-        'backend': 'local',
-        'browsers': ['firefox', 'chrome', 'edge'],
-        'testsLocation': 'tests',
-      }
+        backend: 'local',
+        browsers: ['firefox', 'chrome', 'edge'],
+        testsLocation: 'tests'
+      };
       nightwatchInit.refineAnswers(answers);
-      assert.strictEqual("remoteName" in answers, false);
-      assert.strictEqual("browsers" in answers, true);
-      assert.strictEqual("remoteBrowsers" in answers, false);
-      assert.strictEqual("defaultBrowser" in answers, true);
-      assert.strictEqual("addExamples" in answers, true);
-      assert.strictEqual("examplesLocation" in answers, true);
-      assert.strictEqual("seleniumServer" in answers, false);
-  
-      assert.deepEqual(answers["browsers"], ['firefox', 'chrome', 'edge']);
-      assert.strictEqual(answers["defaultBrowser"], 'firefox');
-      assert.strictEqual(answers["addExamples"], true);
-      assert.strictEqual(answers["examplesLocation"], path.join('tests', 'nightwatch-examples'));
+      assert.strictEqual('remoteName' in answers, false);
+      assert.strictEqual('browsers' in answers, true);
+      assert.strictEqual('remoteBrowsers' in answers, false);
+      assert.strictEqual('defaultBrowser' in answers, true);
+      assert.strictEqual('addExamples' in answers, true);
+      assert.strictEqual('examplesLocation' in answers, true);
+      assert.strictEqual('seleniumServer' in answers, false);
+
+      assert.deepEqual(answers['browsers'], ['firefox', 'chrome', 'edge']);
+      assert.strictEqual(answers['defaultBrowser'], 'firefox');
+      assert.strictEqual(answers['addExamples'], true);
+      assert.strictEqual(answers['examplesLocation'], path.join('tests', 'nightwatch-examples'));
     });
-  
+
     test('with both without browserstack in answers', () => {
       const nightwatchInit = new NightwatchInit(rootDir, []);
-  
-      answers = {
-        'backend': 'both',
-        'browsers': ['firefox', 'chrome', 'edge', 'selenium-server'],
-        'testsLocation': 'tests',
-      }
-      nightwatchInit.refineAnswers(answers);
-      assert.strictEqual("remoteName" in answers, true);
-      assert.strictEqual("browsers" in answers, true);
-      assert.strictEqual("remoteBrowsers" in answers, true);
-      assert.strictEqual("defaultBrowser" in answers, true);
-      assert.strictEqual("seleniumServer" in answers, true);
-      assert.strictEqual("addExamples" in answers, true);
-      assert.strictEqual("examplesLocation" in answers, true);
 
-      assert.strictEqual(answers["remoteName"], 'remote');
-      assert.deepEqual(answers["browsers"], ['firefox', 'chrome', 'edge']);
-      assert.deepEqual(answers["remoteBrowsers"], ['firefox', 'chrome', 'edge']);
-      assert.strictEqual(answers["defaultBrowser"], 'firefox');
-      assert.strictEqual(answers["seleniumServer"], true);
-      assert.strictEqual(answers["addExamples"], true);
-      assert.strictEqual(answers["examplesLocation"], path.join('tests', 'nightwatch-examples'));
+      answers = {
+        backend: 'both',
+        browsers: ['firefox', 'chrome', 'edge', 'selenium-server'],
+        testsLocation: 'tests'
+      };
+      nightwatchInit.refineAnswers(answers);
+      assert.strictEqual('remoteName' in answers, true);
+      assert.strictEqual('browsers' in answers, true);
+      assert.strictEqual('remoteBrowsers' in answers, true);
+      assert.strictEqual('defaultBrowser' in answers, true);
+      assert.strictEqual('seleniumServer' in answers, true);
+      assert.strictEqual('addExamples' in answers, true);
+      assert.strictEqual('examplesLocation' in answers, true);
+
+      assert.strictEqual(answers['remoteName'], 'remote');
+      assert.deepEqual(answers['browsers'], ['firefox', 'chrome', 'edge']);
+      assert.deepEqual(answers['remoteBrowsers'], ['firefox', 'chrome', 'edge']);
+      assert.strictEqual(answers['defaultBrowser'], 'firefox');
+      assert.strictEqual(answers['seleniumServer'], true);
+      assert.strictEqual(answers['addExamples'], true);
+      assert.strictEqual(answers['examplesLocation'], path.join('tests', 'nightwatch-examples'));
     });
-  
+
     test('with remote as browserstack in answers and onlyConfig flag', () => {
       const nightwatchInit = new NightwatchInit(rootDir, []);
-  
+
       answers = {
-        'backend': 'remote',
-        'hostname': 'hub.browserstack.com',
-        'browsers': ['firefox', 'chrome', 'edge', 'ie'],
-        'testsLocation': 'tests'
-      }
+        backend: 'remote',
+        hostname: 'hub.browserstack.com',
+        browsers: ['firefox', 'chrome', 'edge', 'ie'],
+        testsLocation: 'tests'
+      };
       nightwatchInit.onlyConfig = true;
-  
+
       nightwatchInit.refineAnswers(answers);
-      assert.strictEqual("remoteName" in answers, true);
-      assert.strictEqual("browsers" in answers, false);
-      assert.strictEqual("remoteBrowsers" in answers, true);
-      assert.strictEqual("defaultBrowser" in answers, true);
-      assert.strictEqual("seleniumServer" in answers, false);
-      assert.strictEqual("addExamples" in answers, false);
-      assert.strictEqual("examplesLocation" in answers, false);
-  
-      assert.strictEqual(answers["remoteName"], 'browserstack');
-      assert.deepEqual(answers["remoteBrowsers"], ['firefox', 'chrome', 'edge', 'ie']);
-      assert.strictEqual(answers["defaultBrowser"], 'firefox');
+      assert.strictEqual('remoteName' in answers, true);
+      assert.strictEqual('browsers' in answers, false);
+      assert.strictEqual('remoteBrowsers' in answers, true);
+      assert.strictEqual('defaultBrowser' in answers, true);
+      assert.strictEqual('seleniumServer' in answers, false);
+      assert.strictEqual('addExamples' in answers, false);
+      assert.strictEqual('examplesLocation' in answers, false);
+
+      assert.strictEqual(answers['remoteName'], 'browserstack');
+      assert.deepEqual(answers['remoteBrowsers'], ['firefox', 'chrome', 'edge', 'ie']);
+      assert.strictEqual(answers['defaultBrowser'], 'firefox');
     });
   });
 
@@ -167,9 +166,9 @@ describe('init tests', () => {
       });
 
       const answers = {
-        'language': 'ts',
-        'runner': 'mocha',
-        'seleniumServer': true
+        language: 'ts',
+        runner: 'mocha',
+        seleniumServer: true
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -194,17 +193,17 @@ describe('init tests', () => {
           }`;
         }
       });
-  
+
       const answers = {
-        'language': 'js',
-        'runner': 'cucumber'
+        language: 'js',
+        runner: 'cucumber'
       };
-  
+
       const {NightwatchInit} = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
-  
+
       const packagesToInstall = nightwatchInit.identifyPackagesToInstall(answers);
-  
+
       assert.strictEqual(packagesToInstall.includes('nightwatch'), false);
       assert.strictEqual(packagesToInstall.includes('typescript'), false);
       assert.strictEqual(packagesToInstall.includes('@types/nightwatch'), false);
@@ -220,9 +219,9 @@ describe('init tests', () => {
       });
 
       const answers = {
-        'language': 'ts',
-        'runner': 'cucumber',
-        'seleniumServer': true
+        language: 'ts',
+        runner: 'cucumber',
+        seleniumServer: true
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -251,11 +250,14 @@ describe('init tests', () => {
 
     test('packages are installed correctly with correct output', () => {
       const consoleOutput = [];
-      mockery.registerMock('./logger', class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
+      mockery.registerMock(
+        './logger',
+        class {
+          static error(...msgs) {
+            consoleOutput.push(...msgs);
+          }
         }
-      });
+      );
 
       const commandsExecuted = [];
       mockery.registerMock('child_process', {
@@ -322,8 +324,7 @@ describe('init tests', () => {
           tsconfigCopied = true;
         },
         readFileSync(path, encoding) {
-          if (path.endsWith('package.json')) return packageJson;
-          else return tsconfigToCopy;
+          if (path.endsWith('package.json')) {return packageJson} else {return tsconfigToCopy}
         },
         writeFileSync(path, content) {
           writtenPackageJson = content;
@@ -364,8 +365,7 @@ describe('init tests', () => {
           tsconfigCopied = true;
         },
         readFileSync(path, encoding) {
-          if (path.endsWith('package.json')) return currentPackageJson;
-          else return tsconfigAlreadyPresent;
+          if (path.endsWith('package.json')) {return currentPackageJson} else {return tsconfigAlreadyPresent}
         },
         writeFileSync(path, content) {
           writtenPackageJson = content;
@@ -387,7 +387,7 @@ describe('init tests', () => {
       let tsconfigCopied = false;
       let writtenPackageJson = '';
 
-      const tsconfigAlreadyPresent = `{}`;
+      const tsconfigAlreadyPresent = '{}';
       const currentPackageJson = `{
         "scripts": {
           "test": "nightwatch --env chrome",
@@ -403,8 +403,7 @@ describe('init tests', () => {
           tsconfigCopied = true;
         },
         readFileSync(path, encoding) {
-          if (path.endsWith('package.json')) return currentPackageJson;
-          else return tsconfigAlreadyPresent;
+          if (path.endsWith('package.json')) {return currentPackageJson} else {return tsconfigAlreadyPresent}
         },
         writeFileSync(path, content) {
           writtenPackageJson = content;
@@ -445,8 +444,7 @@ describe('init tests', () => {
           tsconfigCopied = true;
         },
         readFileSync(path, encoding) {
-          if (path.endsWith('package.json')) return currentPackageJson;
-          else return tsconfigAlreadyPresent;
+          if (path.endsWith('package.json')) {return currentPackageJson} else {return tsconfigAlreadyPresent}
         },
         writeFileSync(path, content) {
           writtenPackageJson = content;
@@ -478,11 +476,14 @@ describe('init tests', () => {
 
     test('if config file is not already present', async (done) => {
       const consoleOutput = [];
-      mockery.registerMock('./logger', class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
+      mockery.registerMock(
+        './logger',
+        class {
+          static error(...msgs) {
+            consoleOutput.push(...msgs);
+          }
         }
-      });
+      );
 
       mockery.registerMock('fs', {
         existsSync(path) {
@@ -503,11 +504,14 @@ describe('init tests', () => {
 
     test('if config file is already present and overwrite in prompt', async (done) => {
       const consoleOutput = [];
-      mockery.registerMock('./logger', class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
+      mockery.registerMock(
+        './logger',
+        class {
+          static error(...msgs) {
+            consoleOutput.push(...msgs);
+          }
         }
-      });
+      );
 
       mockery.registerMock('fs', {
         existsSync(path) {
@@ -519,7 +523,7 @@ describe('init tests', () => {
         async prompt() {
           return {overwrite: true};
         }
-      })
+      });
 
       const {NightwatchInit} = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
@@ -535,11 +539,14 @@ describe('init tests', () => {
 
     test('if config file is already present and new file in prompt', async (done) => {
       const consoleOutput = [];
-      mockery.registerMock('./logger', class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
+      mockery.registerMock(
+        './logger',
+        class {
+          static error(...msgs) {
+            consoleOutput.push(...msgs);
+          }
         }
-      });
+      );
 
       mockery.registerMock('fs', {
         existsSync(path) {
@@ -553,7 +560,7 @@ describe('init tests', () => {
         async prompt() {
           return {overwrite: false, newFileName: configFileNameInitials};
         }
-      })
+      });
 
       const {NightwatchInit} = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
@@ -580,15 +587,18 @@ describe('init tests', () => {
     });
 
     test('generateConfig with js and without testsLocation and examplesLocation', () => {
-      mockery.registerMock('./logger', class {
-        static error() {}
-      });
+      mockery.registerMock(
+        './logger',
+        class {
+          static error() {}
+        }
+      );
 
       const answers = {
-        'backend': 'local',
-        'browsers': ['chrome', 'firefox'],
-        'defaultBrowser': 'firefox'
-      }
+        backend: 'local',
+        browsers: ['chrome', 'firefox'],
+        defaultBrowser: 'firefox'
+      };
 
       const {NightwatchInit} = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
@@ -600,29 +610,32 @@ describe('init tests', () => {
       assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, undefined);
       assert.deepEqual(config.src_folders, []);
       assert.deepEqual(Object.keys(config.test_settings), ['default', 'firefox', 'chrome']);
-      assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox')
+      assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox');
 
       fs.unlinkSync('test_config.conf.js');
     });
 
     test('generateConfig with js with testsLocation and examplesLocation', () => {
-      mockery.registerMock('./logger', class {
-        static error() {}
-      });
+      mockery.registerMock(
+        './logger',
+        class {
+          static error() {}
+        }
+      );
 
       const answers = {
-        'backend': 'both',
-        'browsers': ['chrome'],
-        'remoteBrowsers': ['chrome', 'firefox'],
-        'host': 'localhost',
-        'port': 4444,
-        'defaultBrowser': 'chrome',
-        'remoteName': 'remote',
-        'seleniumServer': true,
-        'testsLocation': 'tests',
-        'addExamples': true,
-        'examplesLocation': path.join('tests', 'nightwatch-examples')
-      }
+        backend: 'both',
+        browsers: ['chrome'],
+        remoteBrowsers: ['chrome', 'firefox'],
+        host: 'localhost',
+        port: 4444,
+        defaultBrowser: 'chrome',
+        remoteName: 'remote',
+        seleniumServer: true,
+        testsLocation: 'tests',
+        addExamples: true,
+        examplesLocation: path.join('tests', 'nightwatch-examples')
+      };
 
       const {NightwatchInit} = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
@@ -633,30 +646,41 @@ describe('init tests', () => {
       assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
       assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, path.join('tests', 'nightwatch-examples'));
       assert.deepEqual(config.src_folders, ['tests']);
-      assert.deepEqual(Object.keys(config.test_settings), ['default', 'chrome', 'remote', 'remote.chrome', 'remote.firefox', 'selenium_server', 'selenium.chrome']);
-      assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome')
+      assert.deepEqual(Object.keys(config.test_settings), [
+        'default',
+        'chrome',
+        'remote',
+        'remote.chrome',
+        'remote.firefox',
+        'selenium_server',
+        'selenium.chrome'
+      ]);
+      assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
 
       fs.unlinkSync('test_config.conf.js');
     });
 
     test('generateConfig with ts with testsLocation and examplesLocation', () => {
-      mockery.registerMock('./logger', class {
-        static error() {}
-      });
+      mockery.registerMock(
+        './logger',
+        class {
+          static error() {}
+        }
+      );
 
       const answers = {
-        'backend': 'remote',
-        'browsers': ['chrome'],
-        'remoteBrowsers': ['chrome', 'firefox'],
-        'host': 'hub.browserstack.com',
-        'port': 4444,
-        'defaultBrowser': 'chrome',
-        'browserstack': true,
-        'remoteName': 'browserstack',
-        'testsLocation': 'tests',
-        'addExamples': true,
-        'examplesLocation': 'nightwatch-examples'
-      }
+        backend: 'remote',
+        browsers: ['chrome'],
+        remoteBrowsers: ['chrome', 'firefox'],
+        host: 'hub.browserstack.com',
+        port: 4444,
+        defaultBrowser: 'chrome',
+        browserstack: true,
+        remoteName: 'browserstack',
+        testsLocation: 'tests',
+        addExamples: true,
+        examplesLocation: 'nightwatch-examples'
+      };
 
       const {NightwatchInit} = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
@@ -668,8 +692,16 @@ describe('init tests', () => {
       assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, path.join('dist', 'tests'));
       assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, path.join('dist', 'nightwatch-examples'));
       assert.deepEqual(config.src_folders, [path.join('dist', 'tests'), path.join('dist', 'nightwatch-examples')]);
-      assert.deepEqual(Object.keys(config.test_settings), ['default', 'browserstack', 'browserstack.local', 'browserstack.chrome', 'browserstack.firefox', 'browserstack.local_chrome', 'browserstack.local_firefox']);
-      assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome')
+      assert.deepEqual(Object.keys(config.test_settings), [
+        'default',
+        'browserstack',
+        'browserstack.local',
+        'browserstack.chrome',
+        'browserstack.firefox',
+        'browserstack.local_chrome',
+        'browserstack.local_firefox'
+      ]);
+      assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
 
       fs.unlinkSync('test_config.conf.js');
     });

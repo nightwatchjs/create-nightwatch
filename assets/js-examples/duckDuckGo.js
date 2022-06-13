@@ -7,5 +7,5 @@ describe('duckduckgo example', function() {
       .click('#search_button_homepage')
       .assert.visible('.results--main')
       .assert.textContains('.results--main', 'Nightwatch.js');
-  }); 
+  });
 });
