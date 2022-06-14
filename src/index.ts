@@ -4,16 +4,28 @@ import {execSync} from 'child_process';
 import colors from 'ansi-colors';
 import {prompt} from 'inquirer';
 import {NightwatchInit} from './init';
-import {NIGHTWATCH_TITLE} from './constants';
+import {NIGHTWATCH_TITLE, AVAILABLE_CONFIG_ARGS} from './constants';
 import Logger from './logger';
 import {isNodeProject} from './utils';
 import minimist from 'minimist';
+import suggestSimilar from './utils/suggestSimilar';
 
 export const run = async () => {
   try {
     const argv = process.argv.slice(2);
     const args = argv.filter((arg) => !arg.startsWith('-'));
     const options = minimist(argv);
+
+    // Checking Valid options passed to CLI
+    const userOptions = Object.keys(options).slice(1);
+    for (const option of userOptions) {
+      const checkForSuggestion = suggestSimilar(option, AVAILABLE_CONFIG_ARGS);
+      if (checkForSuggestion !== '') {
+        Logger.error(`error: unknown option '${option}'${checkForSuggestion}`);
+
+        return;
+      }
+    }
 
     Logger.error(NIGHTWATCH_TITLE);
 

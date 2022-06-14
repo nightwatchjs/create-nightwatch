@@ -22,6 +22,8 @@ Just answer a few questions to get started with Nightwatch:
 We'll setup everything for you :-)
 `;
 
+export const AVAILABLE_CONFIG_ARGS = ['yes', 'generate-config', 'browser'];
+
 export const BROWSER_CHOICES = [
   {name: 'Firefox', value: 'firefox'},
   {name: 'Chrome', value: 'chrome'},
