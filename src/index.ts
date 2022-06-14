@@ -19,6 +19,10 @@ export const run = async () => {
     // Checking Valid options passed to CLI
     const userOptions = Object.keys(options).slice(1);
     for (const option of userOptions) {
+      // only check for suggestion if it's not one of AVAILABLE_CONFIG_ARGS
+      if (AVAILABLE_CONFIG_ARGS.includes(option)) {
+        break;
+      }
       const checkForSuggestion = suggestSimilar(option, AVAILABLE_CONFIG_ARGS);
       if (checkForSuggestion !== '') {
         Logger.error(`error: unknown option '${option}'${checkForSuggestion}`);
