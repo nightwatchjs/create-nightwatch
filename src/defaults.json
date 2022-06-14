@@ -9,5 +9,6 @@
   ],
   "hostname": "<remote-host>",
   "port": 4444,
+  "testsLocation": "nightwatch-e2e",
   "baseUrl": "http://localhost"
 }

@@ -174,11 +174,24 @@ export class NightwatchInit {
       answers.addExamples = true;
     }
 
+    // Set testsLocation to default if not present
+    if (!answers.testsLocation) {
+      answers.testsLocation = defaultAnswers.testsLocation;
+    }
+
     if (answers.addExamples && !answers.examplesLocation) {
       if (answers.runner === 'cucumber') {
         answers.examplesLocation = path.join(answers.featurePath || '', 'nightwatch-examples');
       } else {
-        answers.examplesLocation = path.join(answers.testsLocation || '', 'nightwatch-examples');
+        // Put examples directly into testsLocation, to be used as boilerplate.
+        answers.examplesLocation = answers.testsLocation;
+        
+        // But if the chosen examplesLocation already contains some files, shift the examples
+        // to a sub-folder named 'nightwatch-examples'.
+        const examplesDestPath = path.join(this.rootDir, answers.examplesLocation);
+        if (fs.existsSync(examplesDestPath) && fs.readdirSync(examplesDestPath).length) {
+          answers.examplesLocation = path.join(answers.examplesLocation, 'nightwatch-examples');
+        }
       }
     }
   }
@@ -315,6 +328,8 @@ export class NightwatchInit {
     const templateFile = path.join(__dirname, '..', 'src', 'config', 'main.ejs');
 
     const src_folders: string[] = []; // to go into the config file as the value of src_folders property.
+    const page_objects_path: string[] = []; // to go as the value of page_objects_configs property.
+    const custom_commands_path: string[] = []; // to go as the value of custom_commands_path property.
 
     const testsJsSrc: string = path.join(this.otherInfo.tsOutDir || '', answers.testsLocation || '');
     if (testsJsSrc !== '.') {
@@ -322,21 +337,31 @@ export class NightwatchInit {
       this.otherInfo.testsJsSrc = testsJsSrc;
     }
 
-    // Add examplesLocation to src_folders, if different from testsLocation.
-    // Don't add for cucumber examples (for now, as addition of examples depends upon featurePath in copyCucumberExamples).
     if (answers.addExamples && answers.runner !== 'cucumber') {
+      // Add examplesLocation to src_folders, if different from testsLocation.
+      // Don't add for cucumber examples (for now, as addition of examples depends upon featurePath in copyCucumberExamples).
       const examplesJsSrc: string = path.join(this.otherInfo.tsOutDir || '', answers.examplesLocation || '');
       if (examplesJsSrc && testsJsSrc && !examplesJsSrc.startsWith(testsJsSrc)) {
         src_folders.push(examplesJsSrc);
       }
       this.otherInfo.examplesJsSrc = examplesJsSrc;
+
+      // Add page_objects_path
+      if (answers.language === 'js') {
+        // Right now, we only ship page-objects/custom-commands examples 
+        // with JS (Nightwatch and Mocha test runner) only.
+        page_objects_path.push(`${path.join(examplesJsSrc, 'page-objects')}`);
+        custom_commands_path.push(`${path.join(examplesJsSrc, 'custom-commands')}`);
+      }
     }
 
     const tplData = fs.readFileSync(templateFile).toString();
 
     let rendered = ejs.render(tplData, {
       plugins: false,
-      src_folders: JSON.stringify(src_folders),
+      src_folders: JSON.stringify(src_folders).replace(/"/g, '\''),
+      page_objects_path: JSON.stringify(page_objects_path).replace(/"/g, '\''),
+      custom_commands_path: JSON.stringify(custom_commands_path).replace(/"/g, '\''),
       answers
     });
 
@@ -481,7 +506,13 @@ export class NightwatchInit {
   copyExamples(examplesLocation: string, typescript: boolean) {
     Logger.error('Generating example files...');
 
-    if (fs.existsSync(path.join(this.rootDir, examplesLocation))) {
+    const examplesDestPath = path.join(this.rootDir, examplesLocation);  // this is different from this.otherInfo.examplesJsSrc
+    try {
+      fs.mkdirSync(examplesDestPath, {recursive: true});
+      // eslint-disable-next-line
+    } catch (err) {}
+
+    if (fs.readdirSync(examplesDestPath).length) {
       Logger.error(`Examples already exists at '${examplesLocation}'. Skipping...`, '\n');
 
       return;
@@ -491,11 +522,8 @@ export class NightwatchInit {
     if (typescript) {
       examplesSrcPath = path.join(__dirname, '..', 'assets', 'ts-examples');
     } else {
-      examplesSrcPath = path.join(__dirname, '..', 'assets', 'js-examples');
+      examplesSrcPath = path.join(__dirname, '..', 'assets', 'js-examples-new');
     }
-
-    const examplesDestPath = path.join(this.rootDir, examplesLocation);
-    fs.mkdirSync(examplesDestPath, {recursive: true});
 
     copy(examplesSrcPath, examplesDestPath);
 
@@ -557,7 +585,12 @@ export class NightwatchInit {
       } else {
         Logger.error('To run all examples, run:');
         Logger.error(
-          colors.cyan(`  npx nightwatch .${path.sep}${this.otherInfo.examplesJsSrc}${envFlag}${configFlag}\n`)
+          colors.cyan(
+            `  npx nightwatch .${path.sep}${path.join(
+              this.otherInfo.examplesJsSrc || '',
+              'specs'
+            )}${envFlag}${configFlag}\n`
+          )
         );
 
         Logger.error('To run a single example (ecosia.js), run:');
@@ -565,6 +598,8 @@ export class NightwatchInit {
           colors.cyan(
             `  npx nightwatch .${path.sep}${path.join(
               this.otherInfo.examplesJsSrc || '',
+              'specs',
+              'basic',
               'ecosia.js'
             )}${envFlag}${configFlag}\n`
           )
