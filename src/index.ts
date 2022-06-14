@@ -17,24 +17,21 @@ export const run = async () => {
     const options = minimist(argv, {
       boolean: 'generate-config',
       alias: {
-        'yes': 'y'
+        yes: 'y'
       }
     });
     const {_, ...nightwatchInitOptions} = options;
 
     // Checking Valid options passed to CLI
-    const userOptions = Object.keys(options).slice(1);
-    for (const option of userOptions) {
-      // only check for suggestion if it's not one of AVAILABLE_CONFIG_ARGS
-      if (AVAILABLE_CONFIG_ARGS.includes(option)) {
-        break;
-      }
-      const checkForSuggestion = suggestSimilar(option, AVAILABLE_CONFIG_ARGS);
-      if (checkForSuggestion !== '') {
-        Logger.error(`error: unknown option '${option}'${checkForSuggestion}`);
+    const userArgs = Object.keys(options).slice(1);
+    // Filter args not present in AVAILABLE_CONFIG_ARGS
+    const wrongUserArgs = userArgs.filter((word) => !AVAILABLE_CONFIG_ARGS.includes(word));
 
-        return;
-      }
+    const checkForSuggestion = suggestSimilar(wrongUserArgs[0], AVAILABLE_CONFIG_ARGS);
+    if (checkForSuggestion !== '') {
+      Logger.error(`error: unknown option '${wrongUserArgs[0]}'${checkForSuggestion}`);
+
+      return;
     }
 
     Logger.error(NIGHTWATCH_TITLE);
