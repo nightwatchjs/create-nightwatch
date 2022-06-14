@@ -14,7 +14,10 @@ export const run = async () => {
   try {
     const argv = process.argv.slice(2);
     const args = argv.filter((arg) => !arg.startsWith('-'));
-    const options = minimist(argv);
+    const options = minimist(argv, {
+      boolean: 'generate-config'
+    });
+    const {_, ...nightwatchInitOptions} = options;
 
     // Checking Valid options passed to CLI
     const userOptions = Object.keys(options).slice(1);
@@ -50,7 +53,7 @@ export const run = async () => {
       initializeNodeProject(rootDir);
     }
 
-    const nightwatchInit = new NightwatchInit(rootDir, options);
+    const nightwatchInit = new NightwatchInit(rootDir, nightwatchInitOptions);
     await nightwatchInit.run();
   } catch (err) {
     Logger.error(err as string);

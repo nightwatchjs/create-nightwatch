@@ -14,11 +14,11 @@ import {ParsedArgs} from 'minimist';
 
 export class NightwatchInit {
   rootDir: string;
-  options: ParsedArgs;
+  options: Omit<ParsedArgs, '_'>;
   otherInfo: OtherInfo;
   onlyConfig: boolean;
 
-  constructor(rootDir = process.cwd(), options: ParsedArgs) {
+  constructor(rootDir = process.cwd(), options: Omit<ParsedArgs, '_'>) {
     this.rootDir = rootDir;
     this.options = options;
     this.otherInfo = {};
@@ -35,7 +35,7 @@ export class NightwatchInit {
     if (this.options?.yes) {
       if (this.options?.browser) {
         defaultAnswers.browsers = this.options.browser;
-        answers = defaultAnswers as ConfigGeneratorAnswers ;
+        answers = defaultAnswers as ConfigGeneratorAnswers;
       } else {
         answers = defaultAnswers as ConfigGeneratorAnswers;
       }

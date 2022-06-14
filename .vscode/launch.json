@@ -33,11 +33,12 @@
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "runtimeExecutable": "npm",
+      "runtimeExecutable": "npx",
       "runtimeArgs": [
-        "run",
-        "test:unit"
+        "nightwatch",
+        "${relativeFile}"
       ],
+      "preLaunchTask": "npm: build",
       "internalConsoleOptions": "openOnSessionStart",
     }
   ]
