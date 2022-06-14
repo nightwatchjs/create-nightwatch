@@ -15,7 +15,10 @@ export const run = async () => {
     const argv = process.argv.slice(2);
     const args = argv.filter((arg) => !arg.startsWith('-'));
     const options = minimist(argv, {
-      boolean: 'generate-config'
+      boolean: 'generate-config',
+      alias: {
+        'yes': 'y'
+      }
     });
     const {_, ...nightwatchInitOptions} = options;
 

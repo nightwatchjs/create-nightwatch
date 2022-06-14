@@ -812,7 +812,7 @@ describe('e2e tests for init', () => {
     done();
   });
 
-  test('with yes flag', async (done) => {
+  test('with yes and browser flag', async (done) => {
     const consoleOutput = [];
     mockery.registerMock(
       './logger',

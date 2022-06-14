@@ -27,7 +27,7 @@
     },
     {
       "type": "pwa-node",
-      "name": "Run Unit Tests",
+      "name": "Run Tests",
       "request": "launch",
       "smartStep": true,
       "skipFiles": [
