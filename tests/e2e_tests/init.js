@@ -837,7 +837,11 @@ describe('e2e tests for init', () => {
     mockery.registerMock('./defaults.json', answers);
 
     const {NightwatchInit} = require('../../lib/init');
-    const nightwatchInit = new NightwatchInit(rootDir, ['yes']);
+    const nightwatchInit = new NightwatchInit(rootDir, {
+      'generate-config': false,
+      yes: true,
+      browser: ['firefox', 'chrome', 'selenium-server']
+    });
 
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
     nightwatchInit.getConfigDestPath = () => {
@@ -971,7 +975,7 @@ describe('e2e tests for init', () => {
     };
 
     const {NightwatchInit} = require('../../lib/init');
-    const nightwatchInit = new NightwatchInit(rootDir, ['generate-config']);
+    const nightwatchInit = new NightwatchInit(rootDir, {'generate-config': true});
 
     nightwatchInit.askQuestions = () => {
       return answers;
@@ -1109,7 +1113,7 @@ describe('e2e tests for init', () => {
     };
 
     const {NightwatchInit} = require('../../lib/init');
-    const nightwatchInit = new NightwatchInit(rootDir, ['generate-config']);
+    const nightwatchInit = new NightwatchInit(rootDir, {'generate-config': true});
 
     nightwatchInit.askQuestions = () => {
       return answers;
