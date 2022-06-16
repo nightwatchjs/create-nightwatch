@@ -28,8 +28,7 @@ export const BROWSER_CHOICES = [
   {name: 'Firefox', value: 'firefox'},
   {name: 'Chrome', value: 'chrome'},
   {name: 'Edge', value: 'edge'},
-  {name: 'Safari', value: 'safari'},
-  {name: 'IE (requires selenium-server)', value: 'ie'}
+  {name: 'Safari', value: 'safari'}
 ];
 
 export const QUESTIONAIRRE: inquirer.QuestionCollection = [
@@ -95,13 +94,6 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
 
       if (['local', 'both'].includes(answers.backend)) {
         browsers = browsers.concat({name: 'Local selenium-server', value: 'selenium-server'});
-      } else {
-        // if answers.backend === 'remote', remove selenium-server note from IE.
-        browsers.forEach((browser) => {
-          if (browser.value === 'ie') {
-            browser.name = 'IE';
-          }
-        });
       }
 
       return browsers;
@@ -121,17 +113,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     type: 'checkbox',
     name: 'remoteBrowsers',
     message: '(Remote) Where you\'ll be testing on?',
-    choices: () => {
-      const browsers = BROWSER_CHOICES;
-      // Remove selenium-server note from IE.
-      browsers.forEach((browser) => {
-        if (browser.value === 'ie') {
-          browser.name = 'IE';
-        }
-      });
-
-      return browsers;
-    },
+    choices: BROWSER_CHOICES,
     default: (answers: { browsers: string[] }) => answers.browsers,
     validate: (value) => {
       return !!value.length || 'Please select at least 1 browser.';
