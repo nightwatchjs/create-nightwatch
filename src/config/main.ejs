@@ -225,14 +225,6 @@ module.exports = {
         browserName: 'firefox'
       }
     },
-    <% } %><% if (answers.remoteBrowsers.includes('ie')) { %>
-    'browserstack.ie': {
-      extends: 'browserstack',
-      desiredCapabilities: {
-        browserName: 'internet explorer',
-        browserVersion: '11.0'
-      }
-    },
     <% } %><% if (answers.remoteBrowsers.includes('safari')) { %>
     'browserstack.safari': {
       extends: 'browserstack',
@@ -387,14 +379,6 @@ module.exports = {
         browserName: 'MicrosoftEdge'
       }
     },
-    <% } %><% if (answers.remoteBrowsers.includes('ie')) { %>
-    '<%- answers.remoteName %>.ie': {
-      extends: '<%- answers.remoteName %>',
-      desiredCapabilities: {
-        browserName: 'internet explorer',
-        browserVersion: '11.0'
-      }
-    },
     <% }} %><% if (answers.seleniumServer) { %>
     //////////////////////////////////////////////////////////////////////////////////
     // Configuration for when using the Selenium service, either locally or remote,  |
@@ -412,8 +396,7 @@ module.exports = {
         cli_args: {
           // 'webdriver.gecko.driver': '',
           // 'webdriver.chrome.driver': '',
-          // 'webdriver.edge.driver': './path/to/msedgedriver',
-          // 'webdriver.ie.driver': ''
+          // 'webdriver.edge.driver': './path/to/msedgedriver'
         }
       },
       webdriver: {
@@ -457,14 +440,6 @@ module.exports = {
         },
         "acceptSslCerts": true
       },
-    },
-    <% } %><% if (answers.browsers.includes('ie')) { %>
-    'selenium.ie': {
-      extends: 'selenium_server',
-      desiredCapabilities: {
-        browserName: 'internet explorer',
-        browserVersion: '11.0'
-      }
     }<% }} %>
   }
 };
@@ -481,9 +456,4 @@ function loadServices() {
   try {
     Services.geckodriver = require('geckodriver');
   } catch (err) {}
-  <% if (answers.browsers && answers.browsers.includes('ie')) { %>
-  try {
-    Services.iedriver = require('iedriver');
-  } catch (err) {}
-  <% } %>
 }

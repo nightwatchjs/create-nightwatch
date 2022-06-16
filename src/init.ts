@@ -146,11 +146,6 @@ export class NightwatchInit {
         answers.browsers.splice(pos, 1);
       }
 
-      // Enable seleniumServer if ie present in local browsers.
-      if (answers.browsers.includes('ie') && !answers.seleniumServer) {
-        answers.seleniumServer = true;
-      }
-
       // Remove safari from answers.browsers from non-mac users
       if (process.platform !== 'darwin' && answers.browsers.includes('safari')) {
         const pos = answers.browsers.indexOf('safari');
@@ -392,9 +387,6 @@ export class NightwatchInit {
     if (answers.browsers?.includes('chrome')) {
       webdrivers.push('chromedriver');
     }
-    if (answers.browsers?.includes('ie')) {
-      webdrivers.push('iedriver');
-    }
     if (answers.browsers?.includes('safari')) {
       webdrivers.push('safaridriver');
     }
@@ -411,8 +403,7 @@ export class NightwatchInit {
 
     const driversDownloadedFromNPM: { [key: string]: string } = {
       geckodriver: 'Firefox',
-      chromedriver: 'Chrome',
-      iedriver: 'IE'
+      chromedriver: 'Chrome'
     };
 
     for (const webdriver of webdriversToInstall) {
