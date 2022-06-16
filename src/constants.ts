@@ -70,11 +70,23 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     default: 'local'
   },
 
+  {
+    type: 'list',
+    name: 'cloudProvider',
+    message: '(Remote) Please select your cloud provider:',
+    choices: [
+      {name: 'BrowserStack', value: 'browserstack'},
+      {name: 'Sauce Labs', value: 'saucelabs'},
+      {name: 'Other providers or remote selenium-server', value: 'other'}
+    ],
+    when: (answers) => ['remote', 'both'].includes(answers.backend)
+  },
+
   // BROWSERS
   {
     type: 'checkbox',
     name: 'browsers',
-    message: (answers) => `${answers.backend === 'both' ? '(Local) ' : ''}Where you\'ll be testing on?`,
+    message: (answers) => `${answers.backend === 'both' ? '(Local) ' : ''}Where you'll be testing on?`,
     choices: (answers) => {
       let browsers = BROWSER_CHOICES;
       if (answers.backend === 'local' && process.platform !== 'darwin') {
@@ -125,28 +137,6 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
       return !!value.length || 'Please select at least 1 browser.';
     },
     when: (answers) => answers.backend === 'both'
-  },
-
-  {
-    type: 'input',
-    name: 'hostname',
-    message: '(Remote) What is the host address of your remote machine?',
-    default: 'localhost',
-    when: (answers) => ['remote', 'both'].includes(answers.backend),
-    filter: (value, answers) => {
-      if (value.search('browserstack') !== -1) {
-        answers.browserstack = true;
-      }
-
-      return value;
-    }
-  },
-  {
-    type: 'input',
-    name: 'port',
-    message: '(Remote) What is the port on which your test backend is running on your remote machine?',
-    default: 80,
-    when: (answers) => ['remote', 'both'].includes(answers.backend)
   },
 
   // TEST LOCATION

@@ -107,14 +107,10 @@ export class NightwatchInit {
     const backendHasRemote = answers.backend && ['remote', 'both'].includes(answers.backend);
 
     if (backendHasRemote) {
-      if (answers.hostname?.includes('browserstack')) {
-        answers.browserstack = true;
-      }
-
-      if (answers.browserstack) {
-        answers.remoteName = 'browserstack';
-      } else {
+      if (answers.cloudProvider === 'other') {
         answers.remoteName = 'remote';
+      } else {
+        answers.remoteName = answers.cloudProvider;
       }
 
       if (!answers.remoteBrowsers) {

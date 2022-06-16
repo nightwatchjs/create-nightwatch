@@ -168,7 +168,7 @@ module.exports = {
         ]
       }
     },
-    <% }} %><% if (answers.browserstack) { %>
+    <% }} %><% if (answers.cloudProvider === 'browserstack') { %>
     //////////////////////////////////////////////////////////////////////////////////
     // Configuration for using the browserstack.com cloud service                    |
     //                                                                               |
@@ -179,15 +179,15 @@ module.exports = {
     //////////////////////////////////////////////////////////////////////////////////
     browserstack: {
       selenium: {
-        host: '<%- answers.hostname %>',
-        port: <%- answers.port %>
+        host: 'hub.browserstack.com',
+        port: 443
       },
       // More info on configuring capabilities can be found on:
       // https://www.browserstack.com/automate/capabilities?tag=selenium-4
       desiredCapabilities: {
         'bstack:options': {
           userName: '${BROWSERSTACK_USER}',
-          accessKey: '${BROWSERSTACK_KEY}',
+          accessKey: '${BROWSERSTACK_KEY}'
         }
       },
 
@@ -254,25 +254,92 @@ module.exports = {
         browserName: 'firefox'
       }
     },
-    <% }} else if (['remote', 'both'].includes(answers.backend)) { %>
-    /////////////////////////////////////////////////////////////////////////////////////////////
-    // Configuration for using remote Selenium service or a cloud-based testing provider.       |
-    //                                                                                          |
-    // If you are using cloud providers such as BrowserStack, CrossBrowserTesting, LambdaTests, |
-    // or SauceLabs, please set the username and access key by setting the below environment    |
-    // variables:                                                                               |
-    // - REMOTE_USERNAME                                                                        |
-    // - REMOTE_ACCESS_KEY                                                                      |
-    // (.env files are supported)                                                               |
-    /////////////////////////////////////////////////////////////////////////////////////////////
+    <% }} else if (answers.cloudProvider === 'saucelabs') { %>
+    //////////////////////////////////////////////////////////////////////////////////
+    // Configuration for using the Sauce Labs cloud service                          |
+    //                                                                               |
+    // Please set the username and access key by setting the environment variables:  |
+    // - SAUCE_USERNAME                                                              |
+    // - SAUCE_ACCESS_KEY                                                            |
+    //////////////////////////////////////////////////////////////////////////////////
+    saucelabs: {
+      selenium: {
+        host: 'ondemand.saucelabs.com',
+        port: 443
+      },
+      // More info on configuring capabilities can be found on:
+      // https://wiki.saucelabs.com/display/DOCS/Test+Configuration+Options
+      desiredCapabilities: {
+        'sauce:options': {
+          username: '${SAUCE_USERNAME}',
+          accessKey: '${SAUCE_ACCESS_KEY}',
+          screenResolution: '1280x1024'
+          // https://docs.saucelabs.com/dev/cli/sauce-connect-proxy/#--region
+          // region: 'us-west-1'
+          // https://docs.saucelabs.com/dev/test-configuration-options/#tunnelidentifier
+          // parentTunnel: '',
+          // tunnelIdentifier: '',
+        },
+        javascriptEnabled: true,
+        acceptSslCerts: true,
+        // https://docs.saucelabs.com/dev/test-configuration-options/#timezone
+        timeZone: 'London'
+      },
+      disable_error_log: false,
+      webdriver: {
+        start_process: false
+      }
+    },
+    <% if (answers.remoteBrowsers.includes('chrome')) { %>
+    'saucelabs.chrome': {
+      extends: 'saucelabs',
+      desiredCapabilities: {
+        browserName: 'chrome',
+        browserVersion: 'latest',
+        'goog:chromeOptions': {
+          w3c: true
+        }
+      }
+    },
+    <% } %><% if (answers.remoteBrowsers.includes('firefox')) { %>
+    'saucelabs.firefox': {
+      extends: 'saucelabs',
+      desiredCapabilities: {
+        browserName: 'firefox',
+        browserVersion: 'latest'
+      }
+    },
+    <% } %><% if (answers.remoteBrowsers.includes('safari')) { %>
+    'saucelabs.safari': {
+      extends: 'saucelabs',
+      desiredCapabilities: {
+        browserName: 'safari',
+        browserVersion: 'latest',
+        platformName: 'macOS 10.13'
+      }
+    },
+    <% }} else if (answers.cloudProvider === 'other') { %>
+    ////////////////////////////////////////////////////////////////////////////////////////
+    // Configuration for using remote Selenium service or a cloud-based testing provider.  |
+    //                                                                                     |
+    // Please set the hostname and port by setting the below environment variables:        |
+    // - REMOTE_HOSTNAME                                                                   |
+    // - REMOTE_PORT                                                                       |
+    //                                                                                     |
+    // If you are using cloud providers such as CrossBrowserTesting, LambdaTests, etc.     |
+    // Please set the username and access key by setting the below environment variables:  |
+    // - REMOTE_USERNAME                                                                   |
+    // - REMOTE_ACCESS_KEY                                                                 |
+    // (.env files are supported)                                                          |
+    ////////////////////////////////////////////////////////////////////////////////////////
     <%- answers.remoteName %>: {
       // Info on all the available options with "selenium":
       // https://nightwatchjs.org/guide/configuration/settings.html#selenium-server-settings
       selenium: {
         start_process: false,
         server_path: '',
-        host: '<%- answers.hostname %>',
-        port: <%- answers.port %>
+        host: '${REMOTE_HOSTNAME}',
+        port: '${REMOTE_PORT}'
       },
 
       // username: '${REMOTE_USERNAME}',
