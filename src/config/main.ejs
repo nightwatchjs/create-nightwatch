@@ -213,7 +213,7 @@ module.exports = {
       extends: 'browserstack',
       desiredCapabilities: {
         browserName: 'chrome',
-        chromeOptions: {
+        'goog:chromeOptions': {
           w3c: true
         }
       }
@@ -288,7 +288,7 @@ module.exports = {
       extends: '<%- answers.remoteName %>',
       desiredCapabilities: {
         browserName: 'chrome',
-        chromeOptions: {
+        'goog:chromeOptions': {
           w3c: true
         }
       }
@@ -359,7 +359,7 @@ module.exports = {
       extends: 'selenium_server',
       desiredCapabilities: {
         browserName: 'chrome',
-        chromeOptions: {
+        'goog:chromeOptions': {
           w3c: true
         }
       }
