@@ -4,7 +4,7 @@ const home: NightwatchTests = {
   'Github Title test': () => {
     browser
       .url('https://github.com')
-      .assert.title('GitHub: Where the world builds software · GitHub');
+      .assert.titleEquals('GitHub: Where the world builds software · GitHub');
   },
 
   'Github search for nightwatch repository': () => {

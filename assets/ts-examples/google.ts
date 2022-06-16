@@ -2,7 +2,7 @@ import {NightwatchTests} from 'nightwatch';
 
 const home: NightwatchTests = {
   'Google title test': () => {
-    browser.url('https://google.com/ncr').assert.title('Google');
+    browser.url('https://google.com/ncr').assert.titleEquals('Google');
   },
 
   'Google search test': () => {
