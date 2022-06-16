@@ -430,16 +430,16 @@ module.exports = {
     <% } %><% if (answers.browsers.includes('edge')) { %>
     'selenium.edge': {
       extends: 'selenium_server',
-      "desiredCapabilities": {
-        "browserName": "MicrosoftEdge",
-        "ms:edgeOptions": {
-          "w3c": true,
-          "args": [
-            //"--headless"
+      desiredCapabilities: {
+        browserName: 'MicrosoftEdge',
+        'ms:edgeOptions': {
+          w3c: true,
+          args: [
+            // '--headless'
           ]
         },
-        "acceptSslCerts": true
-      },
+        acceptSslCerts: true
+      }
     }<% }} %>
   }
 };
