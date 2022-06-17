@@ -113,7 +113,7 @@ describe('e2e tests for init', () => {
     // Test generated config
     assert.strictEqual(fs.existsSync(configPath), true);
     const config = require(configPath);
-    assert.deepEqual(config.src_folders, ['tests']);
+    assert.deepEqual(config.src_folders, [path.join('tests', 'specs')]);
     assert.deepEqual(config.page_objects_path, [path.join('tests', 'page-objects')]);
     assert.deepEqual(config.custom_commands_path, [path.join('tests', 'custom-commands')]);
     assert.deepEqual(config.custom_assertions_path, [path.join('tests', 'custom-assertions')]);
@@ -413,7 +413,7 @@ describe('e2e tests for init', () => {
     // Test generated config
     assert.strictEqual(fs.existsSync(configPath), true);
     const config = require(configPath);
-    assert.deepEqual(config.src_folders, ['tests', 'nightwatch-examples']);
+    assert.deepEqual(config.src_folders, ['tests', path.join('nightwatch-examples', 'specs')]);
     assert.deepEqual(config.page_objects_path, [path.join('nightwatch-examples', 'page-objects')]);
     assert.deepEqual(config.custom_commands_path, [path.join('nightwatch-examples', 'custom-commands')]);
     assert.deepEqual(config.custom_assertions_path, [path.join('nightwatch-examples', 'custom-assertions')]);
@@ -875,7 +875,7 @@ describe('e2e tests for init', () => {
     // Test generated config
     assert.strictEqual(fs.existsSync(configPath), true);
     const config = require(configPath);
-    assert.deepEqual(config.src_folders, ['nightwatch-e2e']);
+    assert.deepEqual(config.src_folders, [path.join('nightwatch-e2e', 'specs')]);
     assert.deepEqual(config.page_objects_path, [path.join('nightwatch-e2e', 'page-objects')]);
     assert.deepEqual(config.custom_commands_path, [path.join('nightwatch-e2e', 'custom-commands')]);
     assert.deepEqual(config.custom_assertions_path, [path.join('nightwatch-e2e', 'custom-assertions')]);

@@ -727,7 +727,44 @@ describe('init tests', () => {
       fs.unlinkSync('test_config.conf.js');
     });
 
-    test('generateConfig with js with testsLocation and examplesLocation', () => {
+    test('generateConfig with js and same testsLocation and examplesLocation', () => {
+      mockery.registerMock(
+        './logger',
+        class {
+          static error() {}
+        }
+      );
+
+      const answers = {
+        language: 'js',
+        backend: 'local',
+        browsers: ['chrome', 'firefox'],
+        defaultBrowser: 'firefox',
+        testsLocation: 'tests',
+        addExamples: true,
+        examplesLocation: 'tests'
+      };
+
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, []);
+
+      nightwatchInit.generateConfig(answers, 'test_config.conf.js');
+      const config = require('../../test_config.conf.js');
+
+      assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
+      assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'tests');
+
+      assert.deepEqual(config.src_folders, [path.join('tests', 'specs')]);
+      assert.deepEqual(config.page_objects_path, [path.join('tests', 'page-objects')]);
+      assert.deepEqual(config.custom_commands_path, [path.join('tests', 'custom-commands')]);
+      assert.deepEqual(config.custom_assertions_path, [path.join('tests', 'custom-assertions')]);
+      assert.deepEqual(Object.keys(config.test_settings), ['default', 'firefox', 'chrome']);
+      assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox');
+
+      fs.unlinkSync('test_config.conf.js');
+    });
+
+    test('generateConfig with js with different testsLocation and examplesLocation', () => {
       mockery.registerMock(
         './logger',
         class {
@@ -758,7 +795,7 @@ describe('init tests', () => {
       assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
       assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, path.join('tests', 'nightwatch-examples'));
 
-      assert.deepEqual(config.src_folders, ['tests']);
+      assert.deepEqual(config.src_folders, ['tests', path.join('tests', 'nightwatch-examples', 'specs')]);
       assert.deepEqual(config.page_objects_path, [path.join('tests', 'nightwatch-examples', 'page-objects')]);
       assert.deepEqual(config.custom_commands_path, [path.join('tests', 'nightwatch-examples', 'custom-commands')]);
       assert.deepEqual(config.custom_assertions_path, [path.join('tests', 'nightwatch-examples', 'custom-assertions')]);
@@ -776,7 +813,7 @@ describe('init tests', () => {
       fs.unlinkSync('test_config.conf.js');
     });
 
-    test('generateConfig with js with cucumber, testsLocation, and examplesLocation', () => {
+    test('generateConfig with js with cucumber and same testsLocation and examplesLocation', () => {
       mockery.registerMock(
         './logger',
         class {
@@ -797,6 +834,58 @@ describe('init tests', () => {
         testsLocation: 'tests',
         addExamples: true,
         examplesLocation: 'tests'
+      };
+
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, []);
+
+      nightwatchInit.generateConfig(answers, 'test_config.conf.js');
+      const config = require('../../test_config.conf.js');
+
+      assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
+      assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, undefined);
+
+      assert.deepEqual(config.src_folders, ['tests']);
+      assert.deepEqual(config.page_objects_path, []);
+      assert.deepEqual(config.custom_commands_path, []);
+      assert.deepEqual(config.custom_assertions_path, []);
+      assert.deepEqual(Object.keys(config.test_settings), [
+        'default',
+        'chrome',
+        'saucelabs',
+        'saucelabs.chrome',
+        'saucelabs.firefox',
+        'selenium_server',
+        'selenium.chrome'
+      ]);
+      assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
+      assert.strictEqual(config.test_settings.saucelabs.selenium.host, 'ondemand.saucelabs.com');
+      assert.strictEqual(config.test_settings.saucelabs.selenium.port, 443);
+
+      fs.unlinkSync('test_config.conf.js');
+    });
+
+    test('generateConfig with js with cucumber and different testsLocation and examplesLocation', () => {
+      mockery.registerMock(
+        './logger',
+        class {
+          static error() {}
+        }
+      );
+
+      const answers = {
+        language: 'js',
+        runner: 'cucumber',
+        backend: 'both',
+        cloudProvider: 'saucelabs',
+        browsers: ['chrome'],
+        remoteBrowsers: ['chrome', 'firefox'],
+        defaultBrowser: 'chrome',
+        remoteName: 'saucelabs',
+        seleniumServer: true,
+        testsLocation: 'tests',
+        addExamples: true,
+        examplesLocation: path.join('tests', 'features', 'nightwatch-examples')
       };
 
       const {NightwatchInit} = require('../../lib/init');
