@@ -731,6 +731,14 @@ describe('index tests', () => {
       }
     });
 
+    mockery.registerMock('./init', {
+      NightwatchInit: class {
+        constructor(rootDir, options) {
+        }
+        run() {}
+      }
+    });
+
     mockery.registerMock(child_process, {
       execSync: () => {
         return true;
