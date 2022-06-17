@@ -720,6 +720,7 @@ describe('init tests', () => {
       assert.deepEqual(config.src_folders, []);
       assert.deepEqual(config.page_objects_path, []);
       assert.deepEqual(config.custom_commands_path, []);
+      assert.deepEqual(config.custom_assertions_path, []);
       assert.deepEqual(Object.keys(config.test_settings), ['default', 'firefox', 'chrome']);
       assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox');
 
@@ -760,6 +761,7 @@ describe('init tests', () => {
       assert.deepEqual(config.src_folders, ['tests']);
       assert.deepEqual(config.page_objects_path, [path.join('tests', 'nightwatch-examples', 'page-objects')]);
       assert.deepEqual(config.custom_commands_path, [path.join('tests', 'nightwatch-examples', 'custom-commands')]);
+      assert.deepEqual(config.custom_assertions_path, [path.join('tests', 'nightwatch-examples', 'custom-assertions')]);
       assert.deepEqual(Object.keys(config.test_settings), [
         'default',
         'chrome',
@@ -809,6 +811,7 @@ describe('init tests', () => {
       assert.deepEqual(config.src_folders, ['tests']);
       assert.deepEqual(config.page_objects_path, []);
       assert.deepEqual(config.custom_commands_path, []);
+      assert.deepEqual(config.custom_assertions_path, []);
       assert.deepEqual(Object.keys(config.test_settings), [
         'default',
         'chrome',
@@ -859,6 +862,7 @@ describe('init tests', () => {
       assert.deepEqual(config.src_folders, [path.join('dist', 'tests'), path.join('dist', 'nightwatch-examples')]);
       assert.deepEqual(config.page_objects_path, []);
       assert.deepEqual(config.custom_commands_path, []);
+      assert.deepEqual(config.custom_assertions_path, []);
       assert.deepEqual(Object.keys(config.test_settings), [
         'default',
         'browserstack',
