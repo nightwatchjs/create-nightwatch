@@ -710,14 +710,7 @@ describe('index tests', () => {
   });
 
   test('should not give suggestion when right args are passed ', () => {
-    process.argv = ['node', 'filename.js', '--browser=chrome', '--browser=safari'];
-
-    const origProcessExit = process.exit;
-
-    let processExitCode;
-    process.exit = (code) => {
-      processExitCode = code;
-    };
+    process.argv = ['node', 'filename.js', '--browser=chrome', '--browser=safari', 'args'];
 
     const consoleOutput = [];
     mockery.registerMock(
@@ -752,19 +745,10 @@ describe('index tests', () => {
       output.includes('[33mpackage.json[39m not found in the root directory. Initializing a new NPM project..'),
       true
     );
-
-    process.exit = origProcessExit;
   });
 
   test('should give suggestion when wrong args are passed ', () => {
     process.argv = ['node', 'filename.js', '--browsers=chrome', '--browsers=safari'];
-
-    const origProcessExit = process.exit;
-
-    let processExitCode;
-    process.exit = (code) => {
-      processExitCode = code;
-    };
 
     const consoleOutput = [];
     mockery.registerMock(
@@ -799,7 +783,5 @@ describe('index tests', () => {
       output.includes('error: unknown option \'browsers\'\n(Did you mean browser?)'),
       true
     );
-
-    process.exit = origProcessExit;
   });
 });
