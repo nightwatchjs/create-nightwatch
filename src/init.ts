@@ -10,14 +10,15 @@ import Logger from './logger';
 import {CONFIG_INTRO, BROWSER_CHOICES, QUESTIONAIRRE, CONFIG_DEST_QUES} from './constants';
 import {ConfigGeneratorAnswers, ConfigDestination, OtherInfo} from './interfaces';
 import defaultAnswers from './defaults.json';
+import {ParsedArgs} from 'minimist';
 
 export class NightwatchInit {
   rootDir: string;
-  options: string[];
+  options: Omit<ParsedArgs, '_'>;
   otherInfo: OtherInfo;
   onlyConfig: boolean;
 
-  constructor(rootDir = process.cwd(), options: string[]) {
+  constructor(rootDir = process.cwd(), options: Omit<ParsedArgs, '_'>) {
     this.rootDir = rootDir;
     this.options = options;
     this.otherInfo = {};
@@ -27,11 +28,14 @@ export class NightwatchInit {
   async run() {
     let answers: ConfigGeneratorAnswers = {};
 
-    if (this.options.includes('generate-config')) {
+    if (this.options?.['generate-config']) {
       this.onlyConfig = true;
     }
 
-    if (this.options.includes('yes')) {
+    if (this.options?.yes) {
+      if (this.options?.browser) {
+        defaultAnswers.browsers = this.options.browser;
+      }
       answers = defaultAnswers as ConfigGeneratorAnswers;
     } else {
       Logger.error(CONFIG_INTRO);
@@ -91,7 +95,8 @@ export class NightwatchInit {
   async askQuestions() {
     const answers = {
       rootDir: this.rootDir,
-      onlyConfig: this.onlyConfig
+      onlyConfig: this.onlyConfig,
+      browsers: this.options?.browser
     };
 
     return await prompt(QUESTIONAIRRE, answers);
@@ -291,7 +296,7 @@ export class NightwatchInit {
   }
 
   async getConfigDestPath() {
-    if (this.options.includes('yes')) {
+    if (this.options?.yes) {
       Logger.error('Auto-generating a configuration file...\n');
     } else {
       Logger.error('Generting a configuration file based on your responses...\n');

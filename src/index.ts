@@ -4,21 +4,42 @@ import {execSync} from 'child_process';
 import colors from 'ansi-colors';
 import {prompt} from 'inquirer';
 import {NightwatchInit} from './init';
-import {NIGHTWATCH_TITLE} from './constants';
+import {NIGHTWATCH_TITLE, AVAILABLE_CONFIG_FLAGS} from './constants';
 import Logger from './logger';
 import {isNodeProject} from './utils';
+import minimist from 'minimist';
+import suggestSimilarOption from './utils/suggestSimilar';
 
 export const run = async () => {
   try {
     const argv = process.argv.slice(2);
     const args = argv.filter((arg) => !arg.startsWith('-'));
-    const options = getArgOptions(argv);
+    const options = minimist(argv, {
+      boolean: 'generate-config',
+      alias: {
+        yes: 'y',
+        browser: 'b'
+      }
+    });
+    const {_, ...nightwatchInitOptions} = options;
+
+    // Filter flags that are not present in AVAILABLE_CONFIG_ARGS
+    const wrongUserFlags = Object.keys(nightwatchInitOptions).filter((word) => !AVAILABLE_CONFIG_FLAGS.includes(word));
+
+    if (wrongUserFlags.length > 0) {
+      const findAndSuggestSimilarOption = suggestSimilarOption(wrongUserFlags[0], AVAILABLE_CONFIG_FLAGS);
+      if (findAndSuggestSimilarOption !== '') {
+        Logger.error(`error: unknown option '${wrongUserFlags[0]}'${findAndSuggestSimilarOption}`);
+  
+        return;
+      }
+    }
 
     Logger.error(NIGHTWATCH_TITLE);
 
     let rootDir = path.resolve(process.cwd(), args[0] || '');
 
-    if (options.includes('generate-config') && !isNodeProject(rootDir)) {
+    if (options?.['generate-config'] && !isNodeProject(rootDir)) {
       throw new Error(`package.json not found. Please run this command from your existing Nightwatch project.
       Or, use \`npm init nightwatch ${args[0] || '.'}\` to initialize a new Nightwatch project instead.`);
     }
@@ -33,30 +54,12 @@ export const run = async () => {
       initializeNodeProject(rootDir);
     }
 
-    const nightwatchInit = new NightwatchInit(rootDir, options);
+    const nightwatchInit = new NightwatchInit(rootDir, nightwatchInitOptions);
     await nightwatchInit.run();
   } catch (err) {
     Logger.error(err as string);
     process.exit(1);
   }
-};
-
-const getArgOptions = (argv: string[]): string[] => {
-  const options: string[] = [];
-
-  const alias: { [key: string]: string } = {
-    y: 'yes'
-  };
-
-  argv.forEach((arg) => {
-    if (arg.startsWith('--')) {
-      options.push(arg.slice(2));
-    } else if (arg.startsWith('-') && alias[arg.slice(1)]) {
-      options.push(alias[arg.slice(1)]);
-    }
-  });
-
-  return options;
 };
 
 export const confirmRootDir = async (rootDir: string): Promise<string> => {

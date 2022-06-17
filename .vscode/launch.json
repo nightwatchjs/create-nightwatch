@@ -14,12 +14,32 @@
         "<node_internals>/**"
       ],
       "program": "${workspaceFolder}/index.js",
-      "args": ["--yes --browser=chrome --browser=firefox"],
+      "args": [
+        "--yes",
+        "--browser=chrome",
+        "--browser=safari"
+      ],
       "outFiles": [
         "${workspaceFolder}/lib/**/*.js"
       ],
       "preLaunchTask": "npm: build",
       "console": "integratedTerminal"
+    },
+    {
+      "type": "pwa-node",
+      "name": "Run Tests",
+      "request": "launch",
+      "smartStep": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "nightwatch",
+        "${relativeFile}"
+      ],
+      "preLaunchTask": "npm: build",
+      "internalConsoleOptions": "openOnSessionStart",
     }
   ]
 }
