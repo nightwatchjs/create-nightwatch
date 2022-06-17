@@ -116,6 +116,7 @@ describe('e2e tests for init', () => {
     assert.deepEqual(config.src_folders, ['tests']);
     assert.deepEqual(config.page_objects_path, [path.join('tests', 'page-objects')]);
     assert.deepEqual(config.custom_commands_path, [path.join('tests', 'custom-commands')]);
+    assert.deepEqual(config.custom_assertions_path, [path.join('tests', 'custom-assertions')]);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
     if (process.platform === 'darwin') {
@@ -155,8 +156,8 @@ describe('e2e tests for init', () => {
     const examplesPath = path.join(rootDir, answers.examplesLocation);
     assert.strictEqual(fs.existsSync(examplesPath), true);
     const exampleFiles = fs.readdirSync(examplesPath);
-    assert.strictEqual(exampleFiles.length, 3);
-    assert.deepEqual(exampleFiles, ['custom-commands', 'page-objects', 'specs']);
+    assert.strictEqual(exampleFiles.length, 4);
+    assert.deepEqual(exampleFiles, ['custom-assertions', 'custom-commands', 'page-objects', 'specs']);
 
     // Test console output
     const output = consoleOutput.toString();
@@ -272,6 +273,7 @@ describe('e2e tests for init', () => {
     assert.deepEqual(config.src_folders, ['tests']);
     assert.deepEqual(config.page_objects_path, []);
     assert.deepEqual(config.custom_commands_path, []);
+    assert.deepEqual(config.custom_assertions_path, []);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.test_runner.type, 'cucumber');
     // assert.strictEqual(config.test_settings.default.test_runner.options.feature_path, path.join('tests', 'features'));
@@ -414,6 +416,7 @@ describe('e2e tests for init', () => {
     assert.deepEqual(config.src_folders, ['tests']);
     assert.deepEqual(config.page_objects_path, [path.join('tests', 'nightwatch-examples', 'page-objects')]);
     assert.deepEqual(config.custom_commands_path, [path.join('tests', 'nightwatch-examples', 'custom-commands')]);
+    assert.deepEqual(config.custom_assertions_path, [path.join('tests', 'nightwatch-examples', 'custom-assertions')]);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.test_runner.type, 'mocha');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
@@ -451,8 +454,8 @@ describe('e2e tests for init', () => {
     const examplesPath = path.join(rootDir, answers.examplesLocation);
     assert.strictEqual(fs.existsSync(examplesPath), true);
     const exampleFiles = fs.readdirSync(examplesPath);
-    assert.strictEqual(exampleFiles.length, 3);
-    assert.deepEqual(exampleFiles, ['custom-commands', 'page-objects', 'specs']);
+    assert.strictEqual(exampleFiles.length, 4);
+    assert.deepEqual(exampleFiles, ['custom-assertions', 'custom-commands', 'page-objects', 'specs']);
 
     // Test console output
     const output = consoleOutput.toString();
@@ -569,6 +572,7 @@ describe('e2e tests for init', () => {
     assert.deepEqual(config.src_folders, [path.join('dist', 'tests')]);
     assert.deepEqual(config.page_objects_path, []);
     assert.deepEqual(config.custom_commands_path, []);
+    assert.deepEqual(config.custom_assertions_path, []);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
     assert.strictEqual(config.test_settings.saucelabs.selenium.host, 'ondemand.saucelabs.com');
@@ -716,6 +720,7 @@ describe('e2e tests for init', () => {
     assert.deepEqual(config.src_folders, [path.join('dist', 'tests')]);
     assert.deepEqual(config.page_objects_path, []);
     assert.deepEqual(config.custom_commands_path, []);
+    assert.deepEqual(config.custom_assertions_path, []);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox');
     assert.strictEqual(config.test_settings.browserstack.selenium.host, 'hub.browserstack.com');
@@ -872,6 +877,7 @@ describe('e2e tests for init', () => {
     assert.deepEqual(config.src_folders, ['nightwatch-e2e']);
     assert.deepEqual(config.page_objects_path, [path.join('nightwatch-e2e', 'page-objects')]);
     assert.deepEqual(config.custom_commands_path, [path.join('nightwatch-e2e', 'custom-commands')]);
+    assert.deepEqual(config.custom_assertions_path, [path.join('nightwatch-e2e', 'custom-assertions')]);
     assert.strictEqual(config.test_settings.default.launch_url, 'http://localhost');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox');
     assert.strictEqual(config.test_settings.browserstack.selenium.host, 'hub.browserstack.com');
@@ -903,8 +909,8 @@ describe('e2e tests for init', () => {
     const examplesPath = path.join(rootDir, answers.examplesLocation);
     assert.strictEqual(fs.existsSync(examplesPath), true);
     const exampleFiles = fs.readdirSync(examplesPath);
-    assert.strictEqual(exampleFiles.length, 3);
-    assert.deepEqual(exampleFiles, ['custom-commands', 'page-objects', 'specs']);
+    assert.strictEqual(exampleFiles.length, 4);
+    assert.deepEqual(exampleFiles, ['custom-assertions', 'custom-commands', 'page-objects', 'specs']);
 
     // Test console output
     const output = consoleOutput.toString();
@@ -1019,6 +1025,7 @@ describe('e2e tests for init', () => {
     assert.deepEqual(config.src_folders, ['tests']);
     assert.deepEqual(config.page_objects_path, []);
     assert.deepEqual(config.custom_commands_path, []);
+    assert.deepEqual(config.custom_assertions_path, []);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
     if (process.platform === 'darwin') {
@@ -1154,6 +1161,7 @@ describe('e2e tests for init', () => {
     assert.deepEqual(config.src_folders, ['tests']);
     assert.deepEqual(config.page_objects_path, []);
     assert.deepEqual(config.custom_commands_path, []);
+    assert.deepEqual(config.custom_assertions_path, []);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox');
     // TODO
