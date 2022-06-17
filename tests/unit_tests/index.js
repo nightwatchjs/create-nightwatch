@@ -413,6 +413,7 @@ describe('index tests', () => {
       assert.strictEqual(rootDirPassed, expectedRootDir);
       assert.deepEqual(optionsPassed, {
         'generate-config': false,
+        b: ['chrome', 'safari'],
         browser: ['chrome', 'safari']
       });
     });

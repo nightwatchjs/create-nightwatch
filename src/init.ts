@@ -35,10 +35,8 @@ export class NightwatchInit {
     if (this.options?.yes) {
       if (this.options?.browser) {
         defaultAnswers.browsers = this.options.browser;
-        answers = defaultAnswers as ConfigGeneratorAnswers;
-      } else {
-        answers = defaultAnswers as ConfigGeneratorAnswers;
       }
+      answers = defaultAnswers as ConfigGeneratorAnswers;
     } else {
       Logger.error(CONFIG_INTRO);
 

@@ -56,7 +56,7 @@ function editDistance(a: string, b: string): number {
  * @returns {string}
  */
 
-export default function suggestSimilar(word: string, candidates: string[]): string {
+export default function suggestSimilarOption(word: string, candidates: string[]): string {
   if (!candidates || candidates.length === 0) {
     return '';
   }

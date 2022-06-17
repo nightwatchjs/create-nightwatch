@@ -4,11 +4,11 @@ import {execSync} from 'child_process';
 import colors from 'ansi-colors';
 import {prompt} from 'inquirer';
 import {NightwatchInit} from './init';
-import {NIGHTWATCH_TITLE, AVAILABLE_CONFIG_ARGS} from './constants';
+import {NIGHTWATCH_TITLE, AVAILABLE_CONFIG_FLAGS} from './constants';
 import Logger from './logger';
 import {isNodeProject} from './utils';
 import minimist from 'minimist';
-import suggestSimilar from './utils/suggestSimilar';
+import suggestSimilarOption from './utils/suggestSimilar';
 
 export const run = async () => {
   try {
@@ -17,21 +17,22 @@ export const run = async () => {
     const options = minimist(argv, {
       boolean: 'generate-config',
       alias: {
-        yes: 'y'
+        yes: 'y',
+        browser: 'b'
       }
     });
     const {_, ...nightwatchInitOptions} = options;
 
-    // Checking Valid options passed to CLI
-    const userArgs = Object.keys(options).slice(1);
-    // Filter args not present in AVAILABLE_CONFIG_ARGS
-    const wrongUserArgs = userArgs.filter((word) => !AVAILABLE_CONFIG_ARGS.includes(word));
+    // Filter flags that are not present in AVAILABLE_CONFIG_ARGS
+    const wrongUserFlags = Object.keys(nightwatchInitOptions).filter((word) => !AVAILABLE_CONFIG_FLAGS.includes(word));
 
-    const checkForSuggestion = suggestSimilar(wrongUserArgs[0], AVAILABLE_CONFIG_ARGS);
-    if (checkForSuggestion !== '') {
-      Logger.error(`error: unknown option '${wrongUserArgs[0]}'${checkForSuggestion}`);
-
-      return;
+    if (wrongUserFlags.length > 0) {
+      const findAndSuggestSimilarOption = suggestSimilarOption(wrongUserFlags[0], AVAILABLE_CONFIG_FLAGS);
+      if (findAndSuggestSimilarOption !== '') {
+        Logger.error(`error: unknown option '${wrongUserFlags[0]}'${findAndSuggestSimilarOption}`);
+  
+        return;
+      }
     }
 
     Logger.error(NIGHTWATCH_TITLE);

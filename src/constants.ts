@@ -22,7 +22,7 @@ Just answer a few questions to get started with Nightwatch:
 We'll setup everything for you :-)
 `;
 
-export const AVAILABLE_CONFIG_ARGS = ['yes', 'generate-config', 'browser'];
+export const AVAILABLE_CONFIG_FLAGS = ['yes', 'generate-config', 'browser', 'y', 'b'];
 
 export const BROWSER_CHOICES = [
   {name: 'Firefox', value: 'firefox'},
