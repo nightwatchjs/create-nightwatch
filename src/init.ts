@@ -172,14 +172,15 @@ export class NightwatchInit {
       if (answers.runner === 'cucumber') {
         answers.examplesLocation = path.join(answers.featurePath || '', 'nightwatch-examples');
       } else {
-        // Put examples directly into testsLocation, to be used as boilerplate.
-        answers.examplesLocation = answers.testsLocation;
-        
-        // But if the chosen examplesLocation already contains some files, shift the examples
-        // to a sub-folder named 'nightwatch-examples'.
-        const examplesDestPath = path.join(this.rootDir, answers.examplesLocation);
-        if (fs.existsSync(examplesDestPath) && fs.readdirSync(examplesDestPath).length) {
-          answers.examplesLocation = path.join(answers.examplesLocation, 'nightwatch-examples');
+        // Find a location for putting the example files.
+        const testsDestPath = path.join(this.rootDir, answers.testsLocation);
+        if (fs.existsSync(testsDestPath) && fs.readdirSync(testsDestPath).length) {
+          // If testsLocation already contains some files, put the examples in a
+          // separate directory.
+          answers.examplesLocation = 'nightwatch-examples';
+        } else {
+          // Put examples directly into testsLocation, to be used as boilerplate.
+          answers.examplesLocation = answers.testsLocation;
         }
       }
     }

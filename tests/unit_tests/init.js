@@ -181,7 +181,7 @@ describe('init tests', () => {
       assert.strictEqual(answers['remoteName'], 'saucelabs');
       assert.strictEqual(answers['testsLocation'], 'tests');
       assert.strictEqual(answers['addExamples'], true);
-      assert.strictEqual(answers['examplesLocation'], path.join('tests', 'nightwatch-examples'));
+      assert.strictEqual(answers['examplesLocation'], 'nightwatch-examples');
     });
 
     test('with remote (other) in answers and onlyConfig flag', () => {
