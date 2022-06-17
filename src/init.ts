@@ -324,7 +324,13 @@ export class NightwatchInit {
 
     const testsJsSrc: string = path.join(this.otherInfo.tsOutDir || '', answers.testsLocation || '');
     if (testsJsSrc !== '.') {
-      src_folders.push(testsJsSrc);
+      if (answers.testsLocation === answers.examplesLocation && answers.language === 'js' && answers.runner !== 'cucumber') {
+        // examples are being put as a boilerplate in testsLocation with main tests in
+        // 'specs' sub-directory (only done for JS-Nightwatch and JS-Mocha).
+        src_folders.push(path.join(testsJsSrc, 'specs'));
+      } else {
+        src_folders.push(testsJsSrc);
+      }
       this.otherInfo.testsJsSrc = testsJsSrc;
     }
 
@@ -332,15 +338,19 @@ export class NightwatchInit {
       // Add examplesLocation to src_folders, if different from testsLocation.
       // Don't add for cucumber examples (for now, as addition of examples depends upon featurePath in copyCucumberExamples).
       const examplesJsSrc: string = path.join(this.otherInfo.tsOutDir || '', answers.examplesLocation || '');
-      if (examplesJsSrc && testsJsSrc && !examplesJsSrc.startsWith(testsJsSrc)) {
-        src_folders.push(examplesJsSrc);
+      if (examplesJsSrc !== testsJsSrc) {
+        if (answers.language === 'js') {
+          // Only for JS-Nightwatch and JS-Mocha.
+          src_folders.push(path.join(examplesJsSrc, 'specs'));
+        } else {
+          src_folders.push(examplesJsSrc);
+        }
       }
       this.otherInfo.examplesJsSrc = examplesJsSrc;
 
-      // Add page_objects_path
       if (answers.language === 'js') {
-        // Right now, we only ship page-objects/custom-commands examples 
-        // with JS (Nightwatch and Mocha test runner) only.
+        // Right now, we only ship page-objects/custom-commands/custom-assertions
+        // examples with JS (Nightwatch and Mocha test runner) only.
         page_objects_path.push(`${path.join(examplesJsSrc, 'page-objects')}`);
         custom_commands_path.push(`${path.join(examplesJsSrc, 'custom-commands')}`);
         custom_assertions_path.push(`${path.join(examplesJsSrc, 'custom-assertions')}`);
