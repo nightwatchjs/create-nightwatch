@@ -1,6 +1,7 @@
 const assert = require('assert');
 const mockery = require('mockery');
 const path = require('path');
+const child_process = require.resolve('child_process');
 
 describe('index tests', () => {
   describe('test run function', () => {
@@ -706,5 +707,99 @@ describe('index tests', () => {
       const output = consoleOutput.toString();
       assert.strictEqual(output.includes('Initializing a new NPM project'), true);
     });
+  });
+
+  test('should not give suggestion when right args are passed ', () => {
+    process.argv = ['node', 'filename.js', '--browser=chrome', '--browser=safari'];
+
+    const origProcessExit = process.exit;
+
+    let processExitCode;
+    process.exit = (code) => {
+      processExitCode = code;
+    };
+
+    const consoleOutput = [];
+    mockery.registerMock(
+      './logger',
+      class {
+        static error(...msgs) {
+          consoleOutput.push(...msgs);
+        }
+      }
+    );
+
+    mockery.registerMock('fs', {
+      existsSync() {
+        return false;
+      },
+      mkdirSync() {
+        return true;
+      }
+    });
+
+    mockery.registerMock(child_process, {
+      execSync: () => {
+        return true;
+      }
+    });
+
+    const index = require('../../lib/index');
+    index.run();
+
+    const output = consoleOutput.toString();
+    assert.strictEqual(
+      output.includes('[33mpackage.json[39m not found in the root directory. Initializing a new NPM project..'),
+      true
+    );
+
+    process.exit = origProcessExit;
+  });
+
+  test('should give suggestion when wrong args are passed ', () => {
+    process.argv = ['node', 'filename.js', '--browsers=chrome', '--browsers=safari'];
+
+    const origProcessExit = process.exit;
+
+    let processExitCode;
+    process.exit = (code) => {
+      processExitCode = code;
+    };
+
+    const consoleOutput = [];
+    mockery.registerMock(
+      './logger',
+      class {
+        static error(...msgs) {
+          consoleOutput.push(...msgs);
+        }
+      }
+    );
+
+    mockery.registerMock('fs', {
+      existsSync() {
+        return false;
+      },
+      mkdirSync() {
+        return true;
+      }
+    });
+
+    mockery.registerMock(child_process, {
+      execSync: () => {
+        return true;
+      }
+    });
+
+    const index = require('../../lib/index');
+    index.run();
+
+    const output = consoleOutput.toString();
+    assert.strictEqual(
+      output.includes('error: unknown option \'browsers\'\n(Did you mean browser?)'),
+      true
+    );
+
+    process.exit = origProcessExit;
   });
 });
