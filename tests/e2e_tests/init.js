@@ -170,6 +170,8 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Generating example files...'), true);
     assert.strictEqual(output.includes('Success! Generated some example files at \'tests\'.'), true);
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
+    assert.strictEqual(output.includes('Join our Discord community and instantly find answers to your issues or queries.'), true);
+    assert.strictEqual(output.includes('Visit our GitHub page to report bugs or raise feature requests:'), true);
     assert.strictEqual(output.includes('RUN NIGHTWATCH TESTS'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
@@ -313,8 +315,10 @@ describe('e2e tests for init', () => {
       true
     );
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
+    assert.strictEqual(output.includes('Join our Discord community and instantly find answers to your issues or queries.'), true);
+    assert.strictEqual(output.includes('Visit our GitHub page to report bugs or raise feature requests:'), true);
     assert.strictEqual(output.includes('IMPORTANT'), true);
-    assert.strictEqual(output.includes('Please set the host and port property in your configuration file.'), true);
+    assert.strictEqual(output.includes('To run tests on your remote device, please set the host and port property in your nightwatch.conf.js file.'), true);
     assert.strictEqual(output.includes('These can be located at:'), true);
     assert.strictEqual(output.includes('Please set the credentials (if any) required to run tests'), true);
     assert.strictEqual(output.includes('- REMOTE_USERNAME'), true);
@@ -488,6 +492,8 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Generating example files...'), true);
     assert.strictEqual(output.includes('Success! Generated some example files at \'nightwatch-examples\'.'), true);
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
+    assert.strictEqual(output.includes('Join our Discord community and instantly find answers to your issues or queries.'), true);
+    assert.strictEqual(output.includes('Visit our GitHub page to report bugs or raise feature requests:'), true);
     assert.strictEqual(output.includes('Please set the credentials required to run tests on your cloud provider'), true);
     assert.strictEqual(output.includes('- BROWSERSTACK_USERNAME'), true);
     assert.strictEqual(output.includes('- BROWSERSTACK_ACCESS_KEY'), true);
@@ -638,6 +644,8 @@ describe('e2e tests for init', () => {
       true
     );
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
+    assert.strictEqual(output.includes('Join our Discord community and instantly find answers to your issues or queries.'), true);
+    assert.strictEqual(output.includes('Visit our GitHub page to report bugs or raise feature requests:'), true);
     assert.strictEqual(output.includes('Please set the credentials required to run tests on your cloud provider'), true);
     assert.strictEqual(output.includes('- SAUCE_USERNAME'), true);
     assert.strictEqual(output.includes('- SAUCE_ACCESS_KEY'), true);
@@ -807,6 +815,8 @@ describe('e2e tests for init', () => {
       true
     );
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
+    assert.strictEqual(output.includes('Join our Discord community and instantly find answers to your issues or queries.'), true);
+    assert.strictEqual(output.includes('Visit our GitHub page to report bugs or raise feature requests:'), true);
     assert.strictEqual(output.includes('Please set the credentials required to run tests on your cloud provider'), true);
     assert.strictEqual(output.includes('- BROWSERSTACK_USERNAME'), true);
     assert.strictEqual(output.includes('- BROWSERSTACK_ACCESS_KEY'), true);
@@ -967,6 +977,8 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Generating example files...'), true);
     assert.strictEqual(output.includes('Success! Generated some example files at \'nightwatch-e2e\'.'), true);
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
+    assert.strictEqual(output.includes('Join our Discord community and instantly find answers to your issues or queries.'), true);
+    assert.strictEqual(output.includes('Visit our GitHub page to report bugs or raise feature requests:'), true);
     assert.strictEqual(output.includes('Please set the credentials required to run tests on your cloud provider'), true);
     assert.strictEqual(output.includes('- BROWSERSTACK_USERNAME'), true);
     assert.strictEqual(output.includes('- BROWSERSTACK_ACCESS_KEY'), true);
