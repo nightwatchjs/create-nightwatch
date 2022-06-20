@@ -278,9 +278,8 @@ describe('e2e tests for init', () => {
     assert.strictEqual(config.test_settings.default.test_runner.type, 'cucumber');
     // assert.strictEqual(config.test_settings.default.test_runner.options.feature_path, path.join('tests', 'features'));
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
-    // TODO
-    // assert.strictEqual(config.test_settings.remote.selenium.host, 'localhost');
-    // assert.strictEqual(config.test_settings.remote.selenium.port, 4444);
+    assert.strictEqual(config.test_settings.remote.selenium.host, '<remote-hostname>');
+    assert.strictEqual(config.test_settings.remote.selenium.port, 4444);
     assert.deepEqual(Object.keys(config.test_settings), ['default', 'remote', 'remote.chrome', 'remote.edge']);
 
     // Test Packages and webdrivers installed
@@ -1165,9 +1164,8 @@ describe('e2e tests for init', () => {
     assert.deepEqual(config.custom_assertions_path, []);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox');
-    // TODO
-    // assert.strictEqual(config.test_settings.remote.selenium.host, 'localhost');
-    // assert.strictEqual(config.test_settings.remote.selenium.port, 4444);
+    assert.strictEqual(config.test_settings.remote.selenium.host, '<remote-hostname>');
+    assert.strictEqual(config.test_settings.remote.selenium.port, 4444);
     assert.deepEqual(Object.keys(config.test_settings), [
       'default',
       'firefox',

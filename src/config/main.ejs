@@ -290,6 +290,7 @@ module.exports = {
       desiredCapabilities: {
         browserName: 'chrome',
         browserVersion: 'latest',
+        platformName: 'Windows 10',
         'goog:chromeOptions': {
           w3c: true
         }
@@ -300,7 +301,8 @@ module.exports = {
       extends: 'saucelabs',
       desiredCapabilities: {
         browserName: 'firefox',
-        browserVersion: 'latest'
+        browserVersion: 'latest',
+        platformName: 'Windows 10'
       }
     },
     <% } %><% if (answers.remoteBrowsers.includes('safari')) { %>
@@ -316,12 +318,13 @@ module.exports = {
     ////////////////////////////////////////////////////////////////////////////////////////
     // Configuration for using remote Selenium service or a cloud-based testing provider.  |
     //                                                                                     |
-    // Please set the hostname and port by setting the below environment variables:        |
-    // - REMOTE_HOSTNAME                                                                   |
-    // - REMOTE_PORT                                                                       |
+    // Please set the hostname and port of your remote selenium-server or cloud-provider   |
+    // (by setting the following properties in the configuration below):                   |
+    // - `selenium.host`                                                                   |
+    // - `selenium.port`                                                                   |
     //                                                                                     |
-    // If you are using cloud providers such as CrossBrowserTesting, LambdaTests, etc.     |
-    // Please set the username and access key by setting the below environment variables:  |
+    // If you are using a cloud provider such as CrossBrowserTesting, LambdaTests, etc.,   |
+    // please set the username and access_key by setting the below environment variables:  |
     // - REMOTE_USERNAME                                                                   |
     // - REMOTE_ACCESS_KEY                                                                 |
     // (.env files are supported)                                                          |
@@ -332,8 +335,8 @@ module.exports = {
       selenium: {
         start_process: false,
         server_path: '',
-        host: '${REMOTE_HOSTNAME}',
-        port: '${REMOTE_PORT}'
+        host: '<remote-hostname>',
+        port: 4444
       },
 
       // username: '${REMOTE_USERNAME}',
