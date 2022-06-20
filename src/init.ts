@@ -107,10 +107,23 @@ export class NightwatchInit {
     const backendHasRemote = answers.backend && ['remote', 'both'].includes(answers.backend);
 
     if (backendHasRemote) {
+      answers.remoteEnv = {
+        username: 'REMOTE_USERNAME',
+        access_key: 'REMOTE_ACCESS_KEY'
+      };
+
       if (answers.cloudProvider === 'other') {
         answers.remoteName = 'remote';
       } else {
         answers.remoteName = answers.cloudProvider;
+
+        if (answers.cloudProvider === 'browserstack') {
+          answers.remoteEnv.username = 'BROWSERSTACK_USERNAME';
+          answers.remoteEnv.access_key = 'BROWSERSTACK_ACCESS_KEY';
+        } else if (answers.cloudProvider === 'saucelabs') {
+          answers.remoteEnv.username = 'SAUCE_USERNAME';
+          answers.remoteEnv.access_key = 'SAUCE_ACCESS_KEY';
+        }
       }
 
       if (!answers.remoteBrowsers) {
@@ -534,6 +547,36 @@ export class NightwatchInit {
   postSetupInstructions(answers: ConfigGeneratorAnswers) {
     Logger.error('Nightwatch setup complete!!\n');
 
+    // Instructions for setting host, port, username and passowrd for remote.
+    if (answers.backend && ['remote', 'both'].includes(answers.backend)) {
+      Logger.error(colors.red('IMPORTANT'));
+      if (answers.cloudProvider === 'other') {
+        Logger.error(
+          `Please set the ${colors.magenta('host')} and ${colors.magenta('port')} property in your configuration file.` 
+        );
+        Logger.error('These can be located at:');
+        Logger.error(
+          `{\n  ...\n  "test_settings": {\n    ...\n    "${answers.remoteName}": {\n      "selenium": {\n        ${colors.cyan(
+            '"host":')}\n        ${colors.cyan('"port":')}\n      }\n    }\n  }\n}`,
+          '\n'
+        );
+
+        Logger.error(
+          'Please set the credentials (if any) required to run tests on your cloud provider or remote selenium-server, by setting the below env variables:'
+        );
+      } else {
+        Logger.error(
+          'Please set the credentials required to run tests on your cloud provider, by setting the below env variables:'
+        );
+      }
+
+      Logger.error(`- ${colors.cyan(answers.remoteEnv?.username as string)}`);
+      Logger.error(`- ${colors.cyan(answers.remoteEnv?.access_key as string)}`);
+      Logger.error('(.env files are also supported)', '\n');
+    }
+
+    Logger.error();
+    Logger.error(colors.green('RUN NIGHTWATCH TESTS'), '\n');
     if (this.rootDir !== process.cwd()) {
       Logger.error('First, change directory to the root dir of your project:');
       Logger.error(colors.cyan(`  cd ${path.relative(process.cwd(), this.rootDir) || '.'}`), '\n');

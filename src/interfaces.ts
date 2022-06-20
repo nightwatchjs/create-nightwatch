@@ -7,6 +7,10 @@ export interface ConfigGeneratorAnswers {
   seleniumServer?: boolean;
   cloudProvider?: 'browserstack' | 'saucelabs' | 'other';
   remoteName?: string;
+  remoteEnv?: {
+    username: string;
+    access_key: string;
+  };
   baseUrl?: string;
   runner?: 'nightwatch' | 'mocha' | 'cucumber';
   testsLocation?: string;
