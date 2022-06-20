@@ -107,23 +107,21 @@ export class NightwatchInit {
     const backendHasRemote = answers.backend && ['remote', 'both'].includes(answers.backend);
 
     if (backendHasRemote) {
+      answers.remoteName = 'remote';
+      if (answers.cloudProvider !== 'other') {
+        answers.remoteName = answers.cloudProvider;
+      }
+
       answers.remoteEnv = {
         username: 'REMOTE_USERNAME',
         access_key: 'REMOTE_ACCESS_KEY'
       };
-
-      if (answers.cloudProvider === 'other') {
-        answers.remoteName = 'remote';
-      } else {
-        answers.remoteName = answers.cloudProvider;
-
-        if (answers.cloudProvider === 'browserstack') {
-          answers.remoteEnv.username = 'BROWSERSTACK_USERNAME';
-          answers.remoteEnv.access_key = 'BROWSERSTACK_ACCESS_KEY';
-        } else if (answers.cloudProvider === 'saucelabs') {
-          answers.remoteEnv.username = 'SAUCE_USERNAME';
-          answers.remoteEnv.access_key = 'SAUCE_ACCESS_KEY';
-        }
+      if (answers.cloudProvider === 'browserstack') {
+        answers.remoteEnv.username = 'BROWSERSTACK_USERNAME';
+        answers.remoteEnv.access_key = 'BROWSERSTACK_ACCESS_KEY';
+      } else if (answers.cloudProvider === 'saucelabs') {
+        answers.remoteEnv.username = 'SAUCE_USERNAME';
+        answers.remoteEnv.access_key = 'SAUCE_ACCESS_KEY';
       }
 
       if (!answers.remoteBrowsers) {
