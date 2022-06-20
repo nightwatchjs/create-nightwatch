@@ -175,8 +175,8 @@ module.exports = {
     // Configuration for using the browserstack.com cloud service                    |
     //                                                                               |
     // Please set the username and access key by setting the environment variables:  |
-    // - BROWSERSTACK_USERNAME                                                       |
-    // - BROWSERSTACK_ACCESS_KEY                                                     |
+    // - <%- answers.remoteEnv.username %>                                                       |
+    // - <%- answers.remoteEnv.access_key %>                                                     |
     // .env files are supported                                                      |
     //////////////////////////////////////////////////////////////////////////////////
     browserstack: {
@@ -188,8 +188,8 @@ module.exports = {
       // https://www.browserstack.com/automate/capabilities?tag=selenium-4
       desiredCapabilities: {
         'bstack:options': {
-          userName: '${BROWSERSTACK_USERNAME}',
-          accessKey: '${BROWSERSTACK_ACCESS_KEY}'
+          userName: '${<%- answers.remoteEnv.username %>}',
+          accessKey: '${<%- answers.remoteEnv.access_key %>}'
         }
       },
 
@@ -253,8 +253,8 @@ module.exports = {
     // Configuration for using the Sauce Labs cloud service                          |
     //                                                                               |
     // Please set the username and access key by setting the environment variables:  |
-    // - SAUCE_USERNAME                                                              |
-    // - SAUCE_ACCESS_KEY                                                            |
+    // - <%- answers.remoteEnv.username %>                                                              |
+    // - <%- answers.remoteEnv.access_key %>                                                            |
     //////////////////////////////////////////////////////////////////////////////////
     saucelabs: {
       selenium: {
@@ -265,8 +265,8 @@ module.exports = {
       // https://wiki.saucelabs.com/display/DOCS/Test+Configuration+Options
       desiredCapabilities: {
         'sauce:options': {
-          username: '${SAUCE_USERNAME}',
-          accessKey: '${SAUCE_ACCESS_KEY}',
+          username: '${<%- answers.remoteEnv.username %>}',
+          accessKey: '${<%- answers.remoteEnv.access_key %>}',
           screenResolution: '1280x1024'
           // https://docs.saucelabs.com/dev/cli/sauce-connect-proxy/#--region
           // region: 'us-west-1'
@@ -325,8 +325,8 @@ module.exports = {
     //                                                                                     |
     // If you are using a cloud provider such as CrossBrowserTesting, LambdaTests, etc.,   |
     // please set the username and access_key by setting the below environment variables:  |
-    // - REMOTE_USERNAME                                                                   |
-    // - REMOTE_ACCESS_KEY                                                                 |
+    // - <%- answers.remoteEnv.username %>                                                                   |
+    // - <%- answers.remoteEnv.access_key %>                                                                 |
     // (.env files are supported)                                                          |
     ////////////////////////////////////////////////////////////////////////////////////////
     <%- answers.remoteName %>: {
@@ -339,8 +339,8 @@ module.exports = {
         port: 4444
       },
 
-      // username: '${REMOTE_USERNAME}',
-      // access_key: '${REMOTE_ACCESS_KEY}',
+      username: '${<%- answers.remoteEnv.username %>}',
+      access_key: '${<%- answers.remoteEnv.access_key %>}',
 
       webdriver: {
         keep_alive: true,

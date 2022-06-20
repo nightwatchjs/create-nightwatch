@@ -65,6 +65,7 @@ describe('init tests', () => {
       assert.strictEqual('defaultBrowser' in answers, true);
       assert.strictEqual('cloudProvider' in answers, false);
       assert.strictEqual('remoteName' in answers, true);
+      assert.strictEqual('remoteEnv' in answers, true);
       assert.strictEqual('seleniumServer' in answers, false);
       assert.strictEqual('testsLocation' in answers, true);
       assert.strictEqual('addExamples' in answers, true);
@@ -76,6 +77,8 @@ describe('init tests', () => {
       assert.deepEqual(answers['browsers'], browsers);
 
       assert.strictEqual(answers['remoteName'], undefined);
+      assert.strictEqual(answers['remoteEnv'].username, 'REMOTE_USERNAME');
+      assert.strictEqual(answers['remoteEnv'].access_key, 'REMOTE_ACCESS_KEY');
       assert.strictEqual(answers['defaultBrowser'], 'firefox');
       assert.strictEqual(answers['testsLocation'], 'nightwatch-e2e');
       assert.strictEqual(answers['addExamples'], true);
@@ -102,6 +105,7 @@ describe('init tests', () => {
       assert.strictEqual('defaultBrowser' in answers, true);
       assert.strictEqual('cloudProvider' in answers, false);
       assert.strictEqual('remoteName' in answers, false);
+      assert.strictEqual('remoteEnv' in answers, false);
       assert.strictEqual('testsLocation' in answers, true);
       assert.strictEqual('addExamples' in answers, true);
       assert.strictEqual('examplesLocation' in answers, true);
@@ -135,6 +139,7 @@ describe('init tests', () => {
       assert.strictEqual('defaultBrowser' in answers, true);
       assert.strictEqual('cloudProvider' in answers, true);
       assert.strictEqual('remoteName' in answers, true);
+      assert.strictEqual('remoteEnv' in answers, true);
       assert.strictEqual('testsLocation' in answers, true);
       assert.strictEqual('addExamples' in answers, true);
       assert.strictEqual('examplesLocation' in answers, true);
@@ -144,6 +149,8 @@ describe('init tests', () => {
       assert.strictEqual(answers['defaultBrowser'], 'firefox');
       assert.strictEqual(answers['cloudProvider'], 'browserstack');
       assert.strictEqual(answers['remoteName'], 'browserstack');
+      assert.strictEqual(answers['remoteEnv'].username, 'BROWSERSTACK_USERNAME');
+      assert.strictEqual(answers['remoteEnv'].access_key, 'BROWSERSTACK_ACCESS_KEY');
       assert.strictEqual(answers['testsLocation'], 'tests');
       assert.strictEqual(answers['addExamples'], true);
       assert.strictEqual(answers['examplesLocation'], 'tests');
@@ -170,6 +177,7 @@ describe('init tests', () => {
       assert.strictEqual('defaultBrowser' in answers, true);
       assert.strictEqual('cloudProvider' in answers, true);
       assert.strictEqual('remoteName' in answers, true);
+      assert.strictEqual('remoteEnv' in answers, true);
       assert.strictEqual('testsLocation' in answers, true);
       assert.strictEqual('addExamples' in answers, true);
       assert.strictEqual('examplesLocation' in answers, true);
@@ -179,6 +187,8 @@ describe('init tests', () => {
       assert.strictEqual(answers['defaultBrowser'], 'firefox');
       assert.strictEqual(answers['cloudProvider'], 'saucelabs');
       assert.strictEqual(answers['remoteName'], 'saucelabs');
+      assert.strictEqual(answers['remoteEnv'].username, 'SAUCE_USERNAME');
+      assert.strictEqual(answers['remoteEnv'].access_key, 'SAUCE_ACCESS_KEY');
       assert.strictEqual(answers['testsLocation'], 'tests');
       assert.strictEqual(answers['addExamples'], true);
       assert.strictEqual(answers['examplesLocation'], 'nightwatch-examples');
@@ -206,6 +216,7 @@ describe('init tests', () => {
       assert.strictEqual('defaultBrowser' in answers, true);
       assert.strictEqual('cloudProvider' in answers, true);
       assert.strictEqual('remoteName' in answers, true);
+      assert.strictEqual('remoteEnv' in answers, true);
       assert.strictEqual('seleniumServer' in answers, false);
       assert.strictEqual('addExamples' in answers, false);
       assert.strictEqual('examplesLocation' in answers, false);
@@ -214,6 +225,8 @@ describe('init tests', () => {
       assert.strictEqual(answers['defaultBrowser'], 'firefox');
       assert.strictEqual(answers['cloudProvider'], 'other');
       assert.strictEqual(answers['remoteName'], 'remote');
+      assert.strictEqual(answers['remoteEnv'].username, 'REMOTE_USERNAME');
+      assert.strictEqual(answers['remoteEnv'].access_key, 'REMOTE_ACCESS_KEY');
     });
 
     test('with both (remote - other) and cucumber runner in answers', () => {
@@ -233,6 +246,7 @@ describe('init tests', () => {
       assert.strictEqual('defaultBrowser' in answers, true);
       assert.strictEqual('cloudProvider' in answers, true);
       assert.strictEqual('remoteName' in answers, true);
+      assert.strictEqual('remoteEnv' in answers, true);
       assert.strictEqual('seleniumServer' in answers, true);
       assert.strictEqual('testsLocation' in answers, true);
       assert.strictEqual('addExamples' in answers, true);
@@ -243,6 +257,8 @@ describe('init tests', () => {
       assert.strictEqual(answers['defaultBrowser'], 'firefox');
       assert.strictEqual(answers['cloudProvider'], 'other');
       assert.strictEqual(answers['remoteName'], 'remote');
+      assert.strictEqual(answers['remoteEnv'].username, 'REMOTE_USERNAME');
+      assert.strictEqual(answers['remoteEnv'].access_key, 'REMOTE_ACCESS_KEY');
       assert.strictEqual(answers['seleniumServer'], true);
       assert.strictEqual(answers['testsLocation'], 'tests');
       assert.strictEqual(answers['addExamples'], true);
@@ -780,6 +796,10 @@ describe('init tests', () => {
         remoteBrowsers: ['chrome', 'firefox'],
         defaultBrowser: 'chrome',
         remoteName: 'remote',
+        remoteEnv: {
+          username: 'REMOTE_USERNAME',
+          access_key: 'REMOTE_ACCESS_KEY'
+        },
         seleniumServer: true,
         testsLocation: 'tests',
         addExamples: true,
@@ -811,6 +831,8 @@ describe('init tests', () => {
       assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
       assert.strictEqual(config.test_settings.remote.selenium.host, '<remote-hostname>');
       assert.strictEqual(config.test_settings.remote.selenium.port, 4444);
+      assert.strictEqual(config.test_settings.remote.username, '${REMOTE_USERNAME}');
+      assert.strictEqual(config.test_settings.remote.access_key, '${REMOTE_ACCESS_KEY}');
 
       fs.unlinkSync('test_config.conf.js');
     });
@@ -832,6 +854,10 @@ describe('init tests', () => {
         remoteBrowsers: ['chrome', 'firefox'],
         defaultBrowser: 'chrome',
         remoteName: 'saucelabs',
+        remoteEnv: {
+          username: 'SAUCE_USERNAME',
+          access_key: 'SAUCE_ACCESS_KEY'
+        },
         seleniumServer: true,
         testsLocation: 'tests',
         addExamples: true,
@@ -863,6 +889,8 @@ describe('init tests', () => {
       assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
       assert.strictEqual(config.test_settings.saucelabs.selenium.host, 'ondemand.saucelabs.com');
       assert.strictEqual(config.test_settings.saucelabs.selenium.port, 443);
+      assert.strictEqual(config.test_settings.saucelabs.desiredCapabilities['sauce:options'].username, '${SAUCE_USERNAME}');
+      assert.strictEqual(config.test_settings.saucelabs.desiredCapabilities['sauce:options'].accessKey, '${SAUCE_ACCESS_KEY}');
 
       fs.unlinkSync('test_config.conf.js');
     });
@@ -884,6 +912,10 @@ describe('init tests', () => {
         remoteBrowsers: ['chrome', 'firefox'],
         defaultBrowser: 'chrome',
         remoteName: 'saucelabs',
+        remoteEnv: {
+          username: 'SAUCE_USERNAME',
+          access_key: 'SAUCE_ACCESS_KEY'
+        },
         seleniumServer: true,
         testsLocation: 'tests',
         addExamples: true,
@@ -915,6 +947,8 @@ describe('init tests', () => {
       assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
       assert.strictEqual(config.test_settings.saucelabs.selenium.host, 'ondemand.saucelabs.com');
       assert.strictEqual(config.test_settings.saucelabs.selenium.port, 443);
+      assert.strictEqual(config.test_settings.saucelabs.desiredCapabilities['sauce:options'].username, '${SAUCE_USERNAME}');
+      assert.strictEqual(config.test_settings.saucelabs.desiredCapabilities['sauce:options'].accessKey, '${SAUCE_ACCESS_KEY}');
 
       fs.unlinkSync('test_config.conf.js');
     });
@@ -935,6 +969,10 @@ describe('init tests', () => {
         remoteBrowsers: ['chrome', 'firefox'],
         defaultBrowser: 'chrome',
         remoteName: 'browserstack',
+        remoteEnv: {
+          username: 'BROWSERSTACK_USERNAME',
+          access_key: 'BROWSERSTACK_ACCESS_KEY'
+        },
         testsLocation: 'tests',
         addExamples: true,
         examplesLocation: 'nightwatch-examples'
@@ -966,6 +1004,8 @@ describe('init tests', () => {
       assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
       assert.strictEqual(config.test_settings.browserstack.selenium.host, 'hub.browserstack.com');
       assert.strictEqual(config.test_settings.browserstack.selenium.port, 443);
+      assert.strictEqual(config.test_settings.browserstack.desiredCapabilities['bstack:options'].userName, '${BROWSERSTACK_USERNAME}');
+      assert.strictEqual(config.test_settings.browserstack.desiredCapabilities['bstack:options'].accessKey, '${BROWSERSTACK_ACCESS_KEY}');
 
       fs.unlinkSync('test_config.conf.js');
     });

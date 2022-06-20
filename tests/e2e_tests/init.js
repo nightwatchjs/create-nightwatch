@@ -96,6 +96,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(answers.remoteBrowsers, undefined);
     assert.strictEqual(answers.cloudProvider, undefined);
     assert.strictEqual(answers.remoteName, undefined);
+    assert.strictEqual(answers.remoteEnv, undefined);
     assert.strictEqual(answers.seleniumServer, true);
     assert.strictEqual(answers.defaultBrowser, 'chrome');
     assert.strictEqual(answers.testsLocation, 'tests');
@@ -169,6 +170,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Generating example files...'), true);
     assert.strictEqual(output.includes('Success! Generated some example files at \'tests\'.'), true);
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
+    assert.strictEqual(output.includes('RUN NIGHTWATCH TESTS'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
     assert.strictEqual(
@@ -254,6 +256,8 @@ describe('e2e tests for init', () => {
     assert.deepEqual(answers.remoteBrowsers, ['chrome', 'edge']);
     assert.strictEqual(answers.cloudProvider, 'other');
     assert.strictEqual(answers.remoteName, 'remote');
+    assert.strictEqual(answers.remoteEnv.username, 'REMOTE_USERNAME');
+    assert.strictEqual(answers.remoteEnv.access_key, 'REMOTE_ACCESS_KEY');
     assert.strictEqual(answers.seleniumServer, undefined);
     assert.strictEqual(answers.defaultBrowser, 'chrome');
     assert.strictEqual(answers.addExamples, true);
@@ -280,6 +284,8 @@ describe('e2e tests for init', () => {
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
     assert.strictEqual(config.test_settings.remote.selenium.host, '<remote-hostname>');
     assert.strictEqual(config.test_settings.remote.selenium.port, 4444);
+    assert.strictEqual(config.test_settings.remote.username, '${REMOTE_USERNAME}');
+    assert.strictEqual(config.test_settings.remote.access_key, '${REMOTE_ACCESS_KEY}');
     assert.deepEqual(Object.keys(config.test_settings), ['default', 'remote', 'remote.chrome', 'remote.edge']);
 
     // Test Packages and webdrivers installed
@@ -307,6 +313,14 @@ describe('e2e tests for init', () => {
       true
     );
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
+    assert.strictEqual(output.includes('IMPORTANT'), true);
+    assert.strictEqual(output.includes('Please set the host and port property in your configuration file.'), true);
+    assert.strictEqual(output.includes('These can be located at:'), true);
+    assert.strictEqual(output.includes('Please set the credentials (if any) required to run tests'), true);
+    assert.strictEqual(output.includes('- REMOTE_USERNAME'), true);
+    assert.strictEqual(output.includes('- REMOTE_ACCESS_KEY'), true);
+    assert.strictEqual(output.includes('(.env files are also supported)'), true);
+    assert.strictEqual(output.includes('RUN NIGHTWATCH TESTS'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
     assert.strictEqual(output.includes('To run your tests with CucumberJS, simply run:'), true);
@@ -396,6 +410,8 @@ describe('e2e tests for init', () => {
     assert.deepEqual(answers.remoteBrowsers, ['chrome', 'safari']);
     assert.strictEqual(answers.cloudProvider, 'browserstack');
     assert.strictEqual(answers.remoteName, 'browserstack');
+    assert.strictEqual(answers.remoteEnv.username, 'BROWSERSTACK_USERNAME');
+    assert.strictEqual(answers.remoteEnv.access_key, 'BROWSERSTACK_ACCESS_KEY');
     assert.strictEqual(answers.seleniumServer, undefined);
     assert.strictEqual(answers.defaultBrowser, 'chrome');
     assert.strictEqual(answers.addExamples, true);
@@ -421,6 +437,8 @@ describe('e2e tests for init', () => {
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
     assert.strictEqual(config.test_settings.browserstack.selenium.host, 'hub.browserstack.com');
     assert.strictEqual(config.test_settings.browserstack.selenium.port, 443);
+    assert.strictEqual(config.test_settings.browserstack.desiredCapabilities['bstack:options'].userName, '${BROWSERSTACK_USERNAME}');
+    assert.strictEqual(config.test_settings.browserstack.desiredCapabilities['bstack:options'].accessKey, '${BROWSERSTACK_ACCESS_KEY}');
     if (process.platform === 'darwin') {
       assert.deepEqual(Object.keys(config.test_settings), [
         'default',
@@ -470,6 +488,11 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Generating example files...'), true);
     assert.strictEqual(output.includes('Success! Generated some example files at \'nightwatch-examples\'.'), true);
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
+    assert.strictEqual(output.includes('Please set the credentials required to run tests on your cloud provider'), true);
+    assert.strictEqual(output.includes('- BROWSERSTACK_USERNAME'), true);
+    assert.strictEqual(output.includes('- BROWSERSTACK_ACCESS_KEY'), true);
+    assert.strictEqual(output.includes('(.env files are also supported)'), true);
+    assert.strictEqual(output.includes('RUN NIGHTWATCH TESTS'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
     assert.strictEqual(output.includes(`npx nightwatch .${path.sep}${path.join('nightwatch-examples', 'specs')}`), true);
@@ -552,6 +575,8 @@ describe('e2e tests for init', () => {
     assert.deepEqual(answers.remoteBrowsers, ['chrome', 'edge', 'safari']);
     assert.strictEqual(answers.cloudProvider, 'saucelabs');
     assert.strictEqual(answers.remoteName, 'saucelabs');
+    assert.strictEqual(answers.remoteEnv.username, 'SAUCE_USERNAME');
+    assert.strictEqual(answers.remoteEnv.access_key, 'SAUCE_ACCESS_KEY');
     assert.strictEqual(answers.seleniumServer, undefined);
     assert.strictEqual(answers.defaultBrowser, 'chrome');
     assert.strictEqual(answers.addExamples, true);
@@ -576,6 +601,8 @@ describe('e2e tests for init', () => {
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
     assert.strictEqual(config.test_settings.saucelabs.selenium.host, 'ondemand.saucelabs.com');
     assert.strictEqual(config.test_settings.saucelabs.selenium.port, 443);
+    assert.strictEqual(config.test_settings.saucelabs.desiredCapabilities['sauce:options'].username, '${SAUCE_USERNAME}');
+    assert.strictEqual(config.test_settings.saucelabs.desiredCapabilities['sauce:options'].accessKey, '${SAUCE_ACCESS_KEY}');
     assert.deepEqual(Object.keys(config.test_settings), [
       'default',
       'saucelabs',
@@ -611,6 +638,11 @@ describe('e2e tests for init', () => {
       true
     );
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
+    assert.strictEqual(output.includes('Please set the credentials required to run tests on your cloud provider'), true);
+    assert.strictEqual(output.includes('- SAUCE_USERNAME'), true);
+    assert.strictEqual(output.includes('- SAUCE_ACCESS_KEY'), true);
+    assert.strictEqual(output.includes('(.env files are also supported)'), true);
+    assert.strictEqual(output.includes('RUN NIGHTWATCH TESTS'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
     assert.strictEqual(output.includes('npm run test -- --env saucelabs'), true);
@@ -702,6 +734,8 @@ describe('e2e tests for init', () => {
     assert.deepEqual(answers.remoteBrowsers, ['chrome']);
     assert.strictEqual(answers.cloudProvider, 'browserstack');
     assert.strictEqual(answers.remoteName, 'browserstack');
+    assert.strictEqual(answers.remoteEnv.username, 'BROWSERSTACK_USERNAME');
+    assert.strictEqual(answers.remoteEnv.access_key, 'BROWSERSTACK_ACCESS_KEY');
     assert.strictEqual(answers.seleniumServer, true);
     assert.strictEqual(answers.defaultBrowser, 'firefox');
     assert.strictEqual(answers.addExamples, true);
@@ -726,6 +760,8 @@ describe('e2e tests for init', () => {
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox');
     assert.strictEqual(config.test_settings.browserstack.selenium.host, 'hub.browserstack.com');
     assert.strictEqual(config.test_settings.browserstack.selenium.port, 443);
+    assert.strictEqual(config.test_settings.browserstack.desiredCapabilities['bstack:options'].userName, '${BROWSERSTACK_USERNAME}');
+    assert.strictEqual(config.test_settings.browserstack.desiredCapabilities['bstack:options'].accessKey, '${BROWSERSTACK_ACCESS_KEY}');
     assert.deepEqual(Object.keys(config.test_settings), [
       'default',
       'firefox',
@@ -771,6 +807,11 @@ describe('e2e tests for init', () => {
       true
     );
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
+    assert.strictEqual(output.includes('Please set the credentials required to run tests on your cloud provider'), true);
+    assert.strictEqual(output.includes('- BROWSERSTACK_USERNAME'), true);
+    assert.strictEqual(output.includes('- BROWSERSTACK_ACCESS_KEY'), true);
+    assert.strictEqual(output.includes('(.env files are also supported)'), true);
+    assert.strictEqual(output.includes('RUN NIGHTWATCH TESTS'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
     assert.strictEqual(output.includes('npm run test -- --config new-config.conf.js'), true);
@@ -857,6 +898,8 @@ describe('e2e tests for init', () => {
     assert.deepEqual(answers.remoteBrowsers, ['firefox', 'chrome']);
     assert.strictEqual(answers.cloudProvider, 'browserstack');
     assert.strictEqual(answers.remoteName, 'browserstack');
+    assert.strictEqual(answers.remoteEnv.username, 'BROWSERSTACK_USERNAME');
+    assert.strictEqual(answers.remoteEnv.access_key, 'BROWSERSTACK_ACCESS_KEY');
     assert.strictEqual(answers.seleniumServer, true);
     assert.strictEqual(answers.defaultBrowser, 'firefox');
     assert.strictEqual(answers.testsLocation, 'nightwatch-e2e');
@@ -882,6 +925,8 @@ describe('e2e tests for init', () => {
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox');
     assert.strictEqual(config.test_settings.browserstack.selenium.host, 'hub.browserstack.com');
     assert.strictEqual(config.test_settings.browserstack.selenium.port, 443);
+    assert.strictEqual(config.test_settings.browserstack.desiredCapabilities['bstack:options'].userName, '${BROWSERSTACK_USERNAME}');
+    assert.strictEqual(config.test_settings.browserstack.desiredCapabilities['bstack:options'].accessKey, '${BROWSERSTACK_ACCESS_KEY}');
     assert.deepEqual(Object.keys(config.test_settings), [
       'default',
       'firefox',
@@ -922,6 +967,11 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Generating example files...'), true);
     assert.strictEqual(output.includes('Success! Generated some example files at \'nightwatch-e2e\'.'), true);
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
+    assert.strictEqual(output.includes('Please set the credentials required to run tests on your cloud provider'), true);
+    assert.strictEqual(output.includes('- BROWSERSTACK_USERNAME'), true);
+    assert.strictEqual(output.includes('- BROWSERSTACK_ACCESS_KEY'), true);
+    assert.strictEqual(output.includes('(.env files are also supported)'), true);
+    assert.strictEqual(output.includes('RUN NIGHTWATCH TESTS'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
     assert.strictEqual(output.includes(`npx nightwatch .${path.sep}${path.join('nightwatch-e2e', 'specs')}`), true);
@@ -1007,6 +1057,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(answers.remoteBrowsers, undefined);
     assert.strictEqual(answers.cloudProvider, undefined);
     assert.strictEqual(answers.remoteName, undefined);
+    assert.strictEqual(answers.remoteEnv, undefined);
     assert.strictEqual(answers.seleniumServer, true);
     assert.strictEqual(answers.defaultBrowser, 'chrome');
     assert.strictEqual(answers.addExamples, undefined);
@@ -1143,6 +1194,8 @@ describe('e2e tests for init', () => {
     assert.deepEqual(answers.remoteBrowsers, ['chrome', 'edge', 'safari']);
     assert.strictEqual(answers.cloudProvider, 'other');
     assert.strictEqual(answers.remoteName, 'remote');
+    assert.strictEqual(answers.remoteEnv.username, 'REMOTE_USERNAME');
+    assert.strictEqual(answers.remoteEnv.access_key, 'REMOTE_ACCESS_KEY');
     assert.strictEqual(answers.seleniumServer, undefined);
     assert.strictEqual(answers.defaultBrowser, 'firefox');
     assert.strictEqual(answers.addExamples, undefined);
@@ -1166,6 +1219,8 @@ describe('e2e tests for init', () => {
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox');
     assert.strictEqual(config.test_settings.remote.selenium.host, '<remote-hostname>');
     assert.strictEqual(config.test_settings.remote.selenium.port, 4444);
+    assert.strictEqual(config.test_settings.remote.username, '${REMOTE_USERNAME}');
+    assert.strictEqual(config.test_settings.remote.access_key, '${REMOTE_ACCESS_KEY}');
     assert.deepEqual(Object.keys(config.test_settings), [
       'default',
       'firefox',
