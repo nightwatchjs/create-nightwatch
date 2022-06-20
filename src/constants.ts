@@ -43,8 +43,8 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
       {name: 'JavaScript - Nightwatch Test Runner', value: 'js-nightwatch'},
       {name: 'JavaScript - Mocha Test Runner', value: 'js-mocha'},
       {name: 'JavaScript - CucumberJS Test Runner', value: 'js-cucumber'},
-      {name: 'TypeScript - Nightwatch Test Runner', value: 'ts-nightwatch'},
-      {name: 'TypeScript - Mocha Test Runner', value: 'ts-mocha'}
+      {name: 'TypeScript - Nightwatch Test Runner', value: 'ts-nightwatch'}
+      // {name: 'TypeScript - Mocha Test Runner', value: 'ts-mocha'}
       // {name: 'TypeScript - CucumberJS Test Runner', value: 'ts-cucumber'}
     ],
     filter: (value, answers) => {
