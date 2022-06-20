@@ -545,12 +545,23 @@ export class NightwatchInit {
   postSetupInstructions(answers: ConfigGeneratorAnswers) {
     Logger.error('Nightwatch setup complete!!\n');
 
+    // Join Discord and GitHub
+    Logger.error('Join our Discord community and instantly find answers to your issues or queries. Or just join and say hi!');
+    Logger.error(colors.cyan('  https://discord.gg/SN8Da2X'), '\n');
+
+    Logger.error('Visit our GitHub page to report bugs or raise feature requests:');
+    Logger.error(colors.cyan('  https://github.com/nightwatchjs/nightwatch'), '\n');
+
     // Instructions for setting host, port, username and passowrd for remote.
     if (answers.backend && ['remote', 'both'].includes(answers.backend)) {
       Logger.error(colors.red('IMPORTANT'));
       if (answers.cloudProvider === 'other') {
+        let configFileName = 'nightwatch.conf.js';
+        if (this.otherInfo.nonDefaultConfigName) {
+          configFileName = this.otherInfo.nonDefaultConfigName;
+        }
         Logger.error(
-          `Please set the ${colors.magenta('host')} and ${colors.magenta('port')} property in your configuration file.` 
+          `To run tests on your remote device, please set the ${colors.magenta('host')} and ${colors.magenta('port')} property in your ${configFileName} file.` 
         );
         Logger.error('These can be located at:');
         Logger.error(
