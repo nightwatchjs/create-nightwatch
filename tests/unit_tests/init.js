@@ -809,6 +809,8 @@ describe('init tests', () => {
         'selenium.chrome'
       ]);
       assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
+      assert.strictEqual(config.test_settings.remote.selenium.host, '<remote-hostname>');
+      assert.strictEqual(config.test_settings.remote.selenium.port, 4444);
 
       fs.unlinkSync('test_config.conf.js');
     });
