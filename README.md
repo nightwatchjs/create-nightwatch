@@ -24,6 +24,10 @@ $ npm init nightwatch
 
 # if you want to initialize a new project
 $ npm init nightwatch path/to/new/project
+
+# if you just want to generate a new config
+# file in your existing Nightwatch project
+$ npm init nightwatch -- --generate-config
 ```
 
 #### 2. Answer a few questions about your preferred setup:
