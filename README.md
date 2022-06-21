@@ -11,8 +11,7 @@ The Nightwatch CLI tool lets you setup Nightwatch.js in your new or existing pro
 #### [Homepage](https://nightwatchjs.org) &bullet; [Developer Guide](https://nightwatchjs.org/guide) &bullet; [API Reference](https://nightwatchjs.org/api) &bullet; [About](https://nightwatchjs.org/about) &bullet; [Blog](https://nightwatchjs.org/blog)
 
 ## Get started in 60 seconds
-![nightwatch-cli-gif](https://user-images.githubusercontent.com/39924567/174761950-fbf54e86-b160-4597-b169-976344ff6ef0.gif)
-
+![nightwatch-cli-gif](https://user-images.githubusercontent.com/39924567/174841680-59664ff6-da2d-44a3-a1df-52d22c69b1e2.gif)
 
 ---
 
