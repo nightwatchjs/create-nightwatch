@@ -11,7 +11,8 @@ The Nightwatch CLI tool lets you setup Nightwatch.js in your new or existing pro
 #### [Homepage](https://nightwatchjs.org) &bullet; [Developer Guide](https://nightwatchjs.org/guide) &bullet; [API Reference](https://nightwatchjs.org/api) &bullet; [About](https://nightwatchjs.org/about) &bullet; [Blog](https://nightwatchjs.org/blog)
 
 ## Get started in 60 seconds
-![nightwatch-cli-gif](https://user-images.githubusercontent.com/2018070/170960356-6f80d072-3bea-4f90-a86f-b6307e6dfc67.gif)
+![nightwatch-cli-gif](https://user-images.githubusercontent.com/39924567/174761950-fbf54e86-b160-4597-b169-976344ff6ef0.gif)
+
 
 ---
 
@@ -37,13 +38,12 @@ Nightwatch will do the entire setup for you based on your answers.
 
 #### 3. Run a Demo Test:
 
-Nightwatch comes with an `examples` folder containing several sample tests.
+Nightwatch comes with a few examples, which are automatically copied to your Nightwatch project during the setup and can also be used as boilerplate to write your own tests on top of them.
 
-Below will run a basic test which opens the search engine [Ecosia.org](https://ecosia.org), searches for the term "nightwatch", and verifies if the term first result is the Nightwatch.js website.
+You can follow the instructions given at the end of the setup to run your first test with Nightwatch.
 
-```sh
-$ npx nightwatch examples/tests/ecosia.js
-```
+<img width="413" alt="image" src="https://user-images.githubusercontent.com/39924567/174763723-aff4d501-6320-402c-81cc-de75fbb5e8f0.png">
+
 
 ## Licence
 [MIT](https://github.com/nightwatchjs/nightwatch/blob/main/LICENSE.md)
