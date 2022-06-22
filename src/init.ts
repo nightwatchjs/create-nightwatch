@@ -82,7 +82,11 @@ export class NightwatchInit {
         this.copyCucumberExamples(answers.examplesLocation || '');
       } else if (answers.addExamples) {
         this.copyExamples(answers.examplesLocation || '', answers.language === 'ts');
-        this.copyTemplates(answers.testsLocation || '');
+        
+        // For now the templates added only for JS
+        if (answers.language !== 'ts') {
+          this.copyTemplates(answers.testsLocation || '');
+        }
       }
 
       // Post instructions to run their first test
