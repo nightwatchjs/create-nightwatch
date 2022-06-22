@@ -5,10 +5,12 @@ export interface ConfigGeneratorAnswers {
   language?: 'js' | 'ts';
   backend?: 'local' | 'remote' | 'both';
   seleniumServer?: boolean;
-  hostname?: string;
-  port?: number;
-  browserstack?: boolean;
+  cloudProvider?: 'browserstack' | 'saucelabs' | 'other';
   remoteName?: string;
+  remoteEnv?: {
+    username: string;
+    access_key: string;
+  };
   baseUrl?: string;
   runner?: 'nightwatch' | 'mocha' | 'cucumber';
   testsLocation?: string;

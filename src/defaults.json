@@ -7,8 +7,7 @@
     "chrome",
     "selenium-server"
   ],
-  "hostname": "<remote-host>",
-  "port": 4444,
+  "cloudProvider": "browserstack",
   "testsLocation": "nightwatch-e2e",
   "baseUrl": "http://localhost"
 }

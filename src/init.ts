@@ -10,14 +10,15 @@ import Logger from './logger';
 import {CONFIG_INTRO, BROWSER_CHOICES, QUESTIONAIRRE, CONFIG_DEST_QUES} from './constants';
 import {ConfigGeneratorAnswers, ConfigDestination, OtherInfo} from './interfaces';
 import defaultAnswers from './defaults.json';
+import {ParsedArgs} from 'minimist';
 
 export class NightwatchInit {
   rootDir: string;
-  options: string[];
+  options: Omit<ParsedArgs, '_'>;
   otherInfo: OtherInfo;
   onlyConfig: boolean;
 
-  constructor(rootDir = process.cwd(), options: string[]) {
+  constructor(rootDir = process.cwd(), options: Omit<ParsedArgs, '_'>) {
     this.rootDir = rootDir;
     this.options = options;
     this.otherInfo = {};
@@ -27,11 +28,14 @@ export class NightwatchInit {
   async run() {
     let answers: ConfigGeneratorAnswers = {};
 
-    if (this.options.includes('generate-config')) {
+    if (this.options?.['generate-config']) {
       this.onlyConfig = true;
     }
 
-    if (this.options.includes('yes')) {
+    if (this.options?.yes) {
+      if (this.options?.browser) {
+        defaultAnswers.browsers = this.options.browser;
+      }
       answers = defaultAnswers as ConfigGeneratorAnswers;
     } else {
       Logger.error(CONFIG_INTRO);
@@ -92,7 +96,8 @@ export class NightwatchInit {
   async askQuestions() {
     const answers = {
       rootDir: this.rootDir,
-      onlyConfig: this.onlyConfig
+      onlyConfig: this.onlyConfig,
+      browsers: this.options?.browser
     };
 
     return await prompt(QUESTIONAIRRE, answers);
@@ -103,14 +108,21 @@ export class NightwatchInit {
     const backendHasRemote = answers.backend && ['remote', 'both'].includes(answers.backend);
 
     if (backendHasRemote) {
-      if (answers.hostname?.includes('browserstack')) {
-        answers.browserstack = true;
+      answers.remoteName = 'remote';
+      if (answers.cloudProvider !== 'other') {
+        answers.remoteName = answers.cloudProvider;
       }
 
-      if (answers.browserstack) {
-        answers.remoteName = 'browserstack';
-      } else {
-        answers.remoteName = 'remote';
+      answers.remoteEnv = {
+        username: 'REMOTE_USERNAME',
+        access_key: 'REMOTE_ACCESS_KEY'
+      };
+      if (answers.cloudProvider === 'browserstack') {
+        answers.remoteEnv.username = 'BROWSERSTACK_USERNAME';
+        answers.remoteEnv.access_key = 'BROWSERSTACK_ACCESS_KEY';
+      } else if (answers.cloudProvider === 'saucelabs') {
+        answers.remoteEnv.username = 'SAUCE_USERNAME';
+        answers.remoteEnv.access_key = 'SAUCE_ACCESS_KEY';
       }
 
       if (!answers.remoteBrowsers) {
@@ -146,11 +158,6 @@ export class NightwatchInit {
         answers.browsers.splice(pos, 1);
       }
 
-      // Enable seleniumServer if ie present in local browsers.
-      if (answers.browsers.includes('ie') && !answers.seleniumServer) {
-        answers.seleniumServer = true;
-      }
-
       // Remove safari from answers.browsers from non-mac users
       if (process.platform !== 'darwin' && answers.browsers.includes('safari')) {
         const pos = answers.browsers.indexOf('safari');
@@ -177,14 +184,15 @@ export class NightwatchInit {
       if (answers.runner === 'cucumber') {
         answers.examplesLocation = path.join(answers.featurePath || '', 'nightwatch-examples');
       } else {
-        // Put examples directly into testsLocation, to be used as boilerplate.
-        answers.examplesLocation = answers.testsLocation;
-        
-        // But if the chosen examplesLocation already contains some files, shift the examples
-        // to a sub-folder named 'nightwatch-examples'.
-        const examplesDestPath = path.join(this.rootDir, answers.examplesLocation);
-        if (fs.existsSync(examplesDestPath) && fs.readdirSync(examplesDestPath).length) {
-          answers.examplesLocation = path.join(answers.examplesLocation, 'nightwatch-examples');
+        // Find a location for putting the example files.
+        const testsDestPath = path.join(this.rootDir, answers.testsLocation);
+        if (fs.existsSync(testsDestPath) && fs.readdirSync(testsDestPath).length) {
+          // If testsLocation already contains some files, put the examples in a
+          // separate directory.
+          answers.examplesLocation = 'nightwatch-examples';
+        } else {
+          // Put examples directly into testsLocation, to be used as boilerplate.
+          answers.examplesLocation = answers.testsLocation;
         }
       }
     }
@@ -292,7 +300,7 @@ export class NightwatchInit {
   }
 
   async getConfigDestPath() {
-    if (this.options.includes('yes')) {
+    if (this.options?.yes) {
       Logger.error('Auto-generating a configuration file...\n');
     } else {
       Logger.error('Generting a configuration file based on your responses...\n');
@@ -324,10 +332,17 @@ export class NightwatchInit {
     const src_folders: string[] = []; // to go into the config file as the value of src_folders property.
     const page_objects_path: string[] = []; // to go as the value of page_objects_configs property.
     const custom_commands_path: string[] = []; // to go as the value of custom_commands_path property.
+    const custom_assertions_path: string[] = []; // to go as the value of custom_assertions_path property.
 
     const testsJsSrc: string = path.join(this.otherInfo.tsOutDir || '', answers.testsLocation || '');
     if (testsJsSrc !== '.') {
-      src_folders.push(testsJsSrc);
+      if (answers.testsLocation === answers.examplesLocation && answers.language === 'js' && answers.runner !== 'cucumber') {
+        // examples are being put as a boilerplate in testsLocation with main tests in
+        // 'specs' sub-directory (only done for JS-Nightwatch and JS-Mocha).
+        src_folders.push(path.join(testsJsSrc, 'specs'));
+      } else {
+        src_folders.push(testsJsSrc);
+      }
       this.otherInfo.testsJsSrc = testsJsSrc;
     }
 
@@ -335,17 +350,22 @@ export class NightwatchInit {
       // Add examplesLocation to src_folders, if different from testsLocation.
       // Don't add for cucumber examples (for now, as addition of examples depends upon featurePath in copyCucumberExamples).
       const examplesJsSrc: string = path.join(this.otherInfo.tsOutDir || '', answers.examplesLocation || '');
-      if (examplesJsSrc && testsJsSrc && !examplesJsSrc.startsWith(testsJsSrc)) {
-        src_folders.push(examplesJsSrc);
+      if (examplesJsSrc !== testsJsSrc) {
+        if (answers.language === 'js') {
+          // Only for JS-Nightwatch and JS-Mocha.
+          src_folders.push(path.join(examplesJsSrc, 'specs'));
+        } else {
+          src_folders.push(examplesJsSrc);
+        }
       }
       this.otherInfo.examplesJsSrc = examplesJsSrc;
 
-      // Add page_objects_path
       if (answers.language === 'js') {
-        // Right now, we only ship page-objects/custom-commands examples 
-        // with JS (Nightwatch and Mocha test runner) only.
+        // Right now, we only ship page-objects/custom-commands/custom-assertions
+        // examples with JS (Nightwatch and Mocha test runner) only.
         page_objects_path.push(`${path.join(examplesJsSrc, 'page-objects')}`);
         custom_commands_path.push(`${path.join(examplesJsSrc, 'custom-commands')}`);
+        custom_assertions_path.push(`${path.join(examplesJsSrc, 'custom-assertions')}`);
       }
     }
 
@@ -356,6 +376,7 @@ export class NightwatchInit {
       src_folders: JSON.stringify(src_folders).replace(/"/g, '\''),
       page_objects_path: JSON.stringify(page_objects_path).replace(/"/g, '\''),
       custom_commands_path: JSON.stringify(custom_commands_path).replace(/"/g, '\''),
+      custom_assertions_path: JSON.stringify(custom_assertions_path).replace(/"/g, '\''),
       answers
     });
 
@@ -392,9 +413,6 @@ export class NightwatchInit {
     if (answers.browsers?.includes('chrome')) {
       webdrivers.push('chromedriver');
     }
-    if (answers.browsers?.includes('ie')) {
-      webdrivers.push('iedriver');
-    }
     if (answers.browsers?.includes('safari')) {
       webdrivers.push('safaridriver');
     }
@@ -411,8 +429,7 @@ export class NightwatchInit {
 
     const driversDownloadedFromNPM: { [key: string]: string } = {
       geckodriver: 'Firefox',
-      chromedriver: 'Chrome',
-      iedriver: 'IE'
+      chromedriver: 'Chrome'
     };
 
     for (const webdriver of webdriversToInstall) {
@@ -557,6 +574,47 @@ export class NightwatchInit {
   postSetupInstructions(answers: ConfigGeneratorAnswers) {
     Logger.error('Nightwatch setup complete!!\n');
 
+    // Join Discord and GitHub
+    Logger.error('Join our Discord community and instantly find answers to your issues or queries. Or just join and say hi!');
+    Logger.error(colors.cyan('  https://discord.gg/SN8Da2X'), '\n');
+
+    Logger.error('Visit our GitHub page to report bugs or raise feature requests:');
+    Logger.error(colors.cyan('  https://github.com/nightwatchjs/nightwatch'), '\n');
+
+    // Instructions for setting host, port, username and passowrd for remote.
+    if (answers.backend && ['remote', 'both'].includes(answers.backend)) {
+      Logger.error(colors.red('IMPORTANT'));
+      if (answers.cloudProvider === 'other') {
+        let configFileName = 'nightwatch.conf.js';
+        if (this.otherInfo.nonDefaultConfigName) {
+          configFileName = this.otherInfo.nonDefaultConfigName;
+        }
+        Logger.error(
+          `To run tests on your remote device, please set the ${colors.magenta('host')} and ${colors.magenta('port')} property in your ${configFileName} file.` 
+        );
+        Logger.error('These can be located at:');
+        Logger.error(
+          `{\n  ...\n  "test_settings": {\n    ...\n    "${answers.remoteName}": {\n      "selenium": {\n        ${colors.cyan(
+            '"host":')}\n        ${colors.cyan('"port":')}\n      }\n    }\n  }\n}`,
+          '\n'
+        );
+
+        Logger.error(
+          'Please set the credentials (if any) required to run tests on your cloud provider or remote selenium-server, by setting the below env variables:'
+        );
+      } else {
+        Logger.error(
+          'Please set the credentials required to run tests on your cloud provider, by setting the below env variables:'
+        );
+      }
+
+      Logger.error(`- ${colors.cyan(answers.remoteEnv?.username as string)}`);
+      Logger.error(`- ${colors.cyan(answers.remoteEnv?.access_key as string)}`);
+      Logger.error('(.env files are also supported)', '\n');
+    }
+
+    Logger.error();
+    Logger.error(colors.green('RUN NIGHTWATCH TESTS'), '\n');
     if (this.rootDir !== process.cwd()) {
       Logger.error('First, change directory to the root dir of your project:');
       Logger.error(colors.cyan(`  cd ${path.relative(process.cwd(), this.rootDir) || '.'}`), '\n');

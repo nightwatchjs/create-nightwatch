@@ -1,6 +1,7 @@
 const assert = require('assert');
 const mockery = require('mockery');
 const path = require('path');
+const child_process = require.resolve('child_process');
 
 describe('index tests', () => {
   describe('test run function', () => {
@@ -49,7 +50,9 @@ describe('index tests', () => {
 
       // Check the arguments passed to NightwatchInit
       assert.strictEqual(rootDirPassed, process.cwd());
-      assert.deepEqual(optionsPassed, []);
+      assert.deepEqual(optionsPassed, {
+        'generate-config': false
+      });
     });
 
     test('works with no argument, package.json not present, and root dir empty', () => {
@@ -102,7 +105,9 @@ describe('index tests', () => {
 
       // Check the arguments passed to NightwatchInit
       assert.strictEqual(rootDirPassed, process.cwd());
-      assert.deepEqual(optionsPassed, []);
+      assert.deepEqual(optionsPassed, {
+        'generate-config': false
+      });
 
       // Check if new node project initialized in correct dir
       assert.strictEqual(newNodeProjectInitialized, true);
@@ -166,7 +171,9 @@ describe('index tests', () => {
 
       // Check the arguments passed to NightwatchInit
       assert.strictEqual(rootDirPassed, process.cwd());
-      assert.deepEqual(optionsPassed, []);
+      assert.deepEqual(optionsPassed, {
+        'generate-config': false
+      });
 
       // Check if root dir confirmation prompted
       assert.strictEqual(rootDirConfirmationPrompted, true);
@@ -210,7 +217,9 @@ describe('index tests', () => {
 
       // Check the arguments passed to NightwatchInit
       assert.strictEqual(rootDirPassed, expectedRootDir);
-      assert.deepEqual(optionsPassed, []);
+      assert.deepEqual(optionsPassed, {
+        'generate-config': false
+      });
     });
 
     test('works with many argument, no options, and package.json not present', () => {
@@ -259,7 +268,9 @@ describe('index tests', () => {
 
       // Check the arguments passed to NightwatchInit
       assert.strictEqual(rootDirPassed, expectedRootDir);
-      assert.deepEqual(optionsPassed, []);
+      assert.deepEqual(optionsPassed, {
+        'generate-config': false
+      });
 
       // Check if new node project initialized in correct dir
       assert.strictEqual(newNodeProjectInitialized, true);
@@ -300,7 +311,9 @@ describe('index tests', () => {
 
       // Check the arguments passed to NightwatchInit
       assert.strictEqual(rootDirPassed, expectedRootDir);
-      assert.deepEqual(optionsPassed, ['generate-config']);
+      assert.deepEqual(optionsPassed, {
+        'generate-config': true
+      });
     });
 
     test('works with many arguments, generate-config options, and package.json not present', () => {
@@ -365,6 +378,108 @@ describe('index tests', () => {
       process.exit = origProcessExit;
     });
 
+    test('works with many arguments, browsers options, and package.json present', () => {
+      process.argv = ['node', 'filename.js', 'new-project', 'random', '--browser=chrome', '--browser=safari', 'args'];
+      const expectedRootDir = path.join(process.cwd(), 'new-project');
+
+      mockery.registerMock(
+        './logger',
+        class {
+          static error() {}
+        }
+      );
+
+      mockery.registerMock('fs', {
+        existsSync() {
+          return true;
+        }
+      });
+
+      let rootDirPassed;
+      let optionsPassed;
+      mockery.registerMock('./init', {
+        NightwatchInit: class {
+          constructor(rootDir, options) {
+            rootDirPassed = rootDir;
+            optionsPassed = options;
+          }
+          run() {}
+        }
+      });
+
+      const index = require('../../lib/index');
+      index.run();
+
+      // Check the arguments passed to NightwatchInit
+      assert.strictEqual(rootDirPassed, expectedRootDir);
+      assert.deepEqual(optionsPassed, {
+        'generate-config': false,
+        b: ['chrome', 'safari'],
+        browser: ['chrome', 'safari']
+      });
+    });
+
+    test('works with many arguments, browser options, and package.json not present', () => {
+      process.argv = ['node', 'filename.js', 'new-project', 'random', '--browser=chrome', '--browser=safari', 'args'];
+
+      const origProcessExit = process.exit;
+
+      let processExitCode;
+      process.exit = (code) => {
+        processExitCode = code;
+      };
+
+      const consoleOutput = [];
+      mockery.registerMock(
+        './logger',
+        class {
+          static error(...msgs) {
+            consoleOutput.push(...msgs);
+          }
+        }
+      );
+
+      mockery.registerMock('fs', {
+        existsSync() {
+          return false;
+        },
+        mkdirSync() {
+          return true;
+        }
+      });
+
+      let rootDirPassed;
+      let optionsPassed;
+      mockery.registerMock('./init', {
+        NightwatchInit: class {
+          constructor(rootDir, options) {
+            rootDirPassed = rootDir;
+            optionsPassed = options;
+          }
+          run() {}
+        }
+      });
+
+      const index = require('../../lib/index');
+      index.run();
+
+      // Check the arguments passed to NightwatchInit (it won't be run due to error)
+      assert.strictEqual(rootDirPassed, undefined);
+      assert.deepEqual(optionsPassed, undefined);
+
+      // Check if process exited with code 1
+      assert.strictEqual(processExitCode, 1);
+
+      // Check console output (error)
+      const output = consoleOutput.toString();
+      assert.strictEqual(
+        output.includes('[33mpackage.json[39m not found in the root directory. Initializing a new NPM project..'),
+        true
+      );
+
+      process.exit = origProcessExit;
+    });
+
     test('works with many arguments, many options, and package.json present', () => {
       process.argv = ['node', 'filename.js', 'new-project', '-y', '--hello', '--there=hi', '-d', '--generate-config'];
       const expectedRootDir = path.join(process.cwd(), 'new-project');
@@ -399,7 +514,14 @@ describe('index tests', () => {
 
       // Check the arguments passed to NightwatchInit
       assert.strictEqual(rootDirPassed, expectedRootDir);
-      assert.deepEqual(optionsPassed, ['yes', 'hello', 'there=hi', 'generate-config']);
+      assert.deepEqual(optionsPassed, {
+        'generate-config': true,
+        d: true,
+        hello: true,
+        there: 'hi',
+        y: true,
+        yes: true
+      });
     });
   });
 
@@ -585,5 +707,89 @@ describe('index tests', () => {
       const output = consoleOutput.toString();
       assert.strictEqual(output.includes('Initializing a new NPM project'), true);
     });
+  });
+
+  test('should not give suggestion when right args are passed ', () => {
+    process.argv = ['node', 'filename.js', '--browser=chrome', '--browser=safari', 'args'];
+
+    const consoleOutput = [];
+    mockery.registerMock(
+      './logger',
+      class {
+        static error(...msgs) {
+          consoleOutput.push(...msgs);
+        }
+      }
+    );
+
+    mockery.registerMock('fs', {
+      existsSync() {
+        return false;
+      },
+      mkdirSync() {
+        return true;
+      }
+    });
+
+    mockery.registerMock('./init', {
+      NightwatchInit: class {
+        constructor(rootDir, options) {
+        }
+        run() {}
+      }
+    });
+
+    mockery.registerMock(child_process, {
+      execSync: () => {
+        return true;
+      }
+    });
+
+    const index = require('../../lib/index');
+    index.run();
+
+    const output = consoleOutput.toString();
+    assert.strictEqual(
+      output.includes('[33mpackage.json[39m not found in the root directory. Initializing a new NPM project..'),
+      true
+    );
+  });
+
+  test('should give suggestion when wrong args are passed ', () => {
+    process.argv = ['node', 'filename.js', '--browsers=chrome', '--browsers=safari'];
+
+    const consoleOutput = [];
+    mockery.registerMock(
+      './logger',
+      class {
+        static error(...msgs) {
+          consoleOutput.push(...msgs);
+        }
+      }
+    );
+
+    mockery.registerMock('fs', {
+      existsSync() {
+        return false;
+      },
+      mkdirSync() {
+        return true;
+      }
+    });
+
+    mockery.registerMock(child_process, {
+      execSync: () => {
+        return true;
+      }
+    });
+
+    const index = require('../../lib/index');
+    index.run();
+
+    const output = consoleOutput.toString();
+    assert.strictEqual(
+      output.includes('error: unknown option \'browsers\'\n(Did you mean browser?)'),
+      true
+    );
   });
 });
