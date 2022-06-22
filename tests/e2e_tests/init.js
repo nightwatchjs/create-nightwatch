@@ -419,13 +419,13 @@ describe('e2e tests for init', () => {
     assert.strictEqual(answers.seleniumServer, undefined);
     assert.strictEqual(answers.defaultBrowser, 'chrome');
     assert.strictEqual(answers.addExamples, true);
-    assert.strictEqual(answers.examplesLocation, path.join('tests', 'nightwatch-examples'));
+    assert.strictEqual(answers.examplesLocation, 'nightwatch-examples');
 
     // Test otherInfo
     assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.tsTestScript, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
-    assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, path.join('tests', 'nightwatch-examples'));
+    assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'nightwatch-examples');
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, undefined);
 
@@ -490,7 +490,7 @@ describe('e2e tests for init', () => {
       );
     }
     assert.strictEqual(output.includes('Generating example files...'), true);
-    assert.strictEqual(output.includes(`Success! Generated some example files at '${path.join('tests', 'nightwatch-examples')}'.`), true);
+    assert.strictEqual(output.includes('Success! Generated some example files at \'nightwatch-examples\'.'), true);
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
     assert.strictEqual(output.includes('Join our Discord community and instantly find answers to your issues or queries.'), true);
     assert.strictEqual(output.includes('Visit our GitHub page to report bugs or raise feature requests:'), true);
