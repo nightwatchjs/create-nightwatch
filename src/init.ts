@@ -617,6 +617,14 @@ export class NightwatchInit {
       Logger.error('(.env files are also supported)', '\n');
     }
 
+    // For now the templates added only for JS
+    if (answers.runner !== 'cucumber' && answers.language !== 'ts') {
+      Logger.error(colors.green('To get started, checkout the following templates in your favourite editor. Or skip/delete them if you are an experienced user.'));
+      Logger.error(colors.cyan(`  1. Title Assertion (${path.join(answers.testsLocation || '', 'templates', 'titleAssertions.js')})`));
+      Logger.error(colors.cyan(`  2. Login (${path.join(answers.testsLocation || '', 'templates', 'login.js')})`));
+      // Logger.error(colors.green('Please open the files in your favourite text editor to get started. You can also skip & delete the tests in case you are an experienced user.\n'));
+    }
+
     Logger.error();
     Logger.error(colors.green('RUN NIGHTWATCH TESTS'), '\n');
     if (this.rootDir !== process.cwd()) {
@@ -741,14 +749,6 @@ export class NightwatchInit {
         'Please follow the below link ("Download" and "Standalone Usage" sections) to setup EdgeDriver manually:'
       );
       Logger.error(colors.cyan('  https://nightwatchjs.org/guide/browser-drivers-setup/edgedriver.html'), '\n');
-    }
-
-    // For now the templates added only for JS
-    if (answers.runner !== 'cucumber' && answers.language !== 'ts') {
-      Logger.error(colors.green('Nightwatch has added the following template tests:'));
-      Logger.error(colors.cyan(`  1. Title Assertion (${path.join(answers.testsLocation || '', 'templates', 'titleAssertions.js')})`));
-      Logger.error(colors.cyan(`  2. Login (${path.join(answers.testsLocation || '', 'templates', 'login.js')})`));
-      Logger.error(colors.green('Please open the files in your favourite text editor to get started. You can also skip & delete the tests in case you are an experienced user.\n'));
     }
   }
 
