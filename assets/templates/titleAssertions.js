@@ -3,34 +3,30 @@
  * https://nightwatchjs.org/guide/writing-tests/test-syntax.html
  */
 describe('Title Assertion', () => {
+    
     /**
      * This section will always execute before the test suite
-     * 
      * Read More : https://nightwatchjs.org/guide/writing-tests/using-test-hooks.html#before-beforeeach-after-aftereach
      */ 
     before(browser => {
-        /**
-         * -------------------- Navigate to a URL ------------------------
+         /**
+         * Navigate to a URL :
+         *   - We need to navigate before performing any actions on the page
+         *     Read More : https://nightwatchjs.org/api/navigateTo.html
          * 
-         * Please enter the login page URL, which you wanted to navigate
-         * 
-         * Read More : https://nightwatchjs.org/api/navigateTo.html
-         * 
-         * Eg : browser.navigateTo('https://github.com');
+         *   - <PAGE-URL> is a placeholder. Replace it with the actual URL, which you wanted to navigate
          */
 
-        browser.navigateTo('<LOGIN-PAGE-URL>');
+        browser.navigateTo('<PAGE-URL>');
     });
 
 
-    // This is the test case
+     /* The following will perform the actual test/assertions */
     it('To test title', function (browser) {
         /**
-         * -------------------- Check title ------------------------
-         * 
-         * Please enter the title of the URL
-         * 
-         * Read More : https://nightwatchjs.org/api/title.html
+         * Check title :
+         *  - Use title assertion command, to check if the title is present or not.
+         *    Read More : https://nightwatchjs.org/api/title.html
          * 
          * Eg : browser.assert.title('GitHub: Where the world builds software · GitHub');
          */
@@ -39,7 +35,7 @@ describe('Title Assertion', () => {
     });
 
 
-    // This section will always execute after the test suite
+    /* The following will always execute after the test suite */
     after(browser => {
         // This is used to close the browser's session
         browser.end()

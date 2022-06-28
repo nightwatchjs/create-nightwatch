@@ -6,105 +6,77 @@ describe('The Login Page', () => {
 
     /**
      * This section will always execute before the test suite
-     * 
      * Read More : https://nightwatchjs.org/guide/writing-tests/using-test-hooks.html#before-beforeeach-after-aftereach
      */ 
     before(browser => {
+
         /**
-         * -------------------- Navigate to a URL ------------------------
+         * Navigate to a URL :
+         *   - We need to navigate before performing any actions on the page
+         *     Read More : https://nightwatchjs.org/api/navigateTo.html
          * 
-         * Please enter the login page URL, which you wanted to navigate and login
-         * 
-         * Read More : https://nightwatchjs.org/api/navigateTo.html
-         * 
-         * Eg : https://the-internet.herokuapp.com/login
+         *   - <LOGIN-PAGE-URL> is a placeholder. Replace it with the actual URL, which you wanted to navigate and login
          */
 
-        browser.navigateTo('<LOGIN-PAGE-URL>');
+        browser.navigateTo('<LOGIN-PAGE-URL>');  
     });
 
     
-    // This is the test case
+    /* The following will perform the actual test/assertions */
     it('To check session cookie after successful login', function (browser) {
 
         /**
-         * --------- Check if the USERNAME input box is present ----------
+         * Check if input box with id 'username' is present :
+         *   - Use elementPresent command, to check if the input box is present or not.
+         *     Read More : https://nightwatchjs.org/api/assert/#assert-elementPresent
+         *   
+         *   - Pass in the css locator to check if the input box (username) is present. 
+         *     Read More: https://www.selenium.dev/documentation/webdriver/elements/locators/
          * 
-         * - Here we have used isPresent command, to check the username input box is present or not.
-         * - In isPresent commabd, 1st argument will be the Locate strategy and the 2nd argument will be the selectors. 
-         *   You can remove the 1st argument, if you want to choose 'css selector' since it is deafult. 
-         * - Read more about locators and selectors https://www.selenium.dev/documentation/webdriver/elements/locators/
-         *       
-         *   For eg. :
-         *               |   Locator strategy   |      Selector            |
-         *          -----|--------------------- + -------------------------|
-         *           1   |  css selector        |  '#main ul li a.first'   |
-         *           2   |  xpath               |  '//*[@id="username"]'   |
-         *           3   |  link text           |  'click here'            |
-         *           4   |  partial link text   |  'click here'            |
-         *           5   |  tag name            |  'div'                   |
-         * 
-         * - If you don't have anything to do in callback, you can skip it too.
-         * 
-         * Read More : https://nightwatchjs.org/api/isVisible.html
-         * 
-         * Eg : browser.isPresent('input[id=username]', function(result) {
-         *          this.assert.equal(typeof result, "object");
-         *      });
+         * Eg : browser.assert.elementPresent('input[id=username]');
          */
 
-        browser.isPresent('<locator strategy>', '<selector>', function (result) {
-            // This place can be used to test the result 
-            this.assert.equal(typeof result, "object");
-            this.assert.equal(result.status, 0);
-            this.assert.equal(result.value, true);
-        });
+        browser.assert.elementPresent('<css locator>');
 
 
         /**
-        * -------------------- Enter the USERNAME -----------------------
+        * Enter the USERNAME :
+        *   - Use sendKeys command to fill the username placeholder.
+        *     Read More : https://nightwatchjs.org/api/sendKeys.html
         * 
-        * - sendKeys command is used to send keyboard keys strokes. We can use it to fill the username
-        * - In sendKeys, 1st argument and 2nd argument will be locators and selectors respectively and in this
-        *   case they will be same as above.
+        *   - <USERNAME> is a placeholder. Replace it with the actual username
+        *   - <css locator> will be same as above in elementPresent
         * 
-        * Read More : https://nightwatchjs.org/api/sendKeys.html
-        * 
-        * Eg : browser.sendKeys('input[id=username]', 'tomsmith');
+        * Eg : browser.sendKeys('input[id=username]', 'john-doe');
         */
 
-        browser.sendKeys('<locator strategy>', '<selector>', '<username>');
+        browser.sendKeys('<css locator>', '<USERNAME>');
 
 
         /**
-         * ----------- Check if the Password input box is present ------------
+         * Check if input box with id 'password' is present :
+         *   - Pass in the css locator to check if the input box (password) is present. 
          * 
-         * Eg : browser.isPresent('input[id=password]', function(result) {
-         *          this.assert.equal(typeof result, "object");
-         *      });
+         * Eg : browser.assert.elementPresent('input[id=password]');
          */
 
-        browser.isPresent('<locator strategy>', '<selector>', function (result) {
-            // This place can be used to test the result 
-            this.assert.equal(typeof result, "object");
-            this.assert.equal(result.status, 0);
-            this.assert.equal(result.value, true);
-        });
+        browser.assert.elementPresent('<css locator>');
 
 
         /**
-          * --------------- Enter the Password and form submission ---------------
-          * Here browser.Keys.ENTER is used to press enter stroke after filling the password and submit the form. 
+          * Enter the Password and form submission :
+          *   - browser.Keys.ENTER is used to press enter stroke after filling the password and submit the form. 
+          *   - <PASSWORD> is a placeholder. Replace it with the actual password
+          *   - <css locator> will be same as above passed for password in elementPresent command
           * 
           * Eg : browser.sendKeys('input[id="password"]', ['SuperSecretPassword!', browser.Keys.ENTER]);
           */
 
-        browser.sendKeys('<locator strategy>', '<selector>', ['<password>', browser.Keys.ENTER]);
+        browser.sendKeys('<css locator>', ['<PASSWORD>', browser.Keys.ENTER]);
 
 
         /**
          * If ENTER doesn't work for you then you can use 'click' command to click on submit button.
-         * 
          * Read More : https://nightwatchjs.org/api/click.html
          * 
          * Eg: browser.click('css selector', '#submitButton');
@@ -112,9 +84,11 @@ describe('The Login Page', () => {
 
 
         /**
-         * -------------------- Check the new URL is correct -----------------------
+         * Check the new URL is correct :
+         *   - Use urlContains command to fill the username placeholder.
+         *     Read More : https://nightwatchjs.org/api/assert/#assert-urlMatches
          * 
-         * Read More : https://nightwatchjs.org/api/assert/#assert-urlMatches
+         *   - <NEW-REDIRCTED-URL> is a placeholder. Replace it with the actual dashboard/profile URL
          * 
          * Eg:  browser.assert.urlContains('/dashboard');
          */
@@ -123,7 +97,7 @@ describe('The Login Page', () => {
 
 
         /**
-         * ------ Check session cookie is present after successful login -----------
+         * Check session cookie is present after successful login.
          * 
          * Read More : https://nightwatchjs.org/api/getCookie.html
          * 
@@ -134,14 +108,14 @@ describe('The Login Page', () => {
          */
 
         browser.getCookie('<cookie-name>', function callback(result) {
-            // This place can be used to test the result
+            // add more assertions here to test the result,
             this.assert.equal(result.value, '<cookie-value>');
             this.assert.equals(result.name, '<cookie-name>');
         });
     });
 
 
-    // This section will always execute after the test suite
+    /* The following will always execute after the test suite */
     after(browser => {
         // This is used to close the browser's session
         browser.end()
