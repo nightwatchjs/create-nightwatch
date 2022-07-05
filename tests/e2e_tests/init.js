@@ -101,23 +101,23 @@ describe('e2e tests for init', () => {
     assert.strictEqual(answers.defaultBrowser, 'chrome');
     assert.strictEqual(answers.testsLocation, 'tests');
     assert.strictEqual(answers.addExamples, true);
-    assert.strictEqual(answers.examplesLocation, 'tests');
+    assert.strictEqual(answers.examplesLocation, 'nightwatch-examples');
 
     // Test otherInfo
     assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.tsTestScript, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
-    assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'tests');
+    assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'nightwatch-examples');
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, undefined);
 
     // Test generated config
     assert.strictEqual(fs.existsSync(configPath), true);
     const config = require(configPath);
-    assert.deepEqual(config.src_folders, [path.join('tests', 'specs')]);
-    assert.deepEqual(config.page_objects_path, [path.join('tests', 'page-objects')]);
-    assert.deepEqual(config.custom_commands_path, [path.join('tests', 'custom-commands')]);
-    assert.deepEqual(config.custom_assertions_path, [path.join('tests', 'custom-assertions')]);
+    assert.deepEqual(config.src_folders, ['tests', 'nightwatch-examples/specs']);
+    assert.deepEqual(config.page_objects_path, [path.join('nightwatch-examples', 'page-objects')]);
+    assert.deepEqual(config.custom_commands_path, [path.join('nightwatch-examples', 'custom-commands')]);
+    assert.deepEqual(config.custom_assertions_path, [path.join('nightwatch-examples', 'custom-assertions')]);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
     if (process.platform === 'darwin') {
@@ -168,7 +168,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Installing webdriver for Chrome (chromedriver)...'), true);
     if (process.platform === 'darwin') {assert.strictEqual(output.includes('Enabling safaridriver...'), true)}
     assert.strictEqual(output.includes('Generating example files...'), true);
-    assert.strictEqual(output.includes('Success! Generated some example files at \'tests\'.'), true);
+    assert.strictEqual(output.includes('Generating example files'), true);
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
     assert.strictEqual(output.includes('Join our Discord community and instantly find answers to your issues or queries.'), true);
     assert.strictEqual(output.includes('Visit our GitHub page to report bugs or raise feature requests:'), true);
@@ -176,11 +176,11 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
     assert.strictEqual(
-      output.includes(`npx nightwatch .${path.sep}${path.join('tests', 'specs')}`),
+      output.includes(`npx nightwatch .${path.sep}${path.join('nightwatch-examples', 'specs')}`),
       true
     );
     assert.strictEqual(
-      output.includes(`npx nightwatch .${path.sep}${path.join('tests', 'specs', 'basic', 'ecosia.js')}`),
+      output.includes(`npx nightwatch .${path.sep}${path.join('nightwatch-examples', 'specs', 'basic', 'ecosia.js')}`),
       true
     );
     assert.strictEqual(output.includes('[Selenium Server]'), true);
@@ -964,8 +964,8 @@ describe('e2e tests for init', () => {
     const examplesPath = path.join(rootDir, answers.examplesLocation);
     assert.strictEqual(fs.existsSync(examplesPath), true);
     const exampleFiles = fs.readdirSync(examplesPath);
-    assert.strictEqual(exampleFiles.length, 4);
-    assert.deepEqual(exampleFiles, ['custom-assertions', 'custom-commands', 'page-objects', 'specs']);
+    assert.strictEqual(exampleFiles.length, 5);
+    assert.deepEqual(exampleFiles, ['custom-assertions', 'custom-commands', 'page-objects', 'specs', 'templates']);
 
     // Test console output
     const output = consoleOutput.toString();
