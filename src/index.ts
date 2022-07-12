@@ -13,18 +13,16 @@ import suggestSimilarOption from './utils/suggestSimilar';
 export const run = async () => {
   try {
     const argv = process.argv.slice(2);
-    const args = argv.filter((arg) => !arg.startsWith('-'));
-    const options = minimist(argv, {
+    const {_: args, ...options} = minimist(argv, {
       boolean: 'generate-config',
       alias: {
         yes: 'y',
         browser: 'b'
       }
     });
-    const {_, ...nightwatchInitOptions} = options;
 
     // Filter flags that are not present in AVAILABLE_CONFIG_ARGS
-    const wrongUserFlags = Object.keys(nightwatchInitOptions).filter((word) => !AVAILABLE_CONFIG_FLAGS.includes(word));
+    const wrongUserFlags = Object.keys(options).filter((word) => !AVAILABLE_CONFIG_FLAGS.includes(word));
 
     if (wrongUserFlags.length > 0) {
       const findAndSuggestSimilarOption = suggestSimilarOption(wrongUserFlags[0], AVAILABLE_CONFIG_FLAGS);
@@ -54,7 +52,7 @@ export const run = async () => {
       initializeNodeProject(rootDir);
     }
 
-    const nightwatchInit = new NightwatchInit(rootDir, nightwatchInitOptions);
+    const nightwatchInit = new NightwatchInit(rootDir, options);
     await nightwatchInit.run();
   } catch (err) {
     Logger.error(err as string);

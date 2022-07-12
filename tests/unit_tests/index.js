@@ -419,15 +419,8 @@ describe('index tests', () => {
       });
     });
 
-    test('works with many arguments, browser options, and package.json not present', () => {
-      process.argv = ['node', 'filename.js', 'new-project', 'random', '--browser=chrome', '--browser=safari', 'args'];
-
-      const origProcessExit = process.exit;
-
-      let processExitCode;
-      process.exit = (code) => {
-        processExitCode = code;
-      };
+    test('works with no arguments, browser options without =, and package.json not present', () => {
+      process.argv = ['node', 'filename.js', '--browser', 'chrome', '--browser', 'safari'];
 
       const consoleOutput = [];
       mockery.registerMock(
@@ -439,12 +432,15 @@ describe('index tests', () => {
         }
       );
 
-      mockery.registerMock('fs', {
-        existsSync() {
+      mockery.registerMock('./utils', {
+        isNodeProject() {
           return false;
-        },
-        mkdirSync() {
-          return true;
+        }
+      });
+
+      mockery.registerMock('fs', {
+        readdirSync() {
+          return [];
         }
       });
 
@@ -461,23 +457,27 @@ describe('index tests', () => {
       });
 
       const index = require('../../lib/index');
+
+      let newNodeProjectInitialized = false;
+      let newNodeProjectRootDir;
+      index.initializeNodeProject = (rootDir) => {
+        newNodeProjectInitialized = true;
+        newNodeProjectRootDir = rootDir;
+      };
+
       index.run();
 
-      // Check the arguments passed to NightwatchInit (it won't be run due to error)
-      assert.strictEqual(rootDirPassed, undefined);
-      assert.deepEqual(optionsPassed, undefined);
+      // Check the arguments passed to NightwatchInit
+      assert.strictEqual(rootDirPassed, process.cwd());
+      assert.deepEqual(optionsPassed, {
+        'generate-config': false,
+        b: ['chrome', 'safari'],
+        browser: ['chrome', 'safari']
+      });
 
-      // Check if process exited with code 1
-      assert.strictEqual(processExitCode, 1);
-
-      // Check console output (error)
-      const output = consoleOutput.toString();
-      assert.strictEqual(
-        output.includes('[33mpackage.json[39m not found in the root directory. Initializing a new NPM project..'),
-        true
-      );
-
-      process.exit = origProcessExit;
+      // Check if new node project initialized in correct dir
+      assert.strictEqual(newNodeProjectInitialized, true);
+      assert.strictEqual(newNodeProjectRootDir, process.cwd());
     });
 
     test('works with many arguments, many options, and package.json present', () => {
