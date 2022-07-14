@@ -16,7 +16,7 @@ describe('Title Assertion', () => {
          * 
          *   - <PAGE-URL> is a placeholder. Replace it with the actual URL, which you wanted to navigate
          * 
-         * Eg : browser.navigateTo('https://github.com/');
+         * Eg : browser.navigateTo('https://www.github.com/');
          */
 
         browser.navigateTo('<PAGE-URL>');
