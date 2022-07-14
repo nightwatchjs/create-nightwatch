@@ -1,5 +1,5 @@
 /**
- * If you wanted to learn more about describe interface. Refer this :
+ * To learn more about the describe interface, refer to the following link:
  * https://nightwatchjs.org/guide/writing-tests/test-syntax.html
  */
 describe('Title Assertion', () => {
@@ -15,6 +15,8 @@ describe('Title Assertion', () => {
          *     Read More : https://nightwatchjs.org/api/navigateTo.html
          * 
          *   - <PAGE-URL> is a placeholder. Replace it with the actual URL, which you wanted to navigate
+         * 
+         * Eg : browser.navigateTo('https://github.com/');
          */
 
         browser.navigateTo('<PAGE-URL>');

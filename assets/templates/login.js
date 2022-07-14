@@ -1,5 +1,5 @@
 /**
- * If you wanted to learn more about describe interface. Refer this :
+ * To learn more about the describe interface, refer to the following link :
  * https://nightwatchjs.org/guide/writing-tests/test-syntax.html
  */
 describe('The Login Page', () => {
