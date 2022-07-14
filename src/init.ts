@@ -337,6 +337,7 @@ export class NightwatchInit {
     const page_objects_path: string[] = []; // to go as the value of page_objects_configs property.
     const custom_commands_path: string[] = []; // to go as the value of custom_commands_path property.
     const custom_assertions_path: string[] = []; // to go as the value of custom_assertions_path property.
+    const feature_path = answers.featurePath || ''; // to be used in cucumber feature_path property.
 
     const testsJsSrc: string = path.join(this.otherInfo.tsOutDir || '', answers.testsLocation || '');
     if (testsJsSrc !== '.') {
@@ -377,10 +378,11 @@ export class NightwatchInit {
 
     let rendered = ejs.render(tplData, {
       plugins: false,
-      src_folders: JSON.stringify(src_folders).replace(/"/g, '\''),
-      page_objects_path: JSON.stringify(page_objects_path).replace(/"/g, '\''),
-      custom_commands_path: JSON.stringify(custom_commands_path).replace(/"/g, '\''),
-      custom_assertions_path: JSON.stringify(custom_assertions_path).replace(/"/g, '\''),
+      src_folders: JSON.stringify(src_folders.map(src => src.replace(/"/g, '\'').replace(/\\/g, '/'))),
+      page_objects_path: JSON.stringify(page_objects_path.map(path => path.replace(/"/g, '\'').replace(/\\/g, '/'))),
+      custom_commands_path: JSON.stringify(custom_commands_path.map(path => path.replace(/"/g, '\'').replace(/\\/g, '/'))),
+      custom_assertions_path: JSON.stringify(custom_assertions_path.map(path => path.replace(/"/g, '\'').replace(/\\/g, '/'))),
+      feature_path: feature_path.replace(/\\/g, '/'),
       answers
     });
 

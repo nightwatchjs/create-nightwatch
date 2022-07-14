@@ -770,10 +770,10 @@ describe('init tests', () => {
       assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
       assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'tests');
 
-      assert.deepEqual(config.src_folders, [path.join('tests', 'specs')]);
-      assert.deepEqual(config.page_objects_path, [path.join('tests', 'page-objects')]);
-      assert.deepEqual(config.custom_commands_path, [path.join('tests', 'custom-commands')]);
-      assert.deepEqual(config.custom_assertions_path, [path.join('tests', 'custom-assertions')]);
+      assert.deepEqual(config.src_folders, ['tests/specs']);
+      assert.deepEqual(config.page_objects_path, ['tests/page-objects']);
+      assert.deepEqual(config.custom_commands_path, ['tests/custom-commands']);
+      assert.deepEqual(config.custom_assertions_path, ['tests/custom-assertions']);
       assert.deepEqual(Object.keys(config.test_settings), ['default', 'firefox', 'chrome']);
       assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox');
 
@@ -815,10 +815,10 @@ describe('init tests', () => {
       assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
       assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, path.join('tests', 'nightwatch-examples'));
 
-      assert.deepEqual(config.src_folders, ['tests', path.join('tests', 'nightwatch-examples', 'specs')]);
-      assert.deepEqual(config.page_objects_path, [path.join('tests', 'nightwatch-examples', 'page-objects')]);
-      assert.deepEqual(config.custom_commands_path, [path.join('tests', 'nightwatch-examples', 'custom-commands')]);
-      assert.deepEqual(config.custom_assertions_path, [path.join('tests', 'nightwatch-examples', 'custom-assertions')]);
+      assert.deepEqual(config.src_folders, ['tests', 'tests/nightwatch-examples/specs']);
+      assert.deepEqual(config.page_objects_path, ['tests/nightwatch-examples/page-objects']);
+      assert.deepEqual(config.custom_commands_path, ['tests/nightwatch-examples/custom-commands']);
+      assert.deepEqual(config.custom_assertions_path, ['tests/nightwatch-examples/custom-assertions']);
       assert.deepEqual(Object.keys(config.test_settings), [
         'default',
         'chrome',
@@ -887,6 +887,8 @@ describe('init tests', () => {
         'selenium.chrome'
       ]);
       assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
+      assert.strictEqual(config.test_settings.default.test_runner.type, 'cucumber');
+      assert.strictEqual(config.test_settings.default.test_runner.options.feature_path, '');
       assert.strictEqual(config.test_settings.saucelabs.selenium.host, 'ondemand.saucelabs.com');
       assert.strictEqual(config.test_settings.saucelabs.selenium.port, 443);
       assert.strictEqual(config.test_settings.saucelabs.desiredCapabilities['sauce:options'].username, '${SAUCE_USERNAME}');
@@ -918,6 +920,7 @@ describe('init tests', () => {
         },
         seleniumServer: true,
         testsLocation: 'tests',
+        featurePath: path.join('tests', 'features'),
         addExamples: true,
         examplesLocation: path.join('tests', 'features', 'nightwatch-examples')
       };
@@ -945,6 +948,8 @@ describe('init tests', () => {
         'selenium.chrome'
       ]);
       assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
+      assert.strictEqual(config.test_settings.default.test_runner.type, 'cucumber');
+      assert.strictEqual(config.test_settings.default.test_runner.options.feature_path, 'tests/features');
       assert.strictEqual(config.test_settings.saucelabs.selenium.host, 'ondemand.saucelabs.com');
       assert.strictEqual(config.test_settings.saucelabs.selenium.port, 443);
       assert.strictEqual(config.test_settings.saucelabs.desiredCapabilities['sauce:options'].username, '${SAUCE_USERNAME}');
@@ -988,7 +993,7 @@ describe('init tests', () => {
       assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, path.join('dist', 'tests'));
       assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, path.join('dist', 'nightwatch-examples'));
 
-      assert.deepEqual(config.src_folders, [path.join('dist', 'tests'), path.join('dist', 'nightwatch-examples')]);
+      assert.deepEqual(config.src_folders, ['dist/tests', 'dist/nightwatch-examples']);
       assert.deepEqual(config.page_objects_path, []);
       assert.deepEqual(config.custom_commands_path, []);
       assert.deepEqual(config.custom_assertions_path, []);
