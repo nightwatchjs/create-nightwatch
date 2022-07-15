@@ -16,6 +16,8 @@ describe('The Login Page', () => {
          *     Read More : https://nightwatchjs.org/api/navigateTo.html
          * 
          *   - <LOGIN-PAGE-URL> is a placeholder. Replace it with the actual URL, which you wanted to navigate and login
+         * 
+         * Eg: browser.navigateTo('https://the-internet.herokuapp.com/login')
          */
 
         browser.navigateTo('<LOGIN-PAGE-URL>');  
@@ -33,7 +35,7 @@ describe('The Login Page', () => {
          *   - Pass in the css locator to check if the input box (username) is present. 
          *     Read More: https://www.selenium.dev/documentation/webdriver/elements/locators/
          * 
-         * Eg : browser.assert.elementPresent('input[id=username]');
+         * Eg: browser.assert.elementPresent('input[id=username]');
          */
 
         browser.assert.elementPresent('<css locator>');
@@ -47,7 +49,7 @@ describe('The Login Page', () => {
         *   - <USERNAME> is a placeholder. Replace it with the actual username
         *   - <css locator> will be same as above in elementPresent
         * 
-        * Eg : browser.sendKeys('input[id=username]', 'john-doe');
+        * Eg: browser.sendKeys('input[id=username]', 'john-doe');
         */
 
         browser.sendKeys('<css locator>', '<USERNAME>');
@@ -57,7 +59,7 @@ describe('The Login Page', () => {
          * Check if input box with id 'password' is present :
          *   - Pass in the css locator to check if the input box (password) is present. 
          * 
-         * Eg : browser.assert.elementPresent('input[id=password]');
+         * Eg: browser.assert.elementPresent('input[id=password]');
          */
 
         browser.assert.elementPresent('<css locator>');
@@ -69,7 +71,7 @@ describe('The Login Page', () => {
           *   - <PASSWORD> is a placeholder. Replace it with the actual password
           *   - <css locator> will be same as above passed for password in elementPresent command
           * 
-          * Eg : browser.sendKeys('input[id="password"]', ['SuperSecretPassword!', browser.Keys.ENTER]);
+          * Eg: browser.sendKeys('input[id="password"]', ['SuperSecretPassword!', browser.Keys.ENTER]);
           */
 
         browser.sendKeys('<css locator>', ['<PASSWORD>', browser.Keys.ENTER]);
