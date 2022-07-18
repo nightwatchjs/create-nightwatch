@@ -33,7 +33,7 @@ describe('Title Assertion', () => {
          * Eg : browser.assert.title('GitHub: Where the world builds software · GitHub');
          */
 
-        browser.assert.title('<TITLE>');
+        browser.assert.titleEquals('<TITLE>');
     });
 
 

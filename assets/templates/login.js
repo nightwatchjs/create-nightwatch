@@ -49,7 +49,7 @@ describe('The Login Page', () => {
         *   - <USERNAME> is a placeholder. Replace it with the actual username
         *   - <css locator> will be same as above in elementPresent
         * 
-        * Eg: browser.sendKeys('input[id=username]', 'john-doe');
+        * Eg: browser.sendKeys('input[id=username]', 'tomsmith');
         */
 
         browser.sendKeys('<css locator>', '<USERNAME>');
@@ -81,7 +81,7 @@ describe('The Login Page', () => {
          * If ENTER doesn't work for you then you can use 'click' command to click on submit button.
          * Read More : https://nightwatchjs.org/api/click.html
          * 
-         * Eg: browser.click('css selector', '#submitButton');
+         * Eg: browser.click('css selector', 'button[type="submit"]');
          */
 
 
@@ -92,7 +92,7 @@ describe('The Login Page', () => {
          * 
          *   - <NEW-REDIRCTED-URL> is a placeholder. Replace it with the actual dashboard/profile URL
          * 
-         * Eg:  browser.assert.urlContains('/dashboard');
+         * Eg:  browser.assert.urlContains('/secure');
          */
 
         browser.assert.urlContains('<NEW-REDIRCTED-URL>');
