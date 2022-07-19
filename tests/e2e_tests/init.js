@@ -9,6 +9,8 @@ const rootDir = path.join(process.cwd(), 'test_output');
 
 describe('e2e tests for init', () => {
   beforeEach(() => {
+    rmDirSync(rootDir);
+
     mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
 
     if (!fs.existsSync(path.join(rootDir, 'package.json'))) {
@@ -20,6 +22,7 @@ describe('e2e tests for init', () => {
         cwd: rootDir
       });
     }
+
   });
 
   afterEach(() => {
@@ -157,8 +160,8 @@ describe('e2e tests for init', () => {
     const examplesPath = path.join(rootDir, answers.examplesLocation);
     assert.strictEqual(fs.existsSync(examplesPath), true);
     const exampleFiles = fs.readdirSync(examplesPath);
-    assert.strictEqual(exampleFiles.length, 4);
-    assert.deepEqual(exampleFiles, ['custom-assertions', 'custom-commands', 'page-objects', 'specs']);
+    assert.strictEqual(exampleFiles.length, 5);
+    assert.deepEqual(exampleFiles, ['custom-assertions', 'custom-commands', 'page-objects', 'specs', 'templates']);
 
     // Test console output
     const output = consoleOutput.toString();
@@ -169,6 +172,8 @@ describe('e2e tests for init', () => {
     if (process.platform === 'darwin') {assert.strictEqual(output.includes('Enabling safaridriver...'), true)}
     assert.strictEqual(output.includes('Generating example files...'), true);
     assert.strictEqual(output.includes('Success! Generated some example files at \'tests\'.'), true);
+    assert.strictEqual(output.includes('Generating template files...'), true);
+    assert.strictEqual(output.includes(`Success! Generated some templates files at '${path.join('tests', 'templates')}'.`), true);
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
     assert.strictEqual(output.includes('Join our Discord community and instantly find answers to your issues or queries.'), true);
     assert.strictEqual(output.includes('Visit our GitHub page to report bugs or raise feature requests:'), true);
@@ -475,8 +480,8 @@ describe('e2e tests for init', () => {
     const examplesPath = path.join(rootDir, answers.examplesLocation);
     assert.strictEqual(fs.existsSync(examplesPath), true);
     const exampleFiles = fs.readdirSync(examplesPath);
-    assert.strictEqual(exampleFiles.length, 4);
-    assert.deepEqual(exampleFiles, ['custom-assertions', 'custom-commands', 'page-objects', 'specs']);
+    assert.strictEqual(exampleFiles.length, 5);
+    assert.deepEqual(exampleFiles, ['custom-assertions', 'custom-commands', 'page-objects', 'specs', 'templates']);
 
     // Test console output
     const output = consoleOutput.toString();
@@ -964,8 +969,8 @@ describe('e2e tests for init', () => {
     const examplesPath = path.join(rootDir, answers.examplesLocation);
     assert.strictEqual(fs.existsSync(examplesPath), true);
     const exampleFiles = fs.readdirSync(examplesPath);
-    assert.strictEqual(exampleFiles.length, 4);
-    assert.deepEqual(exampleFiles, ['custom-assertions', 'custom-commands', 'page-objects', 'specs']);
+    assert.strictEqual(exampleFiles.length, 5);
+    assert.deepEqual(exampleFiles, ['custom-assertions', 'custom-commands', 'page-objects', 'specs', 'templates']);
 
     // Test console output
     const output = consoleOutput.toString();

@@ -82,6 +82,11 @@ export class NightwatchInit {
         this.copyCucumberExamples(answers.examplesLocation || '');
       } else if (answers.addExamples) {
         this.copyExamples(answers.examplesLocation || '', answers.language === 'ts');
+        
+        // For now the templates added only for JS
+        if (answers.language !== 'ts') {
+          this.copyTemplates(answers.examplesLocation || '');
+        }
       }
 
       // Post instructions to run their first test
@@ -544,6 +549,34 @@ export class NightwatchInit {
     );
   }
 
+
+  copyTemplates(examplesLocation: string) {
+    Logger.error('Generating template files...');
+
+    const templatesLocation = path.join(examplesLocation, 'templates');
+
+    const templatesDestPath = path.join(this.rootDir, templatesLocation);
+
+    try {
+      fs.mkdirSync(templatesDestPath, {recursive: true});
+      // eslint-disable-next-line
+    } catch (err) {}
+
+    if (fs.readdirSync(templatesDestPath).length) {
+      Logger.error(`Templates already exists at '${templatesLocation}'. Skipping...`, '\n');
+
+      return;
+    }
+
+    const templatesSrcPath = path.join(__dirname, '..', 'assets', 'templates');
+    
+    copy(templatesSrcPath, templatesDestPath);
+
+    Logger.error(
+      `${colors.green(symbols().ok + ' Success!')} Generated some templates files at '${templatesLocation}'.\n`
+    );
+  }
+
   postSetupInstructions(answers: ConfigGeneratorAnswers) {
     Logger.error('Nightwatch setup complete!!\n');
 
@@ -584,6 +617,13 @@ export class NightwatchInit {
       Logger.error(`- ${colors.cyan(answers.remoteEnv?.username as string)}`);
       Logger.error(`- ${colors.cyan(answers.remoteEnv?.access_key as string)}`);
       Logger.error('(.env files are also supported)', '\n');
+    }
+
+    // For now the templates added only for JS
+    if (answers.runner !== 'cucumber' && answers.language !== 'ts') {
+      Logger.error(colors.green('To get started, checkout the following templates. Skip/delete them if you are an experienced user.'));
+      Logger.error(colors.cyan(`  1. Title Assertion (${path.join(answers.examplesLocation || '', 'templates', 'titleAssertion.js')})`));
+      Logger.error(colors.cyan(`  2. Login (${path.join(answers.examplesLocation || '', 'templates', 'login.js')})`));
     }
 
     Logger.error();
