@@ -171,7 +171,9 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Installing webdriver for Chrome (chromedriver)...'), true);
     if (process.platform === 'darwin') {assert.strictEqual(output.includes('Enabling safaridriver...'), true)}
     assert.strictEqual(output.includes('Generating example files...'), true);
-    assert.strictEqual(output.includes('Generating example files'), true);
+    assert.strictEqual(output.includes('Success! Generated some example files at \'tests\'.'), true);
+    assert.strictEqual(output.includes('Generating template files...'), true);
+    assert.strictEqual(output.includes(`Success! Generated some templates files at '${path.join('tests', 'templates')}'.`), true);
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
     assert.strictEqual(output.includes('Join our Discord community and instantly find answers to your issues or queries.'), true);
     assert.strictEqual(output.includes('Visit our GitHub page to report bugs or raise feature requests:'), true);

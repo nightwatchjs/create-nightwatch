@@ -622,9 +622,8 @@ export class NightwatchInit {
     // For now the templates added only for JS
     if (answers.runner !== 'cucumber' && answers.language !== 'ts') {
       Logger.error(colors.green('To get started, checkout the following templates. Skip/delete them if you are an experienced user.'));
-      Logger.error(colors.cyan(`  1. Title Assertion (${path.join(answers.examplesLocation || '', 'templates', 'titleAssertions.js')})`));
+      Logger.error(colors.cyan(`  1. Title Assertion (${path.join(answers.examplesLocation || '', 'templates', 'titleAssertion.js')})`));
       Logger.error(colors.cyan(`  2. Login (${path.join(answers.examplesLocation || '', 'templates', 'login.js')})`));
-      // Logger.error(colors.green('Please open the files in your favourite text editor to get started. You can also skip & delete the tests in case you are an experienced user.\n'));
     }
 
     Logger.error();
