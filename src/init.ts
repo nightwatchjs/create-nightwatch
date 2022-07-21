@@ -378,10 +378,10 @@ export class NightwatchInit {
 
     let rendered = ejs.render(tplData, {
       plugins: false,
-      src_folders: JSON.stringify(src_folders.map(src => src.replace(/"/g, '\'').replace(/\\/g, '/'))),
-      page_objects_path: JSON.stringify(page_objects_path.map(path => path.replace(/"/g, '\'').replace(/\\/g, '/'))),
-      custom_commands_path: JSON.stringify(custom_commands_path.map(path => path.replace(/"/g, '\'').replace(/\\/g, '/'))),
-      custom_assertions_path: JSON.stringify(custom_assertions_path.map(path => path.replace(/"/g, '\'').replace(/\\/g, '/'))),
+      src_folders: JSON.stringify(src_folders).replace(/"/g, '\'').replace(/\\\\/g, '/'),
+      page_objects_path: JSON.stringify(page_objects_path).replace(/"/g, '\'').replace(/\\\\/g, '/'),
+      custom_commands_path: JSON.stringify(custom_commands_path).replace(/"/g, '\'').replace(/\\\\/g, '/'),
+      custom_assertions_path: JSON.stringify(custom_assertions_path).replace(/"/g, '\'').replace(/\\\\/g, '/'),
       feature_path: feature_path.replace(/\\/g, '/'),
       answers
     });
