@@ -618,19 +618,23 @@ export class NightwatchInit {
       Logger.error(`- ${colors.cyan(answers.remoteEnv?.access_key as string)}`);
       Logger.error('(.env files are also supported)', '\n');
     }
+    Logger.error();
+
+    const relativeToRootDir = path.relative(process.cwd(), this.rootDir) || '.';
 
     // For now the templates added only for JS
     if (answers.runner !== 'cucumber' && answers.language !== 'ts') {
-      Logger.error(colors.green('To get started, checkout the following templates. Skip/delete them if you are an experienced user.'));
-      Logger.error(colors.cyan(`  1. Title Assertion (${path.join(answers.examplesLocation || '', 'templates', 'titleAssertion.js')})`));
-      Logger.error(colors.cyan(`  2. Login (${path.join(answers.examplesLocation || '', 'templates', 'login.js')})`));
+      Logger.error(colors.green('TEMPLATE TESTS'), '\n');
+      Logger.error('To get started, checkout the following templates. Skip/delete them if you are an experienced user.');
+      Logger.error(colors.cyan(`  1. Title Assertion (${path.join(relativeToRootDir, answers.examplesLocation || '', 'templates', 'titleAssertion.js')})`));
+      Logger.error(colors.cyan(`  2. Login (${path.join(relativeToRootDir, answers.examplesLocation || '', 'templates', 'login.js')})`));
+      Logger.error();
     }
 
-    Logger.error();
     Logger.error(colors.green('RUN NIGHTWATCH TESTS'), '\n');
     if (this.rootDir !== process.cwd()) {
       Logger.error('First, change directory to the root dir of your project:');
-      Logger.error(colors.cyan(`  cd ${path.relative(process.cwd(), this.rootDir) || '.'}`), '\n');
+      Logger.error(colors.cyan(`  cd ${relativeToRootDir}`), '\n');
     }
 
     let envFlag = '';
