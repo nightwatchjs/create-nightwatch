@@ -21,6 +21,11 @@ export const run = async () => {
       }
     });
 
+    // If string, convert options.browser to array.
+    if (typeof options.browser === 'string') {
+      options.browser = [options.browser];
+    }
+
     // Filter flags that are not present in AVAILABLE_CONFIG_ARGS
     const wrongUserFlags = Object.keys(options).filter((word) => !AVAILABLE_CONFIG_FLAGS.includes(word));
 
