@@ -24,8 +24,9 @@ $ npm init nightwatch
 # if you want to initialize a new project
 $ npm init nightwatch path/to/new/project
 
-# if you just want to generate a new config
-# file in your existing Nightwatch project
+# generate a new config file in your existing
+# Nightwatch project (also installs webdrivers
+# and other required packages).
 $ npm init nightwatch -- --generate-config
 ```
 
