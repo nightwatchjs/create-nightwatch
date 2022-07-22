@@ -143,6 +143,14 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     name: 'baseUrl',
     message: 'What is the base_url of your project?',
     default: 'http://localhost'
+  },
+
+  // ANONYMOUS METRIC COLLECTION
+  {
+    type: 'confirm',
+    name: 'allowAnonymousMetrics',
+    message: 'Allow Nightwatch to anonymously collect usage metrics?',
+    default: true
   }
 ];
 

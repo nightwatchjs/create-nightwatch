@@ -4,6 +4,7 @@ import ejs from 'ejs';
 import colors from 'ansi-colors';
 import {prompt} from 'inquirer';
 import {execSync} from 'child_process';
+import uuid from 'uuid';
 import {copy, stripControlChars, symbols} from './utils';
 import Logger from './logger';
 
@@ -377,6 +378,7 @@ export class NightwatchInit {
       custom_commands_path: JSON.stringify(custom_commands_path).replace(/"/g, '\'').replace(/\\\\/g, '/'),
       custom_assertions_path: JSON.stringify(custom_assertions_path).replace(/"/g, '\'').replace(/\\\\/g, '/'),
       feature_path: feature_path.replace(/\\/g, '/'),
+      client_id: uuid.v4(),
       answers
     });
 
