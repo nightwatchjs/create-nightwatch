@@ -948,5 +948,72 @@ describe('init tests', () => {
 
       fs.unlinkSync('test_config.conf.js');
     });
+
+    test('generateConfig with js with allowAnonymousMetrics', () => {
+      mockery.registerMock(
+        './logger',
+        class {
+          static error() {}
+        }
+      );
+
+      mockery.registerMock(
+        'uuid',
+
+        class {
+          static v4() {
+            return '3141-5926-5358-9793';
+          }
+        }
+      );
+
+      const answers = {
+        language: 'js',
+        backend: 'local',
+        browsers: ['chrome', 'firefox'],
+        defaultBrowser: 'firefox',
+        allowAnonymousMetrics: false
+      };
+
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, []);
+      nightwatchInit.otherInfo.tsOutDir = 'dist';
+
+      nightwatchInit.generateConfig(answers, 'test_config.conf.js');
+      const config = require('../../test_config.conf.js');
+
+      assert.strictEqual(config.usage_analytics.enabled, false);
+      assert.strictEqual(config.usage_analytics.log_path, './logs/analytics');
+      assert.strictEqual(config.usage_analytics.client_id, '3141-5926-5358-9793');
+
+      fs.unlinkSync('test_config.conf.js');
+    });
+
+    test('generateConfig with js without allowAnonymousMetrics', () => {
+      mockery.registerMock(
+        './logger',
+        class {
+          static error() {}
+        }
+      );
+
+      const answers = {
+        language: 'js',
+        backend: 'local',
+        browsers: ['chrome', 'firefox'],
+        defaultBrowser: 'firefox'
+      };
+
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, []);
+      nightwatchInit.otherInfo.tsOutDir = 'dist';
+
+      nightwatchInit.generateConfig(answers, 'test_config.conf.js');
+      const config = require('../../test_config.conf.js');
+
+      assert.strictEqual(config.usage_analytics.enabled, true);
+
+      fs.unlinkSync('test_config.conf.js');
+    });
   });
 });
