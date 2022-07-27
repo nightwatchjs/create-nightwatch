@@ -11,6 +11,7 @@ import {CONFIG_INTRO, BROWSER_CHOICES, QUESTIONAIRRE, CONFIG_DEST_QUES} from './
 import {ConfigGeneratorAnswers, ConfigDestination, OtherInfo} from './interfaces';
 import defaultAnswers from './defaults.json';
 import {ParsedArgs} from 'minimist';
+import JSON5 from 'json5'
 
 export class NightwatchInit {
   rootDir: string;
@@ -266,7 +267,7 @@ export class NightwatchInit {
     }
 
     // Read outDir property from tsconfig.json file.
-    const tsConfig = JSON.parse(fs.readFileSync(tsConfigPath, 'utf-8'));
+    const tsConfig = JSON5.parse(fs.readFileSync(tsConfigPath, 'utf-8'));
     this.otherInfo.tsOutDir = tsConfig.compilerOptions?.outDir || '';
 
     // Add script to run nightwatch tests
