@@ -188,6 +188,7 @@ module.exports = {
       // https://www.browserstack.com/automate/capabilities?tag=selenium-4
       desiredCapabilities: {
         'bstack:options': {
+          "buildName": "nightwatch-test-build",
           userName: '${<%- answers.remoteEnv.username %>}',
           accessKey: '${<%- answers.remoteEnv.access_key %>}'
         }
