@@ -268,6 +268,7 @@ export class NightwatchInit {
 
     // Read outDir property from tsconfig.json file.
     const tsConfig = JSON5.parse(fs.readFileSync(tsConfigPath, 'utf-8'));
+    fs.writeFileSync(tsConfigPath, JSON.stringify(tsConfig, null, 2));
     this.otherInfo.tsOutDir = tsConfig.compilerOptions?.outDir || '';
 
     // Add script to run nightwatch tests
@@ -291,6 +292,10 @@ export class NightwatchInit {
     packageJson.scripts[this.otherInfo.tsTestScript] = 'tsc && nightwatch';
 
     fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+
+    //move tsconfig.json to nightwatch directory
+    const destTsConfigPath = path.join(this.rootDir, 'node_modules', 'nightwatch', 'tsconfig.json');
+    fs.copyFileSync(tsConfigPath, destTsConfigPath);
   }
 
   checkJavaInstallation() {
