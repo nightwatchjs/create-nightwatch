@@ -655,7 +655,8 @@ describe('init tests', () => {
         language: 'js',
         backend: 'local',
         browsers: ['chrome', 'firefox'],
-        defaultBrowser: 'firefox'
+        defaultBrowser: 'firefox',
+        allowAnonymousMetrics: false
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -692,7 +693,8 @@ describe('init tests', () => {
         defaultBrowser: 'firefox',
         testsLocation: 'tests',
         addExamples: true,
-        examplesLocation: 'tests'
+        examplesLocation: 'tests',
+        allowAnonymousMetrics: false
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -737,7 +739,8 @@ describe('init tests', () => {
         seleniumServer: true,
         testsLocation: 'tests',
         addExamples: true,
-        examplesLocation: path.join('tests', 'nightwatch-examples')
+        examplesLocation: path.join('tests', 'nightwatch-examples'),
+        allowAnonymousMetrics: false
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -795,7 +798,8 @@ describe('init tests', () => {
         seleniumServer: true,
         testsLocation: 'tests',
         addExamples: true,
-        examplesLocation: 'tests'
+        examplesLocation: 'tests',
+        allowAnonymousMetrics: false
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -856,7 +860,8 @@ describe('init tests', () => {
         testsLocation: 'tests',
         featurePath: path.join('tests', 'features'),
         addExamples: true,
-        examplesLocation: path.join('tests', 'features', 'nightwatch-examples')
+        examplesLocation: path.join('tests', 'features', 'nightwatch-examples'),
+        allowAnonymousMetrics: false
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -914,7 +919,8 @@ describe('init tests', () => {
         },
         testsLocation: 'tests',
         addExamples: true,
-        examplesLocation: 'nightwatch-examples'
+        examplesLocation: 'nightwatch-examples',
+        allowAnonymousMetrics: false
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1001,7 +1007,8 @@ describe('init tests', () => {
         language: 'js',
         backend: 'local',
         browsers: ['chrome', 'firefox'],
-        defaultBrowser: 'firefox'
+        defaultBrowser: 'firefox',
+        allowAnonymousMetrics: true
       };
 
       const {NightwatchInit} = require('../../lib/init');

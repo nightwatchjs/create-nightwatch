@@ -453,11 +453,7 @@ module.exports = {
   },
 
   usage_analytics: {
-    <% if (answers.allowAnonymousMetrics === undefined) { %>
-    enabled: true,
-    <% } else { %>
-      enabled: <%- answers.allowAnonymousMetrics %>,
-    <% } %>
+    enabled: <%- answers.allowAnonymousMetrics %>,
     log_path: './logs/analytics',
     client_id: '<%- client_id %>'
   }

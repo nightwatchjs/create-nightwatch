@@ -74,7 +74,8 @@ describe('e2e tests for init', () => {
       backend: 'local',
       browsers: ['chrome', 'edge', 'safari', 'selenium-server'],
       baseUrl: 'https://nightwatchjs.org',
-      testsLocation: 'tests'
+      testsLocation: 'tests',
+      allowAnonymousMetrics: false
     };
 
     const {NightwatchInit} = require('../../lib/init');
@@ -241,7 +242,8 @@ describe('e2e tests for init', () => {
       browsers: ['chrome', 'edge', 'selenium-server'],
       testsLocation: 'tests',
       featurePath: path.join('tests', 'features'),
-      baseUrl: 'https://nightwatchjs.org'
+      baseUrl: 'https://nightwatchjs.org',
+      allowAnonymousMetrics: false
     };
 
     const {NightwatchInit} = require('../../lib/init');
@@ -392,7 +394,8 @@ describe('e2e tests for init', () => {
       cloudProvider: 'browserstack',
       browsers: ['chrome', 'safari'],
       testsLocation: 'tests',
-      baseUrl: 'https://nightwatchjs.org'
+      baseUrl: 'https://nightwatchjs.org',
+      allowAnonymousMetrics: false
     };
 
     const {NightwatchInit} = require('../../lib/init');
@@ -562,7 +565,8 @@ describe('e2e tests for init', () => {
       browsers: ['firefox'],
       remoteBrowsers: ['chrome', 'edge', 'safari'],
       baseUrl: 'https://nightwatchjs.org',
-      testsLocation: 'tests'
+      testsLocation: 'tests',
+      allowAnonymousMetrics: false
     };
 
     const {NightwatchInit} = require('../../lib/init');
@@ -720,7 +724,8 @@ describe('e2e tests for init', () => {
       browsers: ['firefox', 'selenium-server'],
       remoteBrowsers: ['chrome'],
       baseUrl: 'https://nightwatchjs.org',
-      testsLocation: 'tests'
+      testsLocation: 'tests',
+      allowAnonymousMetrics: false
     };
 
     const {NightwatchInit} = require('../../lib/init');
@@ -1039,7 +1044,8 @@ describe('e2e tests for init', () => {
       backend: 'local',
       browsers: ['chrome', 'edge', 'safari', 'selenium-server'],
       baseUrl: 'https://nightwatchjs.org',
-      testsLocation: 'tests'
+      testsLocation: 'tests',
+      allowAnonymousMetrics: false
     };
 
     const {NightwatchInit} = require('../../lib/init');
@@ -1179,7 +1185,8 @@ describe('e2e tests for init', () => {
       browsers: ['firefox'],
       remoteBrowsers: ['chrome', 'edge', 'safari'],
       baseUrl: 'https://nightwatchjs.org',
-      testsLocation: 'tests'
+      testsLocation: 'tests',
+      allowAnonymousMetrics: false
     };
 
     const {NightwatchInit} = require('../../lib/init');
