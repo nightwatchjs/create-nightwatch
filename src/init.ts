@@ -291,24 +291,6 @@ export class NightwatchInit {
     packageJson.scripts[this.otherInfo.tsTestScript] = 'tsc && nightwatch';
 
     fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
-
-    // create nightwatch/tsconfig file
-    const tsConfigNightwatch = { 
-      "compilerOptions": {
-        "target": "es6",
-        "module": "commonjs",
-        "esModuleInterop": true,
-        "forceConsistentCasingInFileNames": true,
-        "strict": true,
-        "skipLibCheck": true
-      }
-    }
-    try {
-      fs.mkdirSync(path.join(this.rootDir, 'nightwatch'), {recursive: true});
-    } catch (err) {}
-    const tsConfigNightwatchPath = path.join(this.rootDir, 'nightwatch', 'tsconfig.json');
-    fs.writeFileSync(tsConfigNightwatchPath, JSON.stringify(tsConfigNightwatch, null, 2));
-
   };
 
   checkJavaInstallation() {
