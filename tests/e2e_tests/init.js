@@ -622,7 +622,7 @@ describe('e2e tests for init', () => {
     ]);
 
     // Test Packages and webdrivers installed
-    assert.strictEqual(commandsExecuted.length, 3);
+    assert.strictEqual(commandsExecuted.length, 4);
     assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[1], 'npm install typescript --save-dev');
     assert.strictEqual(commandsExecuted[2], 'npm install @types/nightwatch --save-dev');
