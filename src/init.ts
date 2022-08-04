@@ -539,6 +539,16 @@ export class NightwatchInit {
     let examplesSrcPath: string;
     if (typescript) {
       examplesSrcPath = path.join(__dirname, '..', 'assets', 'ts-examples');
+
+      // create tsconfig file in nightwatch directory
+      try {
+        fs.mkdirSync(path.join(this.rootDir, 'nightwatch'), {recursive: true});
+      } catch (err) {}  
+      execSync(`tsc --init`, {
+        stdio: 'pipe',
+        cwd: path.join(this.rootDir, 'nightwatch')
+      });
+
     } else {
       examplesSrcPath = path.join(__dirname, '..', 'assets', 'js-examples-new');
     }
