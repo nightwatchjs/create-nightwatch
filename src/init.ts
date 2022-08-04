@@ -540,10 +540,10 @@ export class NightwatchInit {
     if (typescript) {
       examplesSrcPath = path.join(__dirname, '..', 'assets', 'ts-examples');
 
-      // create tsconfig file in nightwatch directory
+      //create tsconfig in nightwatch directory
       try {
         fs.mkdirSync(path.join(this.rootDir, 'nightwatch'), {recursive: true});
-      } catch (err) {}  
+      } catch (err) {}
       execSync(`tsc --init`, {
         stdio: 'pipe',
         cwd: path.join(this.rootDir, 'nightwatch')
