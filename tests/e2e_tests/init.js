@@ -594,17 +594,17 @@ describe('e2e tests for init', () => {
     assert.strictEqual(answers.examplesLocation, 'tests');
 
     // Test otherInfo
-    assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, 'dist');
+    assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, '');
     assert.strictEqual(nightwatchInit.otherInfo.tsTestScript, 'test');
-    assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, path.join('dist', 'tests'));
-    assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, path.join('dist', 'tests'));
+    assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
+    assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'tests');
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, undefined);
 
     // Test generated config
     assert.strictEqual(fs.existsSync(configPath), true);
     const config = require(configPath);
-    assert.deepEqual(config.src_folders, ['dist/tests']);
+    assert.deepEqual(config.src_folders, ['tests']);
     assert.deepEqual(config.page_objects_path, []);
     assert.deepEqual(config.custom_commands_path, []);
     assert.deepEqual(config.custom_assertions_path, []);
@@ -663,7 +663,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('npm run test -- --env saucelabs'), true);
     assert.strictEqual(
       output.includes(
-        `npm run test -- .${path.sep}${path.join('dist', 'tests', 'github.js')} --env saucelabs`
+        `npm run test -- .${path.sep}${path.join('tests', 'github.js')} --env saucelabs`
       ),
       true
     );
@@ -757,17 +757,17 @@ describe('e2e tests for init', () => {
     assert.strictEqual(answers.examplesLocation, 'nightwatch-examples');
 
     // Test otherInfo
-    assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, 'dist');
+    assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, '');
     assert.strictEqual(nightwatchInit.otherInfo.tsTestScript, 'test');
-    assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, path.join('dist', 'tests'));
-    assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, path.join('dist', 'nightwatch-examples'));
+    assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
+    assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'nightwatch-examples');
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, configFileName);
 
     // Test generated config
     assert.strictEqual(fs.existsSync(configPath), true);
     const config = require(configPath);
-    assert.deepEqual(config.src_folders, ['dist/tests', 'dist/nightwatch-examples']);
+    assert.deepEqual(config.src_folders, ['tests', 'nightwatch-examples']);
     assert.deepEqual(config.page_objects_path, []);
     assert.deepEqual(config.custom_commands_path, []);
     assert.deepEqual(config.custom_assertions_path, []);
@@ -837,7 +837,6 @@ describe('e2e tests for init', () => {
     assert.strictEqual(
       output.includes(
         `npm run test -- .${path.sep}${path.join(
-          'dist',
           'nightwatch-examples',
           'github.js'
         )} --config new-config.conf.js`

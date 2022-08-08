@@ -443,6 +443,9 @@ describe('init tests', () => {
         existsSync(path) {
           return false;
         },
+        copyFileSync(src, dest) {
+          tsconfigCopied = true;
+        },
         readFileSync(path, encoding) {
           if (path.endsWith('package.json')) {return packageJson} else {return tsconfigToCopy}
         },
@@ -465,7 +468,8 @@ describe('init tests', () => {
 
       assert.strictEqual(commandsExecuted.length, 1);
       assert.strictEqual(commandsExecuted[0], 'tsc --init');
-      assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, 'dist');
+      assert.strictEqual(tsconfigCopied, true);
+      assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, '');
       assert.strictEqual(nightwatchInit.otherInfo.tsTestScript, 'test');
       assert.strictEqual(JSON.parse(writtenPackageJson).scripts.test, 'tsc && nightwatch');
     });
@@ -476,7 +480,7 @@ describe('init tests', () => {
 
       const tsconfigAlreadyPresent = `{
         "compilerOptions": {
-          "outDir": "dist"
+          "outDir": "lib"
         }
       }`;
       const currentPackageJson = `{
@@ -506,7 +510,7 @@ describe('init tests', () => {
       nightwatchInit.setupTypescript();
 
       assert.strictEqual(tsconfigCopied, false);
-      assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, 'dist');
+      assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, '');
       assert.strictEqual(nightwatchInit.otherInfo.tsTestScript, 'nightwatch:test');
       assert.strictEqual(JSON.parse(writtenPackageJson).scripts['nightwatch:test'], 'tsc && nightwatch');
     });
@@ -544,7 +548,7 @@ describe('init tests', () => {
       nightwatchInit.setupTypescript();
 
       assert.strictEqual(tsconfigCopied, false);
-      assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, 'dist');
+      assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, '');
       assert.strictEqual(nightwatchInit.otherInfo.tsTestScript, 'nightwatch:test:new');
       assert.strictEqual(JSON.parse(writtenPackageJson).scripts['nightwatch:test:new'], 'tsc && nightwatch');
     });
@@ -585,7 +589,7 @@ describe('init tests', () => {
       nightwatchInit.setupTypescript();
 
       assert.strictEqual(tsconfigCopied, false);
-      assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, 'dist');
+      assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, '');
       assert.strictEqual(nightwatchInit.otherInfo.tsTestScript, 'nightwatch:test:new');
       assert.strictEqual(JSON.parse(writtenPackageJson).scripts['nightwatch:test:new'], 'tsc && nightwatch');
     });

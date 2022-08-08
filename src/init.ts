@@ -11,7 +11,6 @@ import {CONFIG_INTRO, BROWSER_CHOICES, QUESTIONAIRRE, CONFIG_DEST_QUES} from './
 import {ConfigGeneratorAnswers, ConfigDestination, OtherInfo} from './interfaces';
 import defaultAnswers from './defaults.json';
 import {ParsedArgs} from 'minimist';
-import JSON5 from 'json5'
 
 export class NightwatchInit {
   rootDir: string;
@@ -279,25 +278,11 @@ export class NightwatchInit {
         fs.mkdirSync(path.join(this.rootDir, 'nightwatch'), {recursive: true});
       } catch (err) {}
 
-      const sampleTsConfig = JSON5.parse(fs.readFileSync(sampleTsConfigPath, 'utf-8'));
-      const destTsConfig = {
-        'compilerOptions': {
-          'target': sampleTsConfig.compilerOptions.target,
-          'module': sampleTsConfig.compilerOptions.module,
-          'esModuleInterop' : sampleTsConfig.compilerOptions.esModuleInterop,
-          'strict': sampleTsConfig.compilerOptions.strict,
-          'skipLibCheck': sampleTsConfig.compilerOptions.skipLibCheck,
-          'allowJs': true,
-          'resolveJsonModule': sampleTsConfig.compilerOptions.resolveJsonModule,
-          'moduleResolution' : sampleTsConfig.compilerOptions.moduleResolution
-        }
-      }
-
-      fs.writeFileSync(destPath, JSON.stringify(destTsConfig, null, 2));
+      fs.copyFileSync(sampleTsConfigPath, destPath);
     }
 
-    // Set outDir as dist for now
-    this.otherInfo.tsOutDir = 'dist';
+    // Set outDir property to null for now.
+    this.otherInfo.tsOutDir = '';
 
     // Add script to run nightwatch tests
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
