@@ -207,7 +207,7 @@ export class NightwatchInit {
     const packages: string[] = ['nightwatch'];
 
     if (answers.language === 'ts') {
-      packages.push('typescript', '@types/nightwatch');
+      packages.push('typescript', '@types/nightwatch','ts-node');
     }
 
     if (answers.runner === 'cucumber') {
@@ -261,14 +261,43 @@ export class NightwatchInit {
 
     // Generate a new tsconfig.json file if not already present.
     if (!fs.existsSync(tsConfigPath)) {
-      const sampleTsConfigPath = path.join(__dirname, '..', 'assets', 'tsconfig.json');
-      const destPath = path.join(this.rootDir, 'tsconfig.json');
-      fs.copyFileSync(sampleTsConfigPath, destPath);
+      execSync(`tsc --init`, {
+        stdio: 'pipe',
+        cwd: this.rootDir
+      });
     }
 
-    // Read outDir property from tsconfig.json file.
-    const tsConfig = JSON5.parse(fs.readFileSync(tsConfigPath, 'utf-8'));
-    this.otherInfo.tsOutDir = tsConfig.compilerOptions?.outDir || '';
+    // Generate a new tsconfig.json file for nightwatch if not present.
+    const tsConfigNightwatchPath1 = path.join(this.rootDir, 'nightwatch', 'tsconfig.json');
+    const tsConfigNightwatchPath2 = path.join(this.rootDir, 'tsconfig.nightwatch.json');
+
+    if (!fs.existsSync(tsConfigNightwatchPath1) && !fs.existsSync(tsConfigNightwatchPath2)) {
+      const sampleTsConfigPath = path.join(__dirname, '..', 'assets', 'tsconfig.json');
+      const destPath = path.join(this.rootDir, 'nightwatch', 'tsconfig.json');
+
+      try {
+        fs.mkdirSync(path.join(this.rootDir, 'nightwatch'), {recursive: true});
+      } catch (err) {}
+
+      const sampleTsConfig = JSON5.parse(fs.readFileSync(sampleTsConfigPath, 'utf-8'));
+      const destTsConfig = {
+        'compilerOptions': {
+          'target': sampleTsConfig.compilerOptions.target,
+          'module': sampleTsConfig.compilerOptions.module,
+          'esModuleInterop' : sampleTsConfig.compilerOptions.esModuleInterop,
+          'strict': sampleTsConfig.compilerOptions.strict,
+          'skipLibCheck': sampleTsConfig.compilerOptions.skipLibCheck,
+          'allowJs': true,
+          'resolveJsonModule': sampleTsConfig.compilerOptions.resolveJsonModule,
+          'moduleResolution' : sampleTsConfig.compilerOptions.moduleResolution
+        }
+      }
+
+      fs.writeFileSync(destPath, JSON.stringify(destTsConfig, null, 2));
+    }
+
+    // Set outDir as dist for now
+    this.otherInfo.tsOutDir = 'dist';
 
     // Add script to run nightwatch tests
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
@@ -539,16 +568,6 @@ export class NightwatchInit {
     let examplesSrcPath: string;
     if (typescript) {
       examplesSrcPath = path.join(__dirname, '..', 'assets', 'ts-examples');
-
-      //create tsconfig in nightwatch directory
-      try {
-        fs.mkdirSync(path.join(this.rootDir, 'nightwatch'), {recursive: true});
-      } catch (err) {}
-      execSync(`tsc --init`, {
-        stdio: 'pipe',
-        cwd: path.join(this.rootDir, 'nightwatch')
-      });
-
     } else {
       examplesSrcPath = path.join(__dirname, '..', 'assets', 'js-examples-new');
     }
