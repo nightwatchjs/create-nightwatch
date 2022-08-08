@@ -19,12 +19,14 @@ export class NightwatchInit {
   options: Omit<ParsedArgs, '_'>;
   otherInfo: OtherInfo;
   onlyConfig: boolean;
+  client_id: string;
 
   constructor(rootDir = process.cwd(), options: Omit<ParsedArgs, '_'>) {
     this.rootDir = rootDir;
     this.options = options;
     this.otherInfo = {};
     this.onlyConfig = false;
+    this.client_id = uuid();
   }
 
   async run() {
@@ -383,7 +385,7 @@ export class NightwatchInit {
       custom_commands_path: JSON.stringify(custom_commands_path).replace(/"/g, '\'').replace(/\\\\/g, '/'),
       custom_assertions_path: JSON.stringify(custom_assertions_path).replace(/"/g, '\'').replace(/\\\\/g, '/'),
       feature_path: feature_path.replace(/\\/g, '/'),
-      client_id: uuid(),
+      client_id: this.client_id,
       answers
     });
 
@@ -760,11 +762,11 @@ export class NightwatchInit {
     const GA_TRACKING_ID = 'G-DEKPKZSLXS';
 
     const payload = {
-      'client_id': uuid(),
+      'client_id': this.client_id,
       'non_personalized_ads': true,
       'timestamp_micros': new Date().getTime() * 1000,
       'events': {
-        'name': 'create_nightwatch_invoke',
+        'name': 'nw_install',
         'params': {
           browsers: answers.browsers?.join(','),
           cloudProvider: answers.cloudProvider,
