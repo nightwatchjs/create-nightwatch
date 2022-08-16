@@ -108,7 +108,6 @@ describe('e2e tests for init', () => {
 
     // Test otherInfo
     assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, undefined);
-    assert.strictEqual(nightwatchInit.otherInfo.tsTestScript, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
     assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'tests');
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
@@ -272,7 +271,6 @@ describe('e2e tests for init', () => {
 
     // Test otherInfo
     assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, undefined);
-    assert.strictEqual(nightwatchInit.otherInfo.tsTestScript, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
     assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, true);
@@ -428,7 +426,6 @@ describe('e2e tests for init', () => {
 
     // Test otherInfo
     assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, undefined);
-    assert.strictEqual(nightwatchInit.otherInfo.tsTestScript, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
     assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'nightwatch-examples');
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
@@ -595,7 +592,6 @@ describe('e2e tests for init', () => {
 
     // Test otherInfo
     assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, '');
-    assert.strictEqual(nightwatchInit.otherInfo.tsTestScript, 'test');
     assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
     assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'tests');
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
@@ -660,10 +656,10 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('RUN NIGHTWATCH TESTS'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
-    assert.strictEqual(output.includes('npm run test -- --env saucelabs'), true);
+    assert.strictEqual(output.includes(`npx nightwatch .${path.sep}${path.join('tests')} --env saucelabs`), true);
     assert.strictEqual(
       output.includes(
-        `npm run test -- .${path.sep}${path.join('tests', 'github.js')} --env saucelabs`
+        `npx nightwatch .${path.sep}${path.join('tests', 'github.ts')} --env saucelabs`
       ),
       true
     );
@@ -758,7 +754,6 @@ describe('e2e tests for init', () => {
 
     // Test otherInfo
     assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, '');
-    assert.strictEqual(nightwatchInit.otherInfo.tsTestScript, 'test');
     assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
     assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'nightwatch-examples');
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
@@ -833,24 +828,19 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('RUN NIGHTWATCH TESTS'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
-    assert.strictEqual(output.includes('npm run test -- --config new-config.conf.js'), true);
+    assert.strictEqual(output.includes(`npx nightwatch .${path.sep}${path.join('nightwatch-examples')} --config new-config.conf.js`), true);
     assert.strictEqual(
       output.includes(
-        `npm run test -- .${path.sep}${path.join(
+        `npx nightwatch .${path.sep}${path.join(
           'nightwatch-examples',
-          'github.js'
+          'github.ts'
         )} --config new-config.conf.js`
       ),
       true
     );
     assert.strictEqual(output.includes('[Selenium Server]'), true);
-    assert.strictEqual(
-      output.includes('To run tests on your local selenium-server, build your project (tsc) and then run:'),
-      true
-    );
+    assert.strictEqual(output.includes('To run tests on your local selenium-server, use command:'), true);
     assert.strictEqual(output.includes('npx nightwatch --env selenium_server --config new-config.conf.js'), true);
-    assert.strictEqual(output.includes('Or, run this command:'), true);
-    assert.strictEqual(output.includes('npm run test -- --env selenium_server --config new-config.conf.js'), true);
 
     rmDirSync(rootDir);
 
@@ -926,7 +916,6 @@ describe('e2e tests for init', () => {
 
     // Test otherInfo
     assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, undefined);
-    assert.strictEqual(nightwatchInit.otherInfo.tsTestScript, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'nightwatch-e2e');
     assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'nightwatch-e2e');
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
@@ -1085,7 +1074,6 @@ describe('e2e tests for init', () => {
 
     // Test otherInfo
     assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, undefined);
-    assert.strictEqual(nightwatchInit.otherInfo.tsTestScript, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
     assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
@@ -1223,7 +1211,6 @@ describe('e2e tests for init', () => {
 
     // Test otherInfo
     assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, undefined);
-    assert.strictEqual(nightwatchInit.otherInfo.tsTestScript, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
     assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
@@ -1268,8 +1255,6 @@ describe('e2e tests for init', () => {
       true
     );
     assert.strictEqual(output.includes('Installing webdriver for Firefox (geckodriver)...'), true);
-    assert.strictEqual(output.includes('Since you are using TypeScript, please verify src_folders'), true);
-    assert.strictEqual(output.includes('It should point to the location of your transpiled (JS) test files.'), true);
     assert.strictEqual(output.includes('Happy Testing!!!'), true);
 
     rmDirSync(rootDir);
