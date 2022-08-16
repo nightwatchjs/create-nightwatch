@@ -629,8 +629,8 @@ describe('e2e tests for init', () => {
     const examplesPath = path.join(rootDir, answers.examplesLocation);
     assert.strictEqual(fs.existsSync(examplesPath), true);
     const exampleFiles = fs.readdirSync(examplesPath);
-    assert.strictEqual(exampleFiles.length, 2);
-    assert.deepEqual(exampleFiles, ['github.ts', 'google.ts']);
+    assert.strictEqual(exampleFiles.length, 3);
+    assert.deepEqual(exampleFiles, ['github.ts', 'google.ts', 'ecosia.ts']);
 
     // Test console output
     const output = consoleOutput.toString();
