@@ -424,21 +424,21 @@ describe('init tests', () => {
       mockery.disable();
     });
 
-    test('with tsconfig not present and default test in package.json', () => {
-      let tsconfigCopied = false;
+    test('with both tsconfig not present', () => {
+      let nwTsconfigCopied = false;
 
       mockery.registerMock('fs', {
-        existsSync(path) {
+        existsSync() {
           return false;
         },
-        copyFileSync(src, dest) {
-          tsconfigCopied = true;
+        copyFileSync() {
+          nwTsconfigCopied = true;
         }
       });
 
       const commandsExecuted = [];
       mockery.registerMock('child_process', {
-        execSync(command, options) {
+        execSync(command) {
           commandsExecuted.push(command);
         }
       });
@@ -450,25 +450,27 @@ describe('init tests', () => {
 
       assert.strictEqual(commandsExecuted.length, 1);
       assert.strictEqual(commandsExecuted[0], 'tsc --init');
-      assert.strictEqual(tsconfigCopied, true);
+
+      assert.strictEqual(nwTsconfigCopied, true);
       assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, '');
     });
 
-    test('with tsconfig and test script already present', () => {
-      let tsconfigCopied = false;
-
-      const tsconfigAlreadyPresent = `{
-        "compilerOptions": {
-          "outDir": "lib"
-        }
-      }`;
+    test('with both tsconfig already present', () => {
+      let nwTsconfigCopied = false;
 
       mockery.registerMock('fs', {
-        existsSync(path) {
+        existsSync() {
           return true;
         },
-        copyFileSync(src, dest) {
-          tsconfigCopied = true;
+        copyFileSync() {
+          nwTsconfigCopied = true;
+        }
+      });
+
+      const commandsExecuted = [];
+      mockery.registerMock('child_process', {
+        execSync(command) {
+          commandsExecuted.push(command);
         }
       });
 
@@ -477,19 +479,31 @@ describe('init tests', () => {
 
       nightwatchInit.setupTypescript();
 
-      assert.strictEqual(tsconfigCopied, false);
+      assert.strictEqual(commandsExecuted.length, 0);
+      assert.strictEqual(nwTsconfigCopied, false);
       assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, '');
     });
 
-    test('with nothing in tsconfig and test and nightwatch:test scripts already present', () => {
-      let tsconfigCopied = false;
+    test('with tsconfig.nightwatch.json already present', () => {
+      let nwTsconfigCopied = false;
 
       mockery.registerMock('fs', {
         existsSync(path) {
-          return true;
+          if (path.endsWith('tsconfig.nightwatch.json')) {
+            return true;
+          }
+
+          return false;
         },
-        copyFileSync(src, dest) {
-          tsconfigCopied = true;
+        copyFileSync() {
+          nwTsconfigCopied = true;
+        }
+      });
+
+      const commandsExecuted = [];
+      mockery.registerMock('child_process', {
+        execSync(command) {
+          commandsExecuted.push(command);
         }
       });
 
@@ -498,28 +512,10 @@ describe('init tests', () => {
 
       nightwatchInit.setupTypescript();
 
-      assert.strictEqual(tsconfigCopied, false);
-      assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, '');
-    });
+      assert.strictEqual(commandsExecuted.length, 1);
+      assert.strictEqual(commandsExecuted[0], 'tsc --init');
 
-    test('with no outDir in tsconfig and test, nightwatch:test and nightwatch:test:new scripts already present', () => {
-      let tsconfigCopied = false;
-
-      mockery.registerMock('fs', {
-        existsSync(path) {
-          return true;
-        },
-        copyFileSync(src, dest) {
-          tsconfigCopied = true;
-        }
-      });
-
-      const {NightwatchInit} = require('../../lib/init');
-      const nightwatchInit = new NightwatchInit(rootDir, []);
-
-      nightwatchInit.setupTypescript();
-
-      assert.strictEqual(tsconfigCopied, false);
+      assert.strictEqual(nwTsconfigCopied, false);
       assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, '');
     });
   });
