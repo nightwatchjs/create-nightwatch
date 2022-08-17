@@ -30,7 +30,6 @@ export interface ConfigDestination {
 
 export interface OtherInfo {
   tsOutDir?: string;
-  tsTestScript?: string;
   testsJsSrc?: string;
   examplesJsSrc?: string;
   cucumberExamplesAdded?: boolean;

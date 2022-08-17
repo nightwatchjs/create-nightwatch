@@ -11,7 +11,6 @@ import {CONFIG_INTRO, BROWSER_CHOICES, QUESTIONAIRRE, CONFIG_DEST_QUES} from './
 import {ConfigGeneratorAnswers, ConfigDestination, OtherInfo} from './interfaces';
 import defaultAnswers from './defaults.json';
 import {ParsedArgs} from 'minimist';
-import JSON5 from 'json5'
 
 export class NightwatchInit {
   rootDir: string;
@@ -207,7 +206,7 @@ export class NightwatchInit {
     const packages: string[] = ['nightwatch'];
 
     if (answers.language === 'ts') {
-      packages.push('typescript', '@types/nightwatch');
+      packages.push('typescript', '@types/nightwatch', 'ts-node');
     }
 
     if (answers.runner === 'cucumber') {
@@ -257,40 +256,34 @@ export class NightwatchInit {
 
   setupTypescript() {
     const tsConfigPath = path.join(this.rootDir, 'tsconfig.json');
-    const packageJsonPath = path.join(this.rootDir, 'package.json');
 
     // Generate a new tsconfig.json file if not already present.
     if (!fs.existsSync(tsConfigPath)) {
-      const sampleTsConfigPath = path.join(__dirname, '..', 'assets', 'tsconfig.json');
-      const destPath = path.join(this.rootDir, 'tsconfig.json');
-      fs.copyFileSync(sampleTsConfigPath, destPath);
+      execSync('tsc --init', {
+        stdio: 'inherit',
+        cwd: this.rootDir
+      });
+      Logger.error();
     }
 
-    // Read outDir property from tsconfig.json file.
-    const tsConfig = JSON5.parse(fs.readFileSync(tsConfigPath, 'utf-8'));
-    this.otherInfo.tsOutDir = tsConfig.compilerOptions?.outDir || '';
+    // Generate a new tsconfig.json file to be used by ts-node, if not already present.
+    const tsConfigNightwatchPath1 = path.join(this.rootDir, 'nightwatch', 'tsconfig.json');
+    const tsConfigNightwatchPath2 = path.join(this.rootDir, 'tsconfig.nightwatch.json');
 
-    // Add script to run nightwatch tests
-    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
-    if (!packageJson.scripts) {
-      packageJson.scripts = {};
-    }
-    if (packageJson.scripts['test']?.includes('no test specified')) {
-      delete packageJson.scripts['test'];
+    if (!fs.existsSync(tsConfigNightwatchPath1) && !fs.existsSync(tsConfigNightwatchPath2)) {
+      const tsConfigSrcPath = path.join(__dirname, '..', 'assets', 'tsconfig.json');
+      const tsConfigDestPath = path.join(this.rootDir, 'nightwatch', 'tsconfig.json');
+
+      try {
+        fs.mkdirSync(path.join(this.rootDir, 'nightwatch'));
+        // eslint-disable-next-line
+      } catch (err) {}
+
+      fs.copyFileSync(tsConfigSrcPath, tsConfigDestPath);
     }
 
-    // eslint-disable-next-line
-    if (!packageJson.scripts.hasOwnProperty('test')) {
-      this.otherInfo.tsTestScript = 'test';
-      // eslint-disable-next-line
-    } else if (!packageJson.scripts.hasOwnProperty('nightwatch:test')) {
-      this.otherInfo.tsTestScript = 'nightwatch:test';
-    } else {
-      this.otherInfo.tsTestScript = 'nightwatch:test:new';
-    }
-    packageJson.scripts[this.otherInfo.tsTestScript] = 'tsc && nightwatch';
-
-    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+    // Set outDir property to null for now.
+    this.otherInfo.tsOutDir = '';
   }
 
   checkJavaInstallation() {
@@ -428,7 +421,7 @@ export class NightwatchInit {
   }
 
   async installWebdrivers(webdriversToInstall: string[]) {
-    Logger.error('Installing/Updating the following webdrivers:');
+    Logger.error('Installing/updating the following webdrivers:');
     for (const webdriver of webdriversToInstall) {
       Logger.error(`- ${webdriver}`);
     }
@@ -648,11 +641,6 @@ export class NightwatchInit {
       configFlag = ` --config ${this.otherInfo.nonDefaultConfigName}`;
     }
 
-    let tsExtraDash = '';
-    if (envFlag || configFlag) {
-      tsExtraDash = ' --';
-    }
-
     if (answers.runner === 'cucumber') {
       Logger.error('To run your tests with CucumberJS, simply run:');
       Logger.error(colors.cyan(`  npx nightwatch${envFlag}${configFlag}`), '\n');
@@ -669,14 +657,16 @@ export class NightwatchInit {
     } else if (answers.addExamples) {
       if (answers.language === 'ts') {
         Logger.error('To run all examples, run:');
-        Logger.error(colors.cyan(`  npm run ${this.otherInfo.tsTestScript}${tsExtraDash}${envFlag}${configFlag}\n`));
+        Logger.error(
+          colors.cyan(`  npx nightwatch .${path.sep}${this.otherInfo.examplesJsSrc}${envFlag}${configFlag}\n`)
+        );
 
         Logger.error('To run a single example (github.ts), run:');
         Logger.error(
           colors.cyan(
-            `  npm run ${this.otherInfo.tsTestScript} -- .${path.sep}${path.join(
+            `  npx nightwatch .${path.sep}${path.join(
               this.otherInfo.examplesJsSrc || '',
-              'github.js'
+              'github.ts'
             )}${envFlag}${configFlag}\n`
           )
         );
@@ -736,17 +726,8 @@ export class NightwatchInit {
         Logger.error(colors.cyan('  https://www.oracle.com/technetwork/java/javase/downloads/index.html'), '\n');
       }
 
-      if (answers.language === 'ts') {
-        Logger.error(
-          `To run tests on your local selenium-server, build your project (${colors.cyan('tsc')}) and then run:`
-        );
-        Logger.error(colors.cyan(`  npx nightwatch --env selenium_server${configFlag}`), '\n');
-        Logger.error('Or, run this command:');
-        Logger.error(colors.cyan(`  npm run ${this.otherInfo.tsTestScript} -- --env selenium_server${configFlag}\n`));
-      } else {
-        Logger.error('To run tests on your local selenium-server, use command:');
-        Logger.error(colors.cyan(`  npx nightwatch --env selenium_server${configFlag}`), '\n');
-      }
+      Logger.error('To run tests on your local selenium-server, use command:');
+      Logger.error(colors.cyan(`  npx nightwatch --env selenium_server${configFlag}`), '\n');
     }
 
     if (answers.browsers?.includes('edge')) {
@@ -762,15 +743,6 @@ export class NightwatchInit {
     if (answers.seleniumServer && this.otherInfo.javaNotInstalled) {
       Logger.error('Java Development Kit (minimum v7) is required to run selenium-server locally. Download from here:');
       Logger.error(colors.cyan('  https://www.oracle.com/technetwork/java/javase/downloads/index.html'), '\n');
-    }
-
-    if (answers.language === 'ts') {
-      Logger.error(
-        `Since you are using TypeScript, please verify ${colors.magenta(
-          'src_folders'
-        )} once in your newly generated config file.`
-      );
-      Logger.error('It should point to the location of your transpiled (JS) test files.\n');
     }
 
     Logger.error('Happy Testing!!!');
