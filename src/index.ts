@@ -9,9 +9,12 @@ import Logger from './logger';
 import {isNodeProject} from './utils';
 import minimist from 'minimist';
 import suggestSimilarOption from './utils/suggestSimilar';
+import axios from 'axios';
 
 export const run = async () => {
   try {
+
+    
     const argv = process.argv.slice(2);
     const {_: args, ...options} = minimist(argv, {
       boolean: 'generate-config',
@@ -39,6 +42,7 @@ export const run = async () => {
     }
 
     Logger.error(NIGHTWATCH_TITLE);
+    await checkCreateNightwatchVersion();
 
     let rootDir = path.resolve(process.cwd(), args[0] || '');
 
@@ -108,4 +112,24 @@ export const initializeNodeProject = (rootDir: string) => {
     stdio: 'inherit',
     cwd: rootDir
   });
+};
+
+export const getLatestVersion  = (): Promise<string | void> =>  {
+
+  return axios.get('https://registry.npmjs.org/create-nightwatch')
+    .then(({data}: any) => {
+      return data['dist-tags'].latest;
+    })
+    .catch(() => null);
+};
+
+
+export const checkCreateNightwatchVersion = async () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const {version} = require('../package.json');
+  const latestVersion = await getLatestVersion();
+
+  if (latestVersion && latestVersion !== version) {
+    Logger.error(`New version is available ${colors.red(version)} -> ${colors.green(latestVersion)}. Try using npm init nightwatch@latest\n\n`);
+  }
 };
