@@ -13,8 +13,6 @@ import axios from 'axios';
 
 export const run = async () => {
   try {
-
-    
     const argv = process.argv.slice(2);
     const {_: args, ...options} = minimist(argv, {
       boolean: 'generate-config',
