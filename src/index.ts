@@ -128,6 +128,6 @@ export const checkCreateNightwatchVersion = async () => {
   const latestVersion = await getLatestVersion();
 
   if (latestVersion && latestVersion !== version) {
-    Logger.error(`New version is available ${colors.red(version)} -> ${colors.green(latestVersion)}. Try using npm init nightwatch@latest\n\n`);
+    Logger.error(`New version is available ${colors.red(version)} -> ${colors.green(latestVersion)}. Run: ${colors.green('npm init nightwatch@latest')} to upgrade\n\n`);
   }
 };
