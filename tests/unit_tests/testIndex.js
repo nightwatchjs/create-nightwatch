@@ -163,7 +163,7 @@ describe('index tests', () => {
 
     const output = consoleOutput.toString();
     assert.strictEqual(
-      output.includes('Try using npm init nightwatch@latest'),
+      output.includes('New version is available [31m1.1.2[39m -> [32m1.0.2[39m. Run: [32mnpm init nightwatch@latest[39m to upgrade'),
       true
     );
   });
