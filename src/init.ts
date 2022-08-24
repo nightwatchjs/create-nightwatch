@@ -4,14 +4,22 @@ import ejs from 'ejs';
 import colors from 'ansi-colors';
 import {prompt} from 'inquirer';
 import {execSync} from 'child_process';
+import {ParsedArgs} from 'minimist';
+import JSON5 from 'json5';
 import {copy, stripControlChars, symbols} from './utils';
 import Logger from './logger';
-
 import {CONFIG_INTRO, BROWSER_CHOICES, QUESTIONAIRRE, CONFIG_DEST_QUES} from './constants';
 import {ConfigGeneratorAnswers, ConfigDestination, OtherInfo} from './interfaces';
 import defaultAnswers from './defaults.json';
-import {ParsedArgs} from 'minimist';
-import JSON5 from 'json5'
+
+
+const EXAMPLE_TEST_FOLDER = 'examples';
+const DEFAULT_FOLDER = 'nightwatch';
+enum Runner {
+  Cucumber = 'cucumber',
+  Mocha = 'mocha',
+  Js = 'js',
+}
 
 export class NightwatchInit {
   rootDir: string;
@@ -79,14 +87,14 @@ export class NightwatchInit {
       // Copy examples
       // For cucumber, only copy the cucumber examples.
       // For rest, copy all examples but cucumber.
-      if (answers.runner === 'cucumber') {
+      if (answers.runner === Runner.Cucumber) {
         this.copyCucumberExamples(answers.examplesLocation || '');
       } else if (answers.addExamples) {
         this.copyExamples(answers.examplesLocation || '', answers.language === 'ts');
         
         // For now the templates added only for JS
         if (answers.language !== 'ts') {
-          this.copyTemplates(answers.examplesLocation || '');
+          this.copyTemplates(path.join(answers.examplesLocation || '', EXAMPLE_TEST_FOLDER));
         }
       }
 
@@ -186,15 +194,15 @@ export class NightwatchInit {
     }
 
     if (answers.addExamples && !answers.examplesLocation) {
-      if (answers.runner === 'cucumber') {
-        answers.examplesLocation = path.join(answers.featurePath || '', 'nightwatch-examples');
+      if (answers.runner === Runner.Cucumber) {
+        answers.examplesLocation = path.join(answers.featurePath || '', DEFAULT_FOLDER);
       } else {
         // Find a location for putting the example files.
         const testsDestPath = path.join(this.rootDir, answers.testsLocation);
         if (fs.existsSync(testsDestPath) && fs.readdirSync(testsDestPath).length) {
           // If testsLocation already contains some files, put the examples in a
           // separate directory.
-          answers.examplesLocation = 'nightwatch-examples';
+          answers.examplesLocation = DEFAULT_FOLDER;
         } else {
           // Put examples directly into testsLocation, to be used as boilerplate.
           answers.examplesLocation = answers.testsLocation;
@@ -210,7 +218,7 @@ export class NightwatchInit {
       packages.push('typescript', '@types/nightwatch');
     }
 
-    if (answers.runner === 'cucumber') {
+    if (answers.runner === Runner.Cucumber) {
       packages.push('@cucumber/cucumber');
     }
 
@@ -332,6 +340,7 @@ export class NightwatchInit {
   }
 
   generateConfig(answers: ConfigGeneratorAnswers, configDestPath: string) {
+ 
     const templateFile = path.join(__dirname, '..', 'src', 'config', 'main.ejs');
 
     const src_folders: string[] = []; // to go into the config file as the value of src_folders property.
@@ -342,24 +351,24 @@ export class NightwatchInit {
 
     const testsJsSrc: string = path.join(this.otherInfo.tsOutDir || '', answers.testsLocation || '');
     if (testsJsSrc !== '.') {
-      if (answers.testsLocation === answers.examplesLocation && answers.language === 'js' && answers.runner !== 'cucumber') {
+      if (answers.testsLocation === answers.examplesLocation && answers.language === 'js' && answers.runner !== Runner.Cucumber) {
         // examples are being put as a boilerplate in testsLocation with main tests in
-        // 'specs' sub-directory (only done for JS-Nightwatch and JS-Mocha).
-        src_folders.push(path.join(testsJsSrc, 'specs'));
+        // EXAMPLE_TEST_FOLDER sub-directory (only done for JS-Nightwatch and JS-Mocha).
+        src_folders.push(path.join(testsJsSrc, EXAMPLE_TEST_FOLDER));
       } else {
         src_folders.push(testsJsSrc);
       }
       this.otherInfo.testsJsSrc = testsJsSrc;
     }
 
-    if (answers.addExamples && answers.runner !== 'cucumber') {
+    if (answers.addExamples && answers.runner !== Runner.Cucumber) {
       // Add examplesLocation to src_folders, if different from testsLocation.
       // Don't add for cucumber examples (for now, as addition of examples depends upon featurePath in copyCucumberExamples).
       const examplesJsSrc: string = path.join(this.otherInfo.tsOutDir || '', answers.examplesLocation || '');
       if (examplesJsSrc !== testsJsSrc) {
         if (answers.language === 'js') {
           // Only for JS-Nightwatch and JS-Mocha.
-          src_folders.push(path.join(examplesJsSrc, 'specs'));
+          src_folders.push(path.join(examplesJsSrc, EXAMPLE_TEST_FOLDER));
         } else {
           src_folders.push(examplesJsSrc);
         }
@@ -624,10 +633,10 @@ export class NightwatchInit {
     const relativeToRootDir = path.relative(process.cwd(), this.rootDir) || '.';
 
     // For now the templates added only for JS
-    if (answers.runner !== 'cucumber' && answers.language !== 'ts') {
+    if (answers.runner !== Runner.Cucumber && answers.language !== 'ts') {
       Logger.error(colors.green('TEMPLATE TESTS'), '\n');
       Logger.error('To get started, checkout the following templates. Skip/delete them if you are an experienced user.');
-      Logger.error(colors.cyan(`  1. Title Assertion (${path.join(relativeToRootDir, answers.examplesLocation || '', 'templates', 'titleAssertion.js')})`));
+      Logger.error(colors.cyan(`  1. Title Assertion (${path.join(relativeToRootDir, answers.examplesLocation || '', EXAMPLE_TEST_FOLDER, 'templates', 'titleAssertion.js')})`));
       Logger.error(colors.cyan(`  2. Login (${path.join(relativeToRootDir, answers.examplesLocation || '', 'templates', 'login.js')})`));
       Logger.error();
     }
@@ -653,7 +662,7 @@ export class NightwatchInit {
       tsExtraDash = ' --';
     }
 
-    if (answers.runner === 'cucumber') {
+    if (answers.runner === Runner.Cucumber) {
       Logger.error('To run your tests with CucumberJS, simply run:');
       Logger.error(colors.cyan(`  npx nightwatch${envFlag}${configFlag}`), '\n');
 
@@ -686,7 +695,7 @@ export class NightwatchInit {
           colors.cyan(
             `  npx nightwatch .${path.sep}${path.join(
               this.otherInfo.examplesJsSrc || '',
-              'specs'
+              EXAMPLE_TEST_FOLDER
             )}${envFlag}${configFlag}\n`
           )
         );
@@ -696,7 +705,7 @@ export class NightwatchInit {
           colors.cyan(
             `  npx nightwatch .${path.sep}${path.join(
               this.otherInfo.examplesJsSrc || '',
-              'specs',
+              EXAMPLE_TEST_FOLDER,
               'basic',
               'ecosia.js'
             )}${envFlag}${configFlag}\n`
