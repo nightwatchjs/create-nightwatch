@@ -31,7 +31,7 @@ describe('e2e tests for init', () => {
     mockery.disable();
   });
 
-  test('with js-nightwatch-local', async (done) => {
+  test('with js-nightwatch-local', async () => {
     const consoleOutput = [];
     mockery.registerMock(
       './logger',
@@ -117,7 +117,7 @@ describe('e2e tests for init', () => {
     // Test generated config
     assert.strictEqual(fs.existsSync(configPath), true);
     const config = require(configPath);
-    assert.deepEqual(config.src_folders, ['tests/specs']);
+    assert.deepEqual(config.src_folders, ['tests/examples']);
     assert.deepEqual(config.page_objects_path, ['tests/page-objects']);
     assert.deepEqual(config.custom_commands_path, ['tests/custom-commands']);
     assert.deepEqual(config.custom_assertions_path, ['tests/custom-assertions']);
@@ -160,8 +160,8 @@ describe('e2e tests for init', () => {
     const examplesPath = path.join(rootDir, answers.examplesLocation);
     assert.strictEqual(fs.existsSync(examplesPath), true);
     const exampleFiles = fs.readdirSync(examplesPath);
-    assert.strictEqual(exampleFiles.length, 5);
-    assert.deepEqual(exampleFiles, ['custom-assertions', 'custom-commands', 'page-objects', 'specs', 'templates']);
+    assert.strictEqual(exampleFiles.length, 4);
+    assert.deepEqual(exampleFiles, ['custom-assertions', 'custom-commands', 'examples',  'page-objects']);
 
     // Test console output
     const output = consoleOutput.toString();
@@ -173,7 +173,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Generating example files...'), true);
     assert.strictEqual(output.includes('Success! Generated some example files at \'tests\'.'), true);
     assert.strictEqual(output.includes('Generating template files...'), true);
-    assert.strictEqual(output.includes(`Success! Generated some templates files at '${path.join('tests', 'templates')}'.`), true);
+    assert.strictEqual(output.includes(`Success! Generated some templates files at '${path.join('tests/examples', 'templates')}'.`), true);
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
     assert.strictEqual(output.includes('Join our Discord community and instantly find answers to your issues or queries.'), true);
     assert.strictEqual(output.includes('Visit our GitHub page to report bugs or raise feature requests:'), true);
@@ -181,11 +181,11 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
     assert.strictEqual(
-      output.includes(`npx nightwatch .${path.sep}${path.join('tests', 'specs')}`),
+      output.includes(`npx nightwatch .${path.sep}${path.join('tests', 'examples')}`),
       true
     );
     assert.strictEqual(
-      output.includes(`npx nightwatch .${path.sep}${path.join('tests', 'specs', 'basic', 'ecosia.js')}`),
+      output.includes(`npx nightwatch .${path.sep}${path.join('tests', 'examples', 'basic', 'ecosia.js')}`),
       true
     );
     assert.strictEqual(output.includes('[Selenium Server]'), true);
@@ -194,10 +194,9 @@ describe('e2e tests for init', () => {
 
     rmDirSync(rootDir);
 
-    done();
   });
 
-  test('with js-cucumber-remote', async (done) => {
+  test('with js-cucumber-remote', async () => {
     const consoleOutput = [];
     mockery.registerMock(
       './logger',
@@ -268,7 +267,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(answers.seleniumServer, undefined);
     assert.strictEqual(answers.defaultBrowser, 'chrome');
     assert.strictEqual(answers.addExamples, true);
-    assert.strictEqual(answers.examplesLocation, path.join('tests', 'features', 'nightwatch-examples'));
+    assert.strictEqual(answers.examplesLocation, path.join('tests', 'features', 'nightwatch'));
 
     // Test otherInfo
     assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, undefined);
@@ -315,7 +314,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Generating example for CucumberJS...'), true);
     assert.strictEqual(
       output.includes(
-        `Success! Generated an example for CucumberJS at "${path.join('tests', 'features', 'nightwatch-examples')}"`
+        `Success! Generated an example for CucumberJS at "${path.join('tests', 'features', 'nightwatch')}"`
       ),
       true
     );
@@ -336,7 +335,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('npx nightwatch --env remote'), true);
     assert.strictEqual(output.includes('To run an example test with CucumberJS, run:'), true);
     assert.strictEqual(
-      output.includes(`npx nightwatch ${path.join('tests', 'features', 'nightwatch-examples')} --env remote`),
+      output.includes(`npx nightwatch ${path.join('tests', 'features', 'nightwatch')} --env remote`),
       true
     );
     assert.strictEqual(output.includes('For more details on using CucumberJS with Nightwatch, visit:'), true);
@@ -344,10 +343,9 @@ describe('e2e tests for init', () => {
 
     rmDirSync(rootDir);
 
-    done();
   });
 
-  test('with js-mocha-both', async (done) => {
+  test('with js-mocha-both', async () => {
     const consoleOutput = [];
     mockery.registerMock(
       './logger',
@@ -424,23 +422,23 @@ describe('e2e tests for init', () => {
     assert.strictEqual(answers.seleniumServer, undefined);
     assert.strictEqual(answers.defaultBrowser, 'chrome');
     assert.strictEqual(answers.addExamples, true);
-    assert.strictEqual(answers.examplesLocation, 'nightwatch-examples');
+    assert.strictEqual(answers.examplesLocation, 'nightwatch');
 
     // Test otherInfo
     assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.tsTestScript, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
-    assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'nightwatch-examples');
+    assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'nightwatch');
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, undefined);
 
     // Test generated config
     assert.strictEqual(fs.existsSync(configPath), true);
     const config = require(configPath);
-    assert.deepEqual(config.src_folders, ['tests', 'nightwatch-examples/specs']);
-    assert.deepEqual(config.page_objects_path, ['nightwatch-examples/page-objects']);
-    assert.deepEqual(config.custom_commands_path, ['nightwatch-examples/custom-commands']);
-    assert.deepEqual(config.custom_assertions_path, ['nightwatch-examples/custom-assertions']);
+    assert.deepEqual(config.src_folders, ['tests', 'nightwatch/examples']);
+    assert.deepEqual(config.page_objects_path, ['nightwatch/page-objects']);
+    assert.deepEqual(config.custom_commands_path, ['nightwatch/custom-commands']);
+    assert.deepEqual(config.custom_assertions_path, ['nightwatch/custom-assertions']);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.test_runner.type, 'mocha');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
@@ -480,8 +478,8 @@ describe('e2e tests for init', () => {
     const examplesPath = path.join(rootDir, answers.examplesLocation);
     assert.strictEqual(fs.existsSync(examplesPath), true);
     const exampleFiles = fs.readdirSync(examplesPath);
-    assert.strictEqual(exampleFiles.length, 5);
-    assert.deepEqual(exampleFiles, ['custom-assertions', 'custom-commands', 'page-objects', 'specs', 'templates']);
+    assert.strictEqual(exampleFiles.length, 4);
+    assert.deepEqual(exampleFiles, ['custom-assertions', 'custom-commands', 'examples',  'page-objects']);
 
     // Test console output
     const output = consoleOutput.toString();
@@ -495,7 +493,7 @@ describe('e2e tests for init', () => {
       );
     }
     assert.strictEqual(output.includes('Generating example files...'), true);
-    assert.strictEqual(output.includes('Success! Generated some example files at \'nightwatch-examples\'.'), true);
+    assert.strictEqual(output.includes('Success! Generated some example files at \'nightwatch\'.'), true);
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
     assert.strictEqual(output.includes('Join our Discord community and instantly find answers to your issues or queries.'), true);
     assert.strictEqual(output.includes('Visit our GitHub page to report bugs or raise feature requests:'), true);
@@ -506,18 +504,17 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('RUN NIGHTWATCH TESTS'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
-    assert.strictEqual(output.includes(`npx nightwatch .${path.sep}${path.join('nightwatch-examples', 'specs')}`), true);
+    assert.strictEqual(output.includes(`npx nightwatch .${path.sep}${path.join('nightwatch', 'examples')}`), true);
     assert.strictEqual(
-      output.includes(`npx nightwatch .${path.sep}${path.join('nightwatch-examples', 'specs', 'basic', 'ecosia.js')}`),
+      output.includes(`npx nightwatch .${path.sep}${path.join('nightwatch', 'examples', 'basic', 'ecosia.js')}`),
       true
     );
 
     rmDirSync(rootDir);
 
-    done();
   });
 
-  test('with ts-nightwatch-remote', async (done) => {
+  test('with ts-nightwatch-remote', async () => {
     const consoleOutput = [];
     mockery.registerMock(
       './logger',
@@ -669,10 +666,9 @@ describe('e2e tests for init', () => {
 
     rmDirSync(rootDir);
 
-    done();
   });
 
-  test('with ts-mocha-both-browserstack and non-default config', async (done) => {
+  test('with ts-mocha-both-browserstack and non-default config', async () => {
     const consoleOutput = [];
     mockery.registerMock(
       './logger',
@@ -710,9 +706,9 @@ describe('e2e tests for init', () => {
     });
 
     // Create a non-empty 'tests' folder as well as a non-empty
-    // 'nightwatch-examples' folder in the rootDir.
+    // 'nightwatch' folder in the rootDir.
     fs.mkdirSync(path.join(rootDir, 'tests', 'sample'), {recursive: true});
-    fs.mkdirSync(path.join(rootDir, 'nightwatch-examples', 'sample'), {recursive: true});
+    fs.mkdirSync(path.join(rootDir, 'nightwatch', 'sample'), {recursive: true});
 
     const answers = {
       language: 'ts',
@@ -752,20 +748,20 @@ describe('e2e tests for init', () => {
     assert.strictEqual(answers.seleniumServer, true);
     assert.strictEqual(answers.defaultBrowser, 'firefox');
     assert.strictEqual(answers.addExamples, true);
-    assert.strictEqual(answers.examplesLocation, 'nightwatch-examples');
+    assert.strictEqual(answers.examplesLocation, 'nightwatch');
 
     // Test otherInfo
     assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, 'dist');
     assert.strictEqual(nightwatchInit.otherInfo.tsTestScript, 'test');
     assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, path.join('dist', 'tests'));
-    assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, path.join('dist', 'nightwatch-examples'));
+    assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, path.join('dist', 'nightwatch'));
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, configFileName);
 
     // Test generated config
     assert.strictEqual(fs.existsSync(configPath), true);
     const config = require(configPath);
-    assert.deepEqual(config.src_folders, ['dist/tests', 'dist/nightwatch-examples']);
+    assert.deepEqual(config.src_folders, ['dist/tests', 'dist/nightwatch']);
     assert.deepEqual(config.page_objects_path, []);
     assert.deepEqual(config.custom_commands_path, []);
     assert.deepEqual(config.custom_assertions_path, []);
@@ -816,7 +812,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Installing webdriver for Firefox (geckodriver)...'), true);
     assert.strictEqual(output.includes('Generating example files...'), true);
     assert.strictEqual(
-      output.includes('Examples already exists at \'nightwatch-examples\'. Skipping...'),
+      output.includes('Examples already exists at \'nightwatch\'. Skipping...'),
       true
     );
     assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
@@ -834,7 +830,7 @@ describe('e2e tests for init', () => {
       output.includes(
         `npm run test -- .${path.sep}${path.join(
           'dist',
-          'nightwatch-examples',
+          'nightwatch',
           'github.js'
         )} --config new-config.conf.js`
       ),
@@ -851,10 +847,9 @@ describe('e2e tests for init', () => {
 
     rmDirSync(rootDir);
 
-    done();
   });
 
-  test('with yes and browser flag', async (done) => {
+  test('with yes and browser flag', async () => {
     const consoleOutput = [];
     mockery.registerMock(
       './logger',
@@ -932,7 +927,7 @@ describe('e2e tests for init', () => {
     // Test generated config
     assert.strictEqual(fs.existsSync(configPath), true);
     const config = require(configPath);
-    assert.deepEqual(config.src_folders, ['nightwatch-e2e/specs']);
+    assert.deepEqual(config.src_folders, ['nightwatch-e2e/examples']);
     assert.deepEqual(config.page_objects_path, ['nightwatch-e2e/page-objects']);
     assert.deepEqual(config.custom_commands_path, ['nightwatch-e2e/custom-commands']);
     assert.deepEqual(config.custom_assertions_path, ['nightwatch-e2e/custom-assertions']);
@@ -969,8 +964,8 @@ describe('e2e tests for init', () => {
     const examplesPath = path.join(rootDir, answers.examplesLocation);
     assert.strictEqual(fs.existsSync(examplesPath), true);
     const exampleFiles = fs.readdirSync(examplesPath);
-    assert.strictEqual(exampleFiles.length, 5);
-    assert.deepEqual(exampleFiles, ['custom-assertions', 'custom-commands', 'page-objects', 'specs', 'templates']);
+    assert.strictEqual(exampleFiles.length, 4);
+    assert.deepEqual(exampleFiles, ['custom-assertions', 'custom-commands', 'examples',  'page-objects']);
 
     // Test console output
     const output = consoleOutput.toString();
@@ -991,9 +986,9 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('RUN NIGHTWATCH TESTS'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
-    assert.strictEqual(output.includes(`npx nightwatch .${path.sep}${path.join('nightwatch-e2e', 'specs')}`), true);
+    assert.strictEqual(output.includes(`npx nightwatch .${path.sep}${path.join('nightwatch-e2e', 'examples')}`), true);
     assert.strictEqual(
-      output.includes(`npx nightwatch .${path.sep}${path.join('nightwatch-e2e', 'specs', 'basic', 'ecosia.js')}`),
+      output.includes(`npx nightwatch .${path.sep}${path.join('nightwatch-e2e', 'examples', 'basic', 'ecosia.js')}`),
       true
     );
     assert.strictEqual(output.includes('[Selenium Server]'), true);
@@ -1001,10 +996,9 @@ describe('e2e tests for init', () => {
 
     rmDirSync(rootDir);
 
-    done();
   });
 
-  test('generate-config with js-nightwatch-local', async (done) => {
+  test('generate-config with js-nightwatch-local', async () => {
     const consoleOutput = [];
     mockery.registerMock(
       './logger',
@@ -1140,10 +1134,9 @@ describe('e2e tests for init', () => {
 
     rmDirSync(rootDir);
 
-    done();
   });
 
-  test('generate-config with ts-nightwatch-both', async (done) => {
+  test('generate-config with ts-nightwatch-both', async () => {
     const consoleOutput = [];
     mockery.registerMock(
       './logger',
@@ -1270,6 +1263,5 @@ describe('e2e tests for init', () => {
 
     rmDirSync(rootDir);
 
-    done();
   });
 });
