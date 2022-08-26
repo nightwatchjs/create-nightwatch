@@ -3,7 +3,6 @@ const mockery = require('mockery');
 const assert = require('assert');
 const nock = require('nock');
 const {extend} = require('axios/lib/utils');
-const VERSION = '1.1.2';
 
 
 describe('test run function', () => {

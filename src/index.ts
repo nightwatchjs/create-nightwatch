@@ -9,7 +9,8 @@ import Logger from './logger';
 import {isNodeProject} from './utils';
 import minimist from 'minimist';
 import suggestSimilarOption from './utils/suggestSimilar';
-import axios from 'axios';
+import axios, {AxiosResponse} from 'axios';
+import {Packument} from '@npm/types';
 
 export const run = async () => {
   try {
@@ -40,6 +41,7 @@ export const run = async () => {
     }
 
     Logger.error(NIGHTWATCH_TITLE);
+
     await checkCreateNightwatchVersion();
 
     let rootDir = path.resolve(process.cwd(), args[0] || '');
@@ -112,10 +114,9 @@ export const initializeNodeProject = (rootDir: string) => {
   });
 };
 
-export const getLatestVersion  = (): Promise<string | void> =>  {
-
+export const getLatestVersion = async (): Promise<string | undefined | null> => {
   return axios.get('https://registry.npmjs.org/create-nightwatch')
-    .then(({data}: any) => {
+    .then(({data}: AxiosResponse<Packument>) => {
       return data['dist-tags'].latest;
     })
     .catch(() => null);
@@ -123,11 +124,14 @@ export const getLatestVersion  = (): Promise<string | void> =>  {
 
 
 export const checkCreateNightwatchVersion = async () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const {version} = require('../package.json');
   const latestVersion = await getLatestVersion();
+  const currentVersion = process.env.npm_package_version;
 
-  if (latestVersion && latestVersion !== version) {
-    Logger.error(`New version is available ${colors.red(version)} -> ${colors.green(latestVersion)}. Run: ${colors.green('npm init nightwatch@latest')} to upgrade\n\n`);
+  if (latestVersion && currentVersion && latestVersion !== currentVersion) {
+    Logger.error(
+      `New version is available ${colors.red(currentVersion)} -> ${colors.green(
+        latestVersion
+      )}. Run: ${colors.green('npm init nightwatch@latest')} to upgrade.\n\n`
+    );
   }
 };

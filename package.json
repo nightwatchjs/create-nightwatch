@@ -21,6 +21,7 @@
     "url": "git+https://github.com/nightwatchjs/create-nightwatch"
   },
   "devDependencies": {
+    "@npm/types": "^1.0.2",
     "@types/ejs": "^3.1.1",
     "@types/inquirer": "^8.2.1",
     "@types/minimist": "^1.2.2",

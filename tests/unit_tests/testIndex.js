@@ -2,7 +2,8 @@ const assert = require('assert');
 const mockery = require('mockery');
 const child_process = require.resolve('child_process');
 const nock = require('nock');
-const VERSION = '1.1.2';
+
+const VERSION = process.env.npm_package_version;
 
 describe('index tests', () => {
 
@@ -51,6 +52,13 @@ describe('index tests', () => {
       }
     });
 
+    const colorFn = (arg) => arg;
+    mockery.registerMock('ansi-colors', {
+      green: colorFn,
+      yellow: colorFn,
+      red: colorFn
+    });
+
     mockery.registerMock('./init', {
       NightwatchInit: class {
         constructor(rootDir, options) {
@@ -70,7 +78,7 @@ describe('index tests', () => {
 
     const output = consoleOutput.toString();
     assert.strictEqual(
-      output.includes('[33mpackage.json[39m not found in the root directory. Initializing a new NPM project..'),
+      output.includes('package.json not found in the root directory. Initializing a new NPM project..'),
       true
     );
   });
@@ -135,6 +143,13 @@ describe('index tests', () => {
       }
     });
 
+    const colorFn = (arg) => arg;
+    mockery.registerMock('ansi-colors', {
+      green: colorFn,
+      yellow: colorFn,
+      red: colorFn
+    });
+
     mockery.registerMock('./init', {
       NightwatchInit: class {
         constructor(rootDir, options) {
@@ -163,7 +178,7 @@ describe('index tests', () => {
 
     const output = consoleOutput.toString();
     assert.strictEqual(
-      output.includes('New version is available [31m1.1.2[39m -> [32m1.0.2[39m. Run: [32mnpm init nightwatch@latest[39m to upgrade'),
+      output.includes(`New version is available ${VERSION} -> 1.0.2. Run: npm init nightwatch@latest to upgrade.`),
       true
     );
   });
