@@ -94,7 +94,7 @@ export class NightwatchInit {
         
         // For now the templates added only for JS
         if (answers.language !== 'ts') {
-          this.copyTemplates(path.join(answers.examplesLocation || '', EXAMPLE_TEST_FOLDER));
+          this.copyTemplates(path.join(answers.examplesLocation || ''));
         }
       }
 
@@ -197,16 +197,7 @@ export class NightwatchInit {
       if (answers.runner === Runner.Cucumber) {
         answers.examplesLocation = path.join(answers.featurePath || '', DEFAULT_FOLDER);
       } else {
-        // Find a location for putting the example files.
-        const testsDestPath = path.join(this.rootDir, answers.testsLocation);
-        if (fs.existsSync(testsDestPath) && fs.readdirSync(testsDestPath).length) {
-          // If testsLocation already contains some files, put the examples in a
-          // separate directory.
-          answers.examplesLocation = DEFAULT_FOLDER;
-        } else {
-          // Put examples directly into testsLocation, to be used as boilerplate.
-          answers.examplesLocation = answers.testsLocation;
-        }
+        answers.examplesLocation = DEFAULT_FOLDER;
       }
     }
   }
@@ -636,7 +627,7 @@ export class NightwatchInit {
     if (answers.runner !== Runner.Cucumber && answers.language !== 'ts') {
       Logger.error(colors.green('TEMPLATE TESTS'), '\n');
       Logger.error('To get started, checkout the following templates. Skip/delete them if you are an experienced user.');
-      Logger.error(colors.cyan(`  1. Title Assertion (${path.join(relativeToRootDir, answers.examplesLocation || '', EXAMPLE_TEST_FOLDER, 'templates', 'titleAssertion.js')})`));
+      Logger.error(colors.cyan(`  1. Title Assertion (${path.join(relativeToRootDir, answers.examplesLocation || '', 'templates', 'titleAssertion.js')})`));
       Logger.error(colors.cyan(`  2. Login (${path.join(relativeToRootDir, answers.examplesLocation || '', 'templates', 'login.js')})`));
       Logger.error();
     }

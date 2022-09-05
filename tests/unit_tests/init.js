@@ -82,7 +82,7 @@ describe('init tests', () => {
       assert.strictEqual(answers['defaultBrowser'], 'firefox');
       assert.strictEqual(answers['testsLocation'], 'nightwatch-e2e');
       assert.strictEqual(answers['addExamples'], true);
-      assert.strictEqual(answers['examplesLocation'], 'nightwatch-e2e');
+      assert.strictEqual(answers['examplesLocation'], 'nightwatch');
       assert.strictEqual(answers['seleniumServer'], undefined);
     });
 
@@ -115,7 +115,7 @@ describe('init tests', () => {
       assert.strictEqual(answers['defaultBrowser'], 'firefox');
       assert.strictEqual(answers['testsLocation'], 'tests');
       assert.strictEqual(answers['addExamples'], true);
-      assert.strictEqual(answers['examplesLocation'], 'tests');
+      assert.strictEqual(answers['examplesLocation'], 'nightwatch');
     });
 
     test('with remote (browserstack) and testsLocation (exist but empty) in answers', () => {
@@ -153,7 +153,7 @@ describe('init tests', () => {
       assert.strictEqual(answers['remoteEnv'].access_key, 'BROWSERSTACK_ACCESS_KEY');
       assert.strictEqual(answers['testsLocation'], 'tests');
       assert.strictEqual(answers['addExamples'], true);
-      assert.strictEqual(answers['examplesLocation'], 'tests');
+      assert.strictEqual(answers['examplesLocation'], 'nightwatch');
     });
 
     test('with remote (saucelabs) and testsLocation (exist and non-empty) in answers', () => {
