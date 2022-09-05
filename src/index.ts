@@ -129,9 +129,9 @@ export const checkCreateNightwatchVersion = async () => {
 
   if (latestVersion && currentVersion && latestVersion !== currentVersion) {
     Logger.error(
-      `New version is available ${colors.red(currentVersion)} -> ${colors.green(
+      `We've updated this onboarding tool. ${colors.red(currentVersion)} -> ${colors.green(
         latestVersion
-      )}. Run: ${colors.green('npm init nightwatch@latest')} to upgrade.\n\n`
+      )}. To get the latest experience, run: ${colors.green('npm init nightwatch@latest')}\n\n`
     );
   }
 };

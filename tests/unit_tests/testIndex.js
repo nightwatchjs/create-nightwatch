@@ -176,9 +176,15 @@ describe('index tests', () => {
     const index = require('../../lib/index');
     await index.run();
 
+    /**
+     * We've updated this onboarding tool. ${colors.red(currentVersion)} -> ${colors.green(
+        latestVersion
+      )}. To get the latest experience, run: ${colors.green('npm init nightwatch@latest')
+     */
+
     const output = consoleOutput.toString();
     assert.strictEqual(
-      output.includes(`New version is available ${VERSION} -> 1.0.2. Run: npm init nightwatch@latest to upgrade.`),
+      output.includes('We\'ve updated this obboarding tool. 1.1.2 -> 1.0.2. To get the latest experience, run: npm init nightwatch@latest'),
       true
     );
   });
