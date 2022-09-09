@@ -9,6 +9,8 @@ import Logger from './logger';
 import {isNodeProject} from './utils';
 import minimist from 'minimist';
 import suggestSimilarOption from './utils/suggestSimilar';
+import axios, {AxiosResponse} from 'axios';
+import {Packument} from '@npm/types';
 
 export const run = async () => {
   try {
@@ -39,6 +41,8 @@ export const run = async () => {
     }
 
     Logger.error(NIGHTWATCH_TITLE);
+
+    await checkCreateNightwatchVersion();
 
     let rootDir = path.resolve(process.cwd(), args[0] || '');
 
@@ -108,4 +112,26 @@ export const initializeNodeProject = (rootDir: string) => {
     stdio: 'inherit',
     cwd: rootDir
   });
+};
+
+export const getLatestVersion = async (): Promise<string | undefined | null> => {
+  return axios.get('https://registry.npmjs.org/create-nightwatch')
+    .then(({data}: AxiosResponse<Packument>) => {
+      return data['dist-tags'].latest;
+    })
+    .catch(() => null);
+};
+
+
+export const checkCreateNightwatchVersion = async () => {
+  const latestVersion = await getLatestVersion();
+  const currentVersion = process.env.npm_package_version;
+
+  if (latestVersion && currentVersion && latestVersion !== currentVersion) {
+    Logger.error(
+      `We've updated this onboarding tool. ${colors.red(currentVersion)} -> ${colors.green(
+        latestVersion
+      )}. To get the latest experience, run: ${colors.green('npm init nightwatch@latest')}\n\n`
+    );
+  }
 };
