@@ -450,5 +450,11 @@ module.exports = {
         acceptSslCerts: true
       }
     }<% }} %>
+  },
+
+  usage_analytics: {
+    enabled: <%- answers.allowAnonymousMetrics %>,
+    log_path: './logs/analytics',
+    client_id: '<%- client_id %>'
   }
 };

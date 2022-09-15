@@ -2,8 +2,10 @@ import fs from 'fs';
 import path from 'path';
 import ejs from 'ejs';
 import colors from 'ansi-colors';
+import https from 'https';
 import {prompt} from 'inquirer';
 import {execSync} from 'child_process';
+import {v4 as uuid} from 'uuid';
 import {copy, stripControlChars, symbols} from './utils';
 import Logger from './logger';
 
@@ -17,12 +19,14 @@ export class NightwatchInit {
   options: Omit<ParsedArgs, '_'>;
   otherInfo: OtherInfo;
   onlyConfig: boolean;
+  client_id: string;
 
   constructor(rootDir = process.cwd(), options: Omit<ParsedArgs, '_'>) {
     this.rootDir = rootDir;
     this.options = options;
     this.otherInfo = {};
     this.onlyConfig = false;
+    this.client_id = uuid();
   }
 
   async run() {
@@ -94,6 +98,10 @@ export class NightwatchInit {
     } else {
       // Post config instructions
       this.postConfigInstructions(answers);
+    }
+
+    if (answers.allowAnonymousMetrics) {
+      this.pushAnonymousMetrics(answers);
     }
   }
 
@@ -377,6 +385,7 @@ export class NightwatchInit {
       custom_commands_path: JSON.stringify(custom_commands_path).replace(/"/g, '\'').replace(/\\\\/g, '/'),
       custom_assertions_path: JSON.stringify(custom_assertions_path).replace(/"/g, '\'').replace(/\\\\/g, '/'),
       feature_path: feature_path.replace(/\\/g, '/'),
+      client_id: this.client_id,
       answers
     });
 
@@ -746,5 +755,43 @@ export class NightwatchInit {
     }
 
     Logger.error('Happy Testing!!!');
+  }
+
+  pushAnonymousMetrics(answers: ConfigGeneratorAnswers) {
+    const GA_API_KEY = 'XuPojOTwQ6yTO758EV4hBg';
+    const GA_TRACKING_ID = 'G-DEKPKZSLXS';
+
+    const payload = {
+      'client_id': this.client_id,
+      'non_personalized_ads': true,
+      'timestamp_micros': new Date().getTime() * 1000,
+      'events': {
+        'name': 'nw_install',
+        'params': {
+          browsers: answers.browsers?.join(','),
+          cloudProvider: answers.cloudProvider,
+          language: answers.language,
+          runner: answers.runner,
+          addExample: answers.addExamples
+        }
+      }
+    };
+
+    const data = JSON.stringify(payload);
+
+    const options = {
+      hostname: 'www.google-analytics.com',
+      port: 443,
+      path: `/mp/collect?api_secret=${GA_API_KEY}&measurement_id=${GA_TRACKING_ID}`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': data.length
+      }
+    };
+
+    const req = https.request(options);
+    req.write(data);
+    req.end();
   }
 }
