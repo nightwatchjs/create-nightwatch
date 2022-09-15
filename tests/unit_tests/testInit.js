@@ -955,7 +955,7 @@ describe('init tests', () => {
       fs.unlinkSync('test_config.conf.js');
     });
 
-    test('generateConfig with js with allowAnonymousMetrics', () => {
+    test('generateConfig with js with allowAnonymousMetrics set to false', () => {
       mockery.registerMock(
         './logger',
         class {
@@ -983,8 +983,10 @@ describe('init tests', () => {
 
       const {NightwatchInit} = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
-      nightwatchInit.otherInfo.tsOutDir = 'dist';
 
+      assert.strictEqual(nightwatchInit.client_id, '3141-5926-5358-9793');
+
+      nightwatchInit.otherInfo.tsOutDir = 'dist';
       nightwatchInit.generateConfig(answers, 'test_config.conf.js');
       const config = require('../../test_config.conf.js');
 
@@ -995,7 +997,7 @@ describe('init tests', () => {
       fs.unlinkSync('test_config.conf.js');
     });
 
-    test('generateConfig with js without allowAnonymousMetrics', () => {
+    test('generateConfig with js with allowAnonymousMetrics set to true', () => {
       mockery.registerMock(
         './logger',
         class {
