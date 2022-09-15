@@ -8,10 +8,9 @@
   },
   "scripts": {
     "build": "tsc",
-    "build-to-publish": "tsc --outDir dist",
+    "prepublishOnly": "tsc --outDir dist",
     "create-nightwatch": "tsc && node dev-run.js",
     "test:unit": "npx nightwatch tests/unit_tests",
-    "prepublishOnly": "npm run build-to-publish",
     "test:e2e": "npx nightwatch tests/e2e_tests"
   },
   "keywords": [],
