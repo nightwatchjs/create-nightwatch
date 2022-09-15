@@ -1299,32 +1299,13 @@ describe('e2e tests for init', () => {
       }
     });
 
-    mockery.registerMock('inquirer', {
-      prompt(questions) {
-        if (questions[0].name === 'safaridriver') {
-          return {safaridriver: true};
-        } else {
-          return {};
-        }
-      }
-    });
-
-    const colorFn = (arg) => arg;
-    mockery.registerMock('ansi-colors', {
-      green: colorFn,
-      yellow: colorFn,
-      magenta: colorFn,
-      cyan: colorFn,
-      red: colorFn
-    });
-
     const answers = {
       language: 'ts',
       runner: 'nightwatch',
       backend: 'both',
       cloudProvider: 'other',
       browsers: ['firefox'],
-      remoteBrowsers: ['chrome', 'edge', 'safari'],
+      remoteBrowsers: ['chrome'],
       baseUrl: 'https://nightwatchjs.org',
       testsLocation: 'tests',
       allowAnonymousMetrics: true
@@ -1335,6 +1316,7 @@ describe('e2e tests for init', () => {
       .reply(204, (uri, requestBody) => {
         assert.notEqual(requestBody.client_id, '');
         assert.notEqual(requestBody.client_id, undefined);
+        assert.strictEqual(typeof requestBody.client_id, 'string');
         assert.deepEqual(requestBody.events, {
           'name': 'nw_install',
           'params': {
@@ -1359,6 +1341,7 @@ describe('e2e tests for init', () => {
     nightwatchInit.askQuestions = () => {
       return answers;
     };
+
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
     nightwatchInit.getConfigDestPath = () => {
       return configPath;
@@ -1392,32 +1375,13 @@ describe('e2e tests for init', () => {
       }
     });
 
-    mockery.registerMock('inquirer', {
-      prompt(questions) {
-        if (questions[0].name === 'safaridriver') {
-          return {safaridriver: true};
-        } else {
-          return {};
-        }
-      }
-    });
-
-    const colorFn = (arg) => arg;
-    mockery.registerMock('ansi-colors', {
-      green: colorFn,
-      yellow: colorFn,
-      magenta: colorFn,
-      cyan: colorFn,
-      red: colorFn
-    });
-
     const answers = {
       language: 'ts',
       runner: 'nightwatch',
       backend: 'both',
       cloudProvider: 'other',
       browsers: ['firefox'],
-      remoteBrowsers: ['chrome', 'edge', 'safari'],
+      remoteBrowsers: ['chrome'],
       baseUrl: 'https://nightwatchjs.org',
       testsLocation: 'tests',
       allowAnonymousMetrics: false
@@ -1435,13 +1399,16 @@ describe('e2e tests for init', () => {
     nightwatchInit.askQuestions = () => {
       return answers;
     };
+
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
     nightwatchInit.getConfigDestPath = () => {
       return configPath;
     };
 
     await nightwatchInit.run();
+
     rmDirSync(rootDir);
+
     done();
   });
 });
