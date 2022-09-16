@@ -449,7 +449,7 @@ describe('init tests', () => {
       nightwatchInit.setupTypescript();
 
       assert.strictEqual(commandsExecuted.length, 1);
-      assert.strictEqual(commandsExecuted[0], 'tsc --init');
+      assert.strictEqual(commandsExecuted[0], 'npx tsc --init');
 
       assert.strictEqual(nwTsconfigCopied, true);
       assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, '');
@@ -513,7 +513,7 @@ describe('init tests', () => {
       nightwatchInit.setupTypescript();
 
       assert.strictEqual(commandsExecuted.length, 1);
-      assert.strictEqual(commandsExecuted[0], 'tsc --init');
+      assert.strictEqual(commandsExecuted[0], 'npx tsc --init');
 
       assert.strictEqual(nwTsconfigCopied, false);
       assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, '');

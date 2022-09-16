@@ -639,7 +639,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(commandsExecuted[1], 'npm install typescript --save-dev');
     assert.strictEqual(commandsExecuted[2], 'npm install @types/nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[3], 'npm install ts-node --save-dev');
-    assert.strictEqual(commandsExecuted[4], 'tsc --init');
+    assert.strictEqual(commandsExecuted[4], 'npx tsc --init');
 
     // Test examples copied
     const examplesPath = path.join(rootDir, answers.examplesLocation);
@@ -807,7 +807,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(commandsExecuted[2], 'npm install @types/nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[3], 'npm install ts-node --save-dev');
     assert.strictEqual(commandsExecuted[4], 'npm install @nightwatch/selenium-server --save-dev');
-    assert.strictEqual(commandsExecuted[5], 'tsc --init');
+    assert.strictEqual(commandsExecuted[5], 'npx tsc --init');
     assert.strictEqual(commandsExecuted[6], 'java -version');
     assert.strictEqual(commandsExecuted[7], 'npm install geckodriver --save-dev');
 

@@ -267,7 +267,7 @@ export class NightwatchInit {
 
     // Generate a new tsconfig.json file if not already present.
     if (!fs.existsSync(tsConfigPath)) {
-      execSync('tsc --init', {
+      execSync('npx tsc --init', {
         stdio: 'inherit',
         cwd: this.rootDir
       });
