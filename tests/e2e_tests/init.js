@@ -4,10 +4,22 @@ const fs = require('fs');
 const path = require('path');
 const {execSync} = require('child_process');
 const {rmDirSync} = require('../../lib/utils');
+const nock = require('nock');
 
 const rootDir = path.join(process.cwd(), 'test_output');
 
 describe('e2e tests for init', () => {
+  before(() => {
+    if (!nock.isActive()) {
+      nock.activate();
+    }
+  });
+
+  after(() => {
+    nock.cleanAll();
+    nock.restore();
+  });
+
   beforeEach(() => {
     rmDirSync(rootDir);
 
@@ -74,7 +86,8 @@ describe('e2e tests for init', () => {
       backend: 'local',
       browsers: ['chrome', 'edge', 'safari', 'selenium-server'],
       baseUrl: 'https://nightwatchjs.org',
-      testsLocation: 'tests'
+      testsLocation: 'tests',
+      allowAnonymousMetrics: false
     };
 
     const {NightwatchInit} = require('../../lib/init');
@@ -240,7 +253,8 @@ describe('e2e tests for init', () => {
       browsers: ['chrome', 'edge', 'selenium-server'],
       testsLocation: 'tests',
       featurePath: path.join('tests', 'features'),
-      baseUrl: 'https://nightwatchjs.org'
+      baseUrl: 'https://nightwatchjs.org',
+      allowAnonymousMetrics: false
     };
 
     const {NightwatchInit} = require('../../lib/init');
@@ -390,7 +404,8 @@ describe('e2e tests for init', () => {
       cloudProvider: 'browserstack',
       browsers: ['chrome', 'safari'],
       testsLocation: 'tests',
-      baseUrl: 'https://nightwatchjs.org'
+      baseUrl: 'https://nightwatchjs.org',
+      allowAnonymousMetrics: false
     };
 
     const {NightwatchInit} = require('../../lib/init');
@@ -559,7 +574,8 @@ describe('e2e tests for init', () => {
       browsers: ['firefox'],
       remoteBrowsers: ['chrome', 'edge', 'safari'],
       baseUrl: 'https://nightwatchjs.org',
-      testsLocation: 'tests'
+      testsLocation: 'tests',
+      allowAnonymousMetrics: false
     };
 
     const {NightwatchInit} = require('../../lib/init');
@@ -620,14 +636,14 @@ describe('e2e tests for init', () => {
     assert.strictEqual(commandsExecuted[1], 'npm install typescript --save-dev');
     assert.strictEqual(commandsExecuted[2], 'npm install @types/nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[3], 'npm install ts-node --save-dev');
-    assert.strictEqual(commandsExecuted[4], 'tsc --init');
+    assert.strictEqual(commandsExecuted[4], 'npx tsc --init');
 
     // Test examples copied
     const examplesPath = path.join(rootDir, answers.examplesLocation);
     assert.strictEqual(fs.existsSync(examplesPath), true);
     const exampleFiles = fs.readdirSync(examplesPath);
     assert.strictEqual(exampleFiles.length, 3);
-    assert.deepEqual(exampleFiles, ['github.ts', 'google.ts', 'tsconfig.json']);
+    assert.deepEqual(exampleFiles, ['ecosia.ts', 'github.ts', 'google.ts', 'tsconfig.json']);
 
     // Test console output
     const output = consoleOutput.toString();
@@ -716,7 +732,8 @@ describe('e2e tests for init', () => {
       browsers: ['firefox', 'selenium-server'],
       remoteBrowsers: ['chrome'],
       baseUrl: 'https://nightwatchjs.org',
-      testsLocation: 'tests'
+      testsLocation: 'tests',
+      allowAnonymousMetrics: false
     };
 
     const {NightwatchInit} = require('../../lib/init');
@@ -786,7 +803,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(commandsExecuted[2], 'npm install @types/nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[3], 'npm install ts-node --save-dev');
     assert.strictEqual(commandsExecuted[4], 'npm install @nightwatch/selenium-server --save-dev');
-    assert.strictEqual(commandsExecuted[5], 'tsc --init');
+    assert.strictEqual(commandsExecuted[5], 'npx tsc --init');
     assert.strictEqual(commandsExecuted[6], 'java -version');
     assert.strictEqual(commandsExecuted[7], 'npm install geckodriver --save-dev');
 
@@ -1033,7 +1050,8 @@ describe('e2e tests for init', () => {
       backend: 'local',
       browsers: ['chrome', 'edge', 'safari', 'selenium-server'],
       baseUrl: 'https://nightwatchjs.org',
-      testsLocation: 'tests'
+      testsLocation: 'tests',
+      allowAnonymousMetrics: false
     };
 
     const {NightwatchInit} = require('../../lib/init');
@@ -1172,7 +1190,8 @@ describe('e2e tests for init', () => {
       browsers: ['firefox'],
       remoteBrowsers: ['chrome', 'edge', 'safari'],
       baseUrl: 'https://nightwatchjs.org',
-      testsLocation: 'tests'
+      testsLocation: 'tests',
+      allowAnonymousMetrics: false
     };
 
     const {NightwatchInit} = require('../../lib/init');
@@ -1251,6 +1270,136 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Happy Testing!!!'), true);
 
     rmDirSync(rootDir);
+  });
 
+  test('make sure we send analytics data if allowAnalytics is set to true', async (done) => {
+    const consoleOutput = [];
+    mockery.registerMock(
+      './logger',
+      class {
+        static error(...msgs) {
+          consoleOutput.push(...msgs);
+        }
+      }
+    );
+
+    const commandsExecuted = [];
+    mockery.registerMock('child_process', {
+      execSync(command, options) {
+        commandsExecuted.push(command);
+      }
+    });
+
+    const answers = {
+      language: 'ts',
+      runner: 'nightwatch',
+      backend: 'both',
+      cloudProvider: 'other',
+      browsers: ['firefox'],
+      remoteBrowsers: ['chrome'],
+      baseUrl: 'https://nightwatchjs.org',
+      testsLocation: 'tests',
+      allowAnonymousMetrics: true
+    };
+
+    const scope = nock('https://www.google-analytics.com')
+      .post('/mp/collect?api_secret=XuPojOTwQ6yTO758EV4hBg&measurement_id=G-DEKPKZSLXS')
+      .reply(204, (uri, requestBody) => {
+        assert.notEqual(requestBody.client_id, '');
+        assert.notEqual(requestBody.client_id, undefined);
+        assert.strictEqual(typeof requestBody.client_id, 'string');
+        assert.deepEqual(requestBody.events, {
+          'name': 'nw_install',
+          'params': {
+            'browsers': 'firefox',
+            'cloudProvider': 'other',
+            'language': 'ts',
+            'runner': 'nightwatch'
+          }
+        });
+        assert.strictEqual(requestBody.non_personalized_ads, true);
+
+        return {
+          status: 0,
+          state: 'success',
+          value: []
+        };
+      });
+    
+    const {NightwatchInit} = require('../../lib/init');
+    const nightwatchInit = new NightwatchInit(rootDir, {'generate-config': true});
+
+    nightwatchInit.askQuestions = () => {
+      return answers;
+    };
+
+    const configPath = path.join(rootDir, 'nightwatch.conf.js');
+    nightwatchInit.getConfigDestPath = () => {
+      return configPath;
+    };
+
+    await nightwatchInit.run();
+    
+    setTimeout(() => {
+      assert.ok(scope.isDone());
+      done();
+    }, 0);
+
+    rmDirSync(rootDir);
+  });
+
+  test('make sure we do not send analytics data if allowAnalytics is set to false', async (done) => {
+    const consoleOutput = [];
+    mockery.registerMock(
+      './logger',
+      class {
+        static error(...msgs) {
+          consoleOutput.push(...msgs);
+        }
+      }
+    );
+
+    const commandsExecuted = [];
+    mockery.registerMock('child_process', {
+      execSync(command, options) {
+        commandsExecuted.push(command);
+      }
+    });
+
+    const answers = {
+      language: 'ts',
+      runner: 'nightwatch',
+      backend: 'both',
+      cloudProvider: 'other',
+      browsers: ['firefox'],
+      remoteBrowsers: ['chrome'],
+      baseUrl: 'https://nightwatchjs.org',
+      testsLocation: 'tests',
+      allowAnonymousMetrics: false
+    };
+
+    nock('https://www.google-analytics.com')
+      .post('/mp/collect?api_secret=XuPojOTwQ6yTO758EV4hBg&measurement_id=G-DEKPKZSLXS')
+      .reply(204, (uri, requestBody) => {
+        assert.fail();
+      });
+    
+    const {NightwatchInit} = require('../../lib/init');
+    const nightwatchInit = new NightwatchInit(rootDir, {'generate-config': true});
+
+    nightwatchInit.askQuestions = () => {
+      return answers;
+    };
+
+    const configPath = path.join(rootDir, 'nightwatch.conf.js');
+    nightwatchInit.getConfigDestPath = () => {
+      return configPath;
+    };
+
+    await nightwatchInit.run();
+
+    rmDirSync(rootDir);
+
+    done();
   });
 });

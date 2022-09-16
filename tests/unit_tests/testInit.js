@@ -449,7 +449,7 @@ describe('init tests', () => {
       nightwatchInit.setupTypescript();
 
       assert.strictEqual(commandsExecuted.length, 1);
-      assert.strictEqual(commandsExecuted[0], 'tsc --init');
+      assert.strictEqual(commandsExecuted[0], 'npx tsc --init');
 
       assert.strictEqual(nwTsconfigCopied, true);
       assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, '');
@@ -513,7 +513,7 @@ describe('init tests', () => {
       nightwatchInit.setupTypescript();
 
       assert.strictEqual(commandsExecuted.length, 1);
-      assert.strictEqual(commandsExecuted[0], 'tsc --init');
+      assert.strictEqual(commandsExecuted[0], 'npx tsc --init');
 
       assert.strictEqual(nwTsconfigCopied, false);
       assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, '');
@@ -655,7 +655,8 @@ describe('init tests', () => {
         language: 'js',
         backend: 'local',
         browsers: ['chrome', 'firefox'],
-        defaultBrowser: 'firefox'
+        defaultBrowser: 'firefox',
+        allowAnonymousMetrics: false
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -692,7 +693,8 @@ describe('init tests', () => {
         defaultBrowser: 'firefox',
         testsLocation: 'tests',
         addExamples: true,
-        examplesLocation: 'tests'
+        examplesLocation: 'tests',
+        allowAnonymousMetrics: false
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -737,7 +739,8 @@ describe('init tests', () => {
         seleniumServer: true,
         testsLocation: 'tests',
         addExamples: true,
-        examplesLocation: path.join('tests', 'nightwatch-examples')
+        examplesLocation: path.join('tests', 'nightwatch-examples'),
+        allowAnonymousMetrics: false
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -795,7 +798,8 @@ describe('init tests', () => {
         seleniumServer: true,
         testsLocation: 'tests',
         addExamples: true,
-        examplesLocation: 'tests'
+        examplesLocation: 'tests',
+        allowAnonymousMetrics: false
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -856,7 +860,8 @@ describe('init tests', () => {
         testsLocation: 'tests',
         featurePath: path.join('tests', 'features'),
         addExamples: true,
-        examplesLocation: path.join('tests', 'features', 'nightwatch-examples')
+        examplesLocation: path.join('tests', 'features', 'nightwatch-examples'),
+        allowAnonymousMetrics: false
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -914,7 +919,8 @@ describe('init tests', () => {
         },
         testsLocation: 'tests',
         addExamples: true,
-        examplesLocation: 'nightwatch-examples'
+        examplesLocation: 'nightwatch-examples',
+        allowAnonymousMetrics: false
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -945,6 +951,76 @@ describe('init tests', () => {
       assert.strictEqual(config.test_settings.browserstack.selenium.port, 443);
       assert.strictEqual(config.test_settings.browserstack.desiredCapabilities['bstack:options'].userName, '${BROWSERSTACK_USERNAME}');
       assert.strictEqual(config.test_settings.browserstack.desiredCapabilities['bstack:options'].accessKey, '${BROWSERSTACK_ACCESS_KEY}');
+
+      fs.unlinkSync('test_config.conf.js');
+    });
+
+    test('generateConfig with js with allowAnonymousMetrics set to false', () => {
+      mockery.registerMock(
+        './logger',
+        class {
+          static error() {}
+        }
+      );
+
+      mockery.registerMock(
+        'uuid',
+
+        class {
+          static v4() {
+            return '3141-5926-5358-9793';
+          }
+        }
+      );
+
+      const answers = {
+        language: 'js',
+        backend: 'local',
+        browsers: ['chrome', 'firefox'],
+        defaultBrowser: 'firefox',
+        allowAnonymousMetrics: false
+      };
+
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, []);
+
+      assert.strictEqual(nightwatchInit.client_id, '3141-5926-5358-9793');
+
+      nightwatchInit.otherInfo.tsOutDir = 'dist';
+      nightwatchInit.generateConfig(answers, 'test_config.conf.js');
+      const config = require('../../test_config.conf.js');
+
+      assert.strictEqual(config.usage_analytics.enabled, false);
+      assert.strictEqual(config.usage_analytics.log_path, './logs/analytics');
+      assert.strictEqual(config.usage_analytics.client_id, '3141-5926-5358-9793');
+
+      fs.unlinkSync('test_config.conf.js');
+    });
+
+    test('generateConfig with js with allowAnonymousMetrics set to true', () => {
+      mockery.registerMock(
+        './logger',
+        class {
+          static error() {}
+        }
+      );
+
+      const answers = {
+        language: 'js',
+        backend: 'local',
+        browsers: ['chrome', 'firefox'],
+        defaultBrowser: 'firefox',
+        allowAnonymousMetrics: true
+      };
+
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, []);
+      nightwatchInit.otherInfo.tsOutDir = 'dist';
+
+      nightwatchInit.generateConfig(answers, 'test_config.conf.js');
+      const config = require('../../test_config.conf.js');
+
+      assert.strictEqual(config.usage_analytics.enabled, true);
 
       fs.unlinkSync('test_config.conf.js');
     });

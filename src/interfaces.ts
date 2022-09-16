@@ -20,6 +20,7 @@ export interface ConfigGeneratorAnswers {
   browsers?: string[];
   defaultBrowser?: string;
   remoteBrowsers?: string[];
+  allowAnonymousMetrics?: boolean;
 }
 
 export interface ConfigDestination {
