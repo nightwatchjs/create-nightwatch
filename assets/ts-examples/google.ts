@@ -14,7 +14,7 @@ const home: NightwatchTests = {
         return actions.keyDown(this.Keys['ENTER']).keyUp(this.Keys['ENTER']);
       })
       .waitForElementVisible('#main')
-      .assert.containsText('#main', 'Nightwatch.js');
+      .assert.textContains('#main', 'Nightwatch.js');
   }
 };
 
