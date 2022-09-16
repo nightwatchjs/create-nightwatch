@@ -82,7 +82,7 @@ describe('init tests', () => {
       assert.strictEqual(answers['defaultBrowser'], 'firefox');
       assert.strictEqual(answers['testsLocation'], 'nightwatch-e2e');
       assert.strictEqual(answers['addExamples'], true);
-      assert.strictEqual(answers['examplesLocation'], 'nightwatch-e2e');
+      assert.strictEqual(answers['examplesLocation'], 'nightwatch');
       assert.strictEqual(answers['seleniumServer'], undefined);
     });
 
@@ -115,7 +115,7 @@ describe('init tests', () => {
       assert.strictEqual(answers['defaultBrowser'], 'firefox');
       assert.strictEqual(answers['testsLocation'], 'tests');
       assert.strictEqual(answers['addExamples'], true);
-      assert.strictEqual(answers['examplesLocation'], 'tests');
+      assert.strictEqual(answers['examplesLocation'], 'nightwatch');
     });
 
     test('with remote (browserstack) and testsLocation (exist but empty) in answers', () => {
@@ -153,7 +153,7 @@ describe('init tests', () => {
       assert.strictEqual(answers['remoteEnv'].access_key, 'BROWSERSTACK_ACCESS_KEY');
       assert.strictEqual(answers['testsLocation'], 'tests');
       assert.strictEqual(answers['addExamples'], true);
-      assert.strictEqual(answers['examplesLocation'], 'tests');
+      assert.strictEqual(answers['examplesLocation'], 'nightwatch');
     });
 
     test('with remote (saucelabs) and testsLocation (exist and non-empty) in answers', () => {
@@ -191,7 +191,7 @@ describe('init tests', () => {
       assert.strictEqual(answers['remoteEnv'].access_key, 'SAUCE_ACCESS_KEY');
       assert.strictEqual(answers['testsLocation'], 'tests');
       assert.strictEqual(answers['addExamples'], true);
-      assert.strictEqual(answers['examplesLocation'], 'nightwatch-examples');
+      assert.strictEqual(answers['examplesLocation'], 'nightwatch');
     });
 
     test('with remote (other) in answers and onlyConfig flag', () => {
@@ -262,7 +262,7 @@ describe('init tests', () => {
       assert.strictEqual(answers['seleniumServer'], true);
       assert.strictEqual(answers['testsLocation'], 'tests');
       assert.strictEqual(answers['addExamples'], true);
-      assert.strictEqual(answers['examplesLocation'], 'nightwatch-examples');
+      assert.strictEqual(answers['examplesLocation'], 'nightwatch');
     });
   });
 
@@ -706,7 +706,7 @@ describe('init tests', () => {
       assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
       assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'tests');
 
-      assert.deepEqual(config.src_folders, ['tests/specs']);
+      assert.deepEqual(config.src_folders, ['tests/examples']);
       assert.deepEqual(config.page_objects_path, ['tests/page-objects']);
       assert.deepEqual(config.custom_commands_path, ['tests/custom-commands']);
       assert.deepEqual(config.custom_assertions_path, ['tests/custom-assertions']);
@@ -752,7 +752,7 @@ describe('init tests', () => {
       assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
       assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, path.join('tests', 'nightwatch-examples'));
 
-      assert.deepEqual(config.src_folders, ['tests', 'tests/nightwatch-examples/specs']);
+      assert.deepEqual(config.src_folders, ['tests', 'tests/nightwatch-examples/examples']);
       assert.deepEqual(config.page_objects_path, ['tests/nightwatch-examples/page-objects']);
       assert.deepEqual(config.custom_commands_path, ['tests/nightwatch-examples/custom-commands']);
       assert.deepEqual(config.custom_assertions_path, ['tests/nightwatch-examples/custom-assertions']);
