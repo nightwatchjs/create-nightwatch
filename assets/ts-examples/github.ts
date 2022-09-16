@@ -4,7 +4,7 @@ const home: NightwatchTests = {
   'Github Title test': () => {
     browser
       .url('https://github.com')
-      .assert.title('GitHub: Where the world builds software · GitHub');
+      .assert.titleEquals('GitHub: Where the world builds software · GitHub');
   },
 
   'Github search for nightwatch repository': () => {
@@ -20,7 +20,7 @@ const home: NightwatchTests = {
       .waitForElementVisible('.header-search-input')
       .assert.valueContains('.header-search-input', 'nightwatch')
       .waitForElementVisible('.repo-list-item:first-child')
-      .assert.containsText(
+      .assert.textContains(
         '.repo-list-item:first-child',
         'End-to-end testing framework written in Node.js and using the W3C Webdriver API'
       );
@@ -35,7 +35,7 @@ const home: NightwatchTests = {
       .setValue('#password', 'testpassword')
       .waitForElementVisible('[value=\'Sign in\']')
       .click('[value=\'Sign in\']')
-      .assert.containsText(
+      .assert.textContains(
         '#js-flash-container .flash.flash-error',
         'Incorrect username or password.'
       )

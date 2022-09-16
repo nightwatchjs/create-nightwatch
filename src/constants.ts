@@ -13,8 +13,7 @@ export const NIGHTWATCH_TITLE = `
            |___/
 `;
 
-export const CONFIG_INTRO = 
-`===============================
+export const CONFIG_INTRO = `===============================
 Nightwatch Configuration Wizard
 ===============================
 
@@ -23,12 +22,13 @@ Just answer a few questions to get started with Nightwatch:
 We'll setup everything for you :-)
 `;
 
+export const AVAILABLE_CONFIG_FLAGS = ['yes', 'generate-config', 'browser', 'y', 'b'];
+
 export const BROWSER_CHOICES = [
   {name: 'Firefox', value: 'firefox'},
   {name: 'Chrome', value: 'chrome'},
   {name: 'Edge', value: 'edge'},
-  {name: 'Safari', value: 'safari'},
-  {name: 'IE (requires selenium-server)', value: 'ie'}
+  {name: 'Safari', value: 'safari'}
 ];
 
 export const QUESTIONAIRRE: inquirer.QuestionCollection = [
@@ -43,8 +43,8 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
       {name: 'JavaScript - Nightwatch Test Runner', value: 'js-nightwatch'},
       {name: 'JavaScript - Mocha Test Runner', value: 'js-mocha'},
       {name: 'JavaScript - CucumberJS Test Runner', value: 'js-cucumber'},
-      {name: 'TypeScript - Nightwatch Test Runner', value: 'ts-nightwatch'},
-      {name: 'TypeScript - Mocha Test Runner', value: 'ts-mocha'}
+      {name: 'TypeScript - Nightwatch Test Runner', value: 'ts-nightwatch'}
+      // {name: 'TypeScript - Mocha Test Runner', value: 'ts-mocha'}
       // {name: 'TypeScript - CucumberJS Test Runner', value: 'ts-cucumber'}
     ],
     filter: (value, answers) => {
@@ -69,24 +69,31 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     default: 'local'
   },
 
+  {
+    type: 'list',
+    name: 'cloudProvider',
+    message: '(Remote) Please select your cloud provider:',
+    choices: [
+      {name: 'BrowserStack', value: 'browserstack'},
+      {name: 'Sauce Labs', value: 'saucelabs'},
+      {name: 'Other providers or remote selenium-server', value: 'other'}
+    ],
+    when: (answers) => ['remote', 'both'].includes(answers.backend)
+  },
+
   // BROWSERS
   {
     type: 'checkbox',
     name: 'browsers',
-    message: (answers) => `${answers.backend === 'both' ? '(Local) ' : ''}Where you\'ll be testing on?`,
+    message: (answers) => `${answers.backend === 'both' ? '(Local) ' : ''}Where you'll be testing on?`,
     choices: (answers) => {
       let browsers = BROWSER_CHOICES;
       if (answers.backend === 'local' && process.platform !== 'darwin') {
-        browsers =  browsers.filter((browser) => browser.value !== 'safari');
+        browsers = browsers.filter((browser) => browser.value !== 'safari');
       }
 
       if (['local', 'both'].includes(answers.backend)) {
         browsers = browsers.concat({name: 'Local selenium-server', value: 'selenium-server'});
-      } else {
-        // if answers.backend === 'remote', remove selenium-server note from IE.
-        browsers.forEach((browser) => {
-          if (browser.value === 'ie') {browser.name = 'IE'}
-        });
       }
 
       return browsers;
@@ -106,40 +113,12 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     type: 'checkbox',
     name: 'remoteBrowsers',
     message: '(Remote) Where you\'ll be testing on?',
-    choices: () => {
-      const browsers = BROWSER_CHOICES;
-      // Remove selenium-server note from IE.
-      browsers.forEach((browser) => {
-        if (browser.value === 'ie') {browser.name = 'IE'}
-      });
-
-      return browsers;
-    },
-    default: (answers: { browsers: string[]; }) => answers.browsers,
+    choices: BROWSER_CHOICES,
+    default: (answers: { browsers: string[] }) => answers.browsers,
     validate: (value) => {
       return !!value.length || 'Please select at least 1 browser.';
     },
     when: (answers) => answers.backend === 'both'
-  },
-
-  {
-    type: 'input',
-    name: 'hostname',
-    message: '(Remote) What is the host address of your remote machine?',
-    default: 'localhost',
-    when: (answers) => ['remote', 'both'].includes(answers.backend),
-    filter: (value, answers) => {
-      if (value.search('browserstack') !== -1) {answers.browserstack = true}
-
-      return value;
-    }
-  },
-  {
-    type: 'input',
-    name: 'port',
-    message: '(Remote) What is the port on which your test backend is running on your remote machine?',
-    default: 80,
-    when: (answers) => ['remote', 'both'].includes(answers.backend)
   },
 
   // TEST LOCATION
@@ -154,7 +133,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     type: 'input',
     name: 'featurePath',
     message: 'Where do you plan to keep your CucumberJS feature files?',
-    default: (answers: { testsLocation: string; }) => path.join(answers.testsLocation, 'features'),
+    default: (answers: { testsLocation: string }) => path.join(answers.testsLocation, 'features'),
     when: (answers) => answers.runner === 'cucumber'
   },
 
@@ -164,6 +143,14 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     name: 'baseUrl',
     message: 'What is the base_url of your project?',
     default: 'http://localhost'
+  },
+
+  // ANONYMOUS METRIC COLLECTION
+  {
+    type: 'confirm',
+    name: 'allowAnonymousMetrics',
+    message: 'Allow Nightwatch to anonymously collect usage metrics?',
+    default: false
   }
 ];
 

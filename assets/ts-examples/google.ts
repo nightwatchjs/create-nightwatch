@@ -2,7 +2,7 @@ import {NightwatchTests} from 'nightwatch';
 
 const home: NightwatchTests = {
   'Google title test': () => {
-    browser.url('https://google.com/ncr').assert.title('Google');
+    browser.url('https://google.com/ncr').assert.titleEquals('Google');
   },
 
   'Google search test': () => {
@@ -14,7 +14,7 @@ const home: NightwatchTests = {
         return actions.keyDown(this.Keys['ENTER']).keyUp(this.Keys['ENTER']);
       })
       .waitForElementVisible('#main')
-      .assert.containsText('#main', 'Nightwatch.js');
+      .assert.textContains('#main', 'Nightwatch.js');
   }
 };
 

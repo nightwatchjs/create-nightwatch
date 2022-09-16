@@ -3,6 +3,7 @@
  * https://github.com/nightwatchjs-community/todo-vue
  */
 describe('To-Do List End-to-End Test', function() {
+
   // using the new element() global utility in Nightwatch 2 to init elements
   // before tests and use them later
   const todoElement = element('#new-todo-input');
@@ -41,4 +42,5 @@ describe('To-Do List End-to-End Test', function() {
     // verify if there are 3 tasks which are marked as done in the list
     await expect.elements('#todo-list ul li input:checked').count.toEqual(3);
   });
+
 });
