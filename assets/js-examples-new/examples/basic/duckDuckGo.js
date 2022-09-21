@@ -2,9 +2,9 @@ describe('duckduckgo example', function() {
   it('Search Nightwatch.js and check results', function(browser) {
     browser
       .navigateTo('https://duckduckgo.com')
-      .waitForElementVisible('#search_form_input_homepage')
-      .sendKeys('#search_form_input_homepage', ['Nightwatch.js'])
-      .click('#search_button_homepage')
+      .waitForElementVisible('input[name=q]')
+      .sendKeys('input[name=q]', ['Nightwatch.js'])
+      .click('*[type="submit"]')
       .assert.visible('.results--main')
       .assert.textContains('.results--main', 'Nightwatch.js');
   }); 
