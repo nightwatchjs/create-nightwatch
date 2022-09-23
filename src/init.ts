@@ -74,10 +74,6 @@ export class NightwatchInit {
       this.checkJavaInstallation();
     }
 
-    // Generate configuration file
-    const configDestPath = await this.getConfigDestPath();
-    this.generateConfig(answers, configDestPath);
-
     // Install/Update webdrivers
     const webdriversToInstall = this.identifyWebdriversToInstall(answers);
     await this.installWebdrivers(webdriversToInstall);
@@ -101,7 +97,13 @@ export class NightwatchInit {
           this.copyTemplates(path.join(answers.examplesLocation || ''));
         }
       }
+    }
 
+    // Generate configuration file
+    const configDestPath = await this.getConfigDestPath();
+    this.generateConfig(answers, configDestPath);
+
+    if (!this.onlyConfig) {
       // Post instructions to run their first test
       this.postSetupInstructions(answers);
     } else {
