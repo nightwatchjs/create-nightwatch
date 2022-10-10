@@ -3,6 +3,7 @@ export interface ConfigGeneratorAnswers {
   onlyConfig?: boolean;
   languageRunnerSetup?: string;
   language?: 'js' | 'ts';
+  deviceType?: string;
   backend?: 'local' | 'remote' | 'both';
   seleniumServer?: boolean;
   cloudProvider?: 'browserstack' | 'saucelabs' | 'other';
