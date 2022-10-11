@@ -31,6 +31,19 @@ export const BROWSER_CHOICES = [
   {name: 'Safari', value: 'safari'}
 ];
 
+export const MOBILE_BROWSER_CHOICES = [
+  {name: 'Firefox (Android)', value: 'firefox'},
+  {name: 'Chrome (Android)', value: 'chrome'},
+  {name: 'Safari (iOS) ', value: 'safari'}
+];
+
+export const DEVIVE_CHOICES = [
+  {name: 'iOS Real', value: 'ios-real'},
+  {name: 'iOS Simulator', value: 'ios-sim'},
+  {name: 'Android Real', value: 'android-real'},
+  {name: 'Android Emulator', value: 'android-em'}
+];
+
 export const QUESTIONAIRRE: inquirer.QuestionCollection = [
   // answers.rootDir is available to all the questions (passed in Inquirer.prompt()).
 
@@ -54,6 +67,19 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
 
       return value;
     }
+  },
+
+  // Platform Web or Mobile Web
+  {
+    type: 'list',
+    name: 'platformType',
+    message: 'Which platform do you wish to run your tests against?',
+    choices: [
+      {name: 'Web', value: 'web'},
+      {name: 'Mobile Web', value: 'mobile-web'},
+      {name: 'Both', value: 'both'}
+    ],
+    default: 'web'
   },
 
   // TESTING BACKEND
@@ -81,15 +107,33 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     when: (answers) => ['remote', 'both'].includes(answers.backend)
   },
 
-  // BROWSERS
+  // Device Type for Mobile
+  {
+    type: 'checkbox',
+    name: 'deviceType',
+    message: (answers) => `(${answers.backend === 'both' ? 'Local - ' : ''}Mobile) On which device do you wish to run your tests?`,
+    choices: () => {
+      let devices = DEVIVE_CHOICES;
+
+      if(process.platform !== 'darwin') {
+        devices = devices.filter((device) => !['ios-sim', 'ios-real'].includes(device.value))
+      }
+
+      return devices;
+    },
+    default: ['ios-real'],
+    when: (answers) => ['local', 'both'].includes(answers.backend) && ['mobile-web', 'both'].includes(answers.platformType)
+  },
+
+  // WEB BROWSERS - LOCAL
   {
     type: 'checkbox',
     name: 'browsers',
-    message: (answers) => `${answers.backend === 'both' ? '(Local) ' : ''}Where you'll be testing on?`,
+    message: (answers) => `(${answers.backend === 'both' ? 'Local - ' : ''}Web) Where you'll be testing on?`,
     choices: (answers) => {
       let browsers = BROWSER_CHOICES;
       if (answers.backend === 'local' && process.platform !== 'darwin') {
-        browsers = browsers.filter((browser) => browser.value !== 'safari');
+        browsers =  browsers.filter((browser) => browser.value !== 'safari');
       }
 
       if (['local', 'both'].includes(answers.backend)) {
@@ -105,20 +149,60 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
       }
 
       return !!value.length || 'Please select at least 1 browser.';
-    }
+    },
+    when: (answers) => ['web', 'both'].includes(answers.platformType)
+  },
+
+  // MOBILE BROWSERS - LOCAL
+  {
+    type: 'checkbox',
+    name: 'mobileBrowsers',
+    message: (answers) => `${answers.backend === 'both' ? '(Local - Mobile) ' : '(Mobile) '}Where you'll be testing on?`,
+    choices: (answers) => {
+      let browsers = MOBILE_BROWSER_CHOICES;
+
+      const isIos = ['ios-real', 'ios-sim'].some(value => answers.deviceType.includes(value))
+      if (!isIos) {
+        browsers =  browsers.filter((browser) => browser.value !== 'safari');
+      }
+
+      const isAndroid = ['android-real', 'android-em'].some(value => answers.deviceType.includes(value))
+      if (!isAndroid) {
+        browsers =  browsers.filter((browser) => !['firefox', 'chrome'].includes(browser.value));
+      }
+
+      return browsers;
+    },
+    validate: (value) => {
+      return !!value.length || 'Please select at least 1 browser.';
+    },
+    when: (answers) => ['mobile-web', 'both'].includes(answers.platformType) && ['local', 'both'].includes(answers.backend)
   },
 
   // FOR REMOTE
   {
     type: 'checkbox',
     name: 'remoteBrowsers',
-    message: '(Remote) Where you\'ll be testing on?',
+    message: "(Remote - Web) Where you'll be testing on?",
     choices: BROWSER_CHOICES,
     default: (answers: { browsers: string[] }) => answers.browsers,
     validate: (value) => {
       return !!value.length || 'Please select at least 1 browser.';
     },
-    when: (answers) => answers.backend === 'both'
+    when: (answers) => answers.platformType === 'web' && ['both'].includes(answers.backend)
+  },
+
+  // FOR REMOTE - Mobile
+  {
+    type: 'checkbox',
+    name: 'mobileRemoteBrowsers',
+    message: (answers) => `${answers.backend === 'both' ? '(Remote - Mobile) ' : '(Mobile) '}Where you'll be testing on?`,
+    choices: BROWSER_CHOICES,
+    default: (answers: { browsers: string[] }) => answers.browsers,
+    validate: (value) => {
+      return !!value.length || 'Please select at least 1 browser.';
+    },
+    when: (answers) => ['mobile-web', 'both'].includes(answers.platformType) && ['remote', 'both'].includes(answers.backend)
   },
 
   // TEST LOCATION
