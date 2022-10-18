@@ -789,7 +789,7 @@ export class NightwatchInit {
         Logger.error("Run command to setup `npx @nightwatch/mobile-helper ios`");
         Logger.error("Run command for more help `npx @nightwatch/mobile-helper ios --help`");
       } else {
-        envFlag = ` --env ios.simulator.safari`;
+        envFlag = ` --env ios.real.safari`;
         Logger.error('To run example on real iOS device, run:');
         Logger.error(
           colors.cyan(`  npx nightwatch .${path.sep}${this.otherInfo.examplesJsSrc}${envFlag}${configFlag}\n`)
