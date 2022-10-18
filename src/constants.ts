@@ -151,7 +151,45 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     name: 'allowAnonymousMetrics',
     message: 'Allow Nightwatch to anonymously collect usage metrics?',
     default: false
-  }
+  },
+
+  // Test on Mobile
+  {
+    type: 'list',
+    name: 'mobile',
+    message: "Do you want to run on mobile?",
+    choices: () => [
+        {name: 'Yes', value: true},
+        {name: 'No, skip for now', value: false}
+      ],
+    default: false,
+    when: (answers) => answers.browsers?.filter(function (b: string) {
+      return ['chrome', 'firefox', 'safari'].indexOf(b) > -1;
+    })
+  },
+
+  // Device Type for Mobile
+  process.platform === 'darwin' ? 
+  {
+   type: 'list',
+   name: 'mobileDevice',
+   message: "Please select device type?",
+   choices: () => {
+     let devices = [
+      {name: 'Android (for chrome, firefox)', value: 'android'},
+      {name: 'iOS (for safari)', value: 'ios'},
+      {name: 'both', value: 'both'},
+    ];
+
+     if(process.platform !== 'darwin') {
+       devices = devices.filter((device) => !['ios'].includes(device.value))
+     }
+
+     return devices;
+   },
+   default: 'android',
+   when: (answers) => answers.mobile
+ } : null,
 ];
 
 export const CONFIG_DEST_QUES: inquirer.QuestionCollection = [

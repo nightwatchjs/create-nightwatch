@@ -174,6 +174,100 @@ module.exports = {
         ]
       }
     },
+    <% } %><% if (answers.mobileBrowsers.includes('firefox')) { %>
+    'android.firefox': {
+      desiredCapabilities: {
+        browserName: 'firefox',
+        acceptInsecureCerts: true,
+        'moz:firefoxOptions': {
+          args: [
+            // '-headless',
+            // '-verbose'
+          ],
+          androidPackage: 'org.mozilla.firefox',
+          // add the device serial to run tests on, if multiple devices are online
+          // Run command: `$ANDROID_HOME/platform-tools/adb devices`
+          // androidDeviceSerial: 'ZD2222W62Y'
+        }
+      },
+      webdriver: {
+        start_process: true,
+        server_path: '',
+        cli_args: [
+          // very verbose geckodriver logs
+          // '-vv'
+        ]
+      }
+    },
+    <% } %><% if (answers.mobileBrowsers.includes('chrome')) { %>
+    'android.chrome': {
+      desiredCapabilities: {
+        avd: 'nightwatch-android-11',
+        browserName: 'chrome',
+        'goog:chromeOptions': {
+          // More info on Chromedriver: https://sites.google.com/a/chromium.org/chromedriver/
+          //
+          // w3c:false tells Chromedriver to run using the legacy JSONWire protocol (not required in Chrome 78)
+          w3c: true,
+          args: [
+            //'--no-sandbox',
+            //'--ignore-certificate-errors',
+            //'--allow-insecure-localhost',
+            //'--headless'
+          ],
+          androidPackage: 'com.android.chrome',
+          // add the device serial to run tests on, if multiple devices are online
+          // Run command: `$ANDROID_HOME/platform-tools/adb devices`
+          // androidDeviceSerial: ''
+        },
+      },
+    
+      webdriver: {
+        start_process: true,
+        server_path: 'chromedriver-mobile/chromedriver',
+        cli_args: [
+          // --verbose
+        ]
+      }
+    },
+    <% } %><% if (answers.mobileBrowsers.includes('safari')) { %>
+    'ios.real.safari': {
+      desiredCapabilities: {
+        browserName: 'safari',
+        platformName: 'iOS',
+        // add the device UUID to run tests on (necessary)
+        // Run command: `xcrun simctl list devices`
+        // 'safari:deviceUUID': '00008030-00024C2C3453402E',
+      },
+    
+      webdriver: {
+        start_process: true,
+        server_path: '',
+        cli_args: [
+          // --verbose
+        ]
+      }
+    },
+    
+    'ios.simulator.safari': {
+      desiredCapabilities: {
+        browserName: 'safari',
+        platformName: 'iOS',
+        'safari:useSimulator': true,
+        // change the deviceName, platformVersion accordingly to run tests on 
+        // Run command: `xcrun simctl list devices`
+        // 'safari:platformVersion': '15.0',
+        'safari:deviceName': 'iPhone 13'
+      },
+    
+      webdriver: {
+        start_process: true,
+        server_path: '',
+        cli_args: [
+          // --verbose
+        ]
+      }
+    },
     <% }} %><% if (answers.cloudProvider === 'browserstack') { %>
     //////////////////////////////////////////////////////////////////////////////////
     // Configuration for using the browserstack.com cloud service                    |

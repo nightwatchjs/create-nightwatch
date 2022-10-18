@@ -18,6 +18,9 @@ export interface ConfigGeneratorAnswers {
   addExamples?: boolean;
   examplesLocation?: string;
   browsers?: string[];
+  mobile?: boolean;
+  mobileDevice?: 'ios' | 'android' | 'both';
+  mobileBrowsers?: string[];
   defaultBrowser?: string;
   remoteBrowsers?: string[];
   allowAnonymousMetrics?: boolean;
@@ -37,3 +40,8 @@ export interface OtherInfo {
   javaNotInstalled?: boolean;
   nonDefaultConfigName?: string;
 }
+
+export interface MobileResult {
+  android?: boolean,
+  ios?: boolean
+};

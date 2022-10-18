@@ -10,5 +10,7 @@
   "cloudProvider": "browserstack",
   "testsLocation": "nightwatch-e2e",
   "baseUrl": "http://localhost",
-  "allowAnonymousMetrics": false
+  "allowAnonymousMetrics": false,
+  "mobile": false,
+  "mobileBrowsers": []
 }
