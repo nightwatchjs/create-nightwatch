@@ -114,7 +114,7 @@ export class NightwatchInit {
       }
 
       if( answers.mobileDevice === 'android' || answers.mobileDevice === 'both') {
-        const android = new AndroidSetup({browser: answers.mobileBrowsers || ['chrome']}, this.rootDir);
+        const android = new AndroidSetup({browsers: answers.mobileBrowsers || ['chrome']}, this.rootDir);
         mobile_result.android = await android.run();
       }
     }
