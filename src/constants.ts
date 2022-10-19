@@ -25,11 +25,38 @@ We'll setup everything for you :-)
 export const AVAILABLE_CONFIG_FLAGS = ['yes', 'generate-config', 'browser', 'y', 'b'];
 
 export const BROWSER_CHOICES = [
-  {name: 'Firefox', value: 'firefox'},
-  {name: 'Chrome', value: 'chrome'},
-  {name: 'Edge', value: 'edge'},
-  {name: 'Safari', value: 'safari'}
+  { name: 'Firefox', value: 'firefox' },
+  { name: 'Chrome', value: 'chrome' },
+  { name: 'Edge', value: 'edge' },
+  { name: 'Safari', value: 'safari' }
 ];
+
+export const MOBILE_BROWSER_CHOICES = [
+  { name: 'Chrome (Android)', value: 'chrome' },
+  { name: 'Firefox (Android)', value: 'firefox' },
+  { name: 'Safari (iOS)', value: 'safari' },
+];
+
+export const MOBILE_BROWSER_QUES: inquirer.QuestionCollection = 
+{
+  type: 'checkbox',
+  name: 'mobileBrowsers',
+  message: "Which mobile browsers would you like to test on?",
+  choices: () => {
+    let devices = MOBILE_BROWSER_CHOICES;
+
+    if (process.platform !== 'darwin') {
+      devices = devices.filter((device) => !['ios'].includes(device.value))
+    }
+
+    return devices;
+  },
+  default: ['chrome'],
+  validate: (value) => {
+    return !!value.length || 'Please select at least 1 browser.';
+  },
+  when: (answers) => answers.mobile && answers.backend !== 'remote'
+}
 
 export const QUESTIONAIRRE: inquirer.QuestionCollection = [
   // answers.rootDir is available to all the questions (passed in Inquirer.prompt()).
@@ -40,10 +67,10 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     name: 'languageRunnerSetup',
     message: 'What is your Language - Test Runner setup?',
     choices: [
-      {name: 'JavaScript - Nightwatch Test Runner', value: 'js-nightwatch'},
-      {name: 'JavaScript - Mocha Test Runner', value: 'js-mocha'},
-      {name: 'JavaScript - CucumberJS Test Runner', value: 'js-cucumber'},
-      {name: 'TypeScript - Nightwatch Test Runner', value: 'ts-nightwatch'}
+      { name: 'JavaScript - Nightwatch Test Runner', value: 'js-nightwatch' },
+      { name: 'JavaScript - Mocha Test Runner', value: 'js-mocha' },
+      { name: 'JavaScript - CucumberJS Test Runner', value: 'js-cucumber' },
+      { name: 'TypeScript - Nightwatch Test Runner', value: 'ts-nightwatch' }
       // {name: 'TypeScript - Mocha Test Runner', value: 'ts-mocha'}
       // {name: 'TypeScript - CucumberJS Test Runner', value: 'ts-cucumber'}
     ],
@@ -62,9 +89,9 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     name: 'backend',
     message: 'Where do you want to run your e2e tests?',
     choices: [
-      {name: 'On my local machine', value: 'local'},
-      {name: 'On a remote machine (cloud)', value: 'remote'},
-      {name: 'Both', value: 'both'}
+      { name: 'On my local machine', value: 'local' },
+      { name: 'On a remote machine (cloud)', value: 'remote' },
+      { name: 'Both', value: 'both' }
     ],
     default: 'local'
   },
@@ -74,38 +101,31 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     name: 'cloudProvider',
     message: '(Remote) Please select your cloud provider:',
     choices: [
-      {name: 'BrowserStack', value: 'browserstack'},
-      {name: 'Sauce Labs', value: 'saucelabs'},
-      {name: 'Other providers or remote selenium-server', value: 'other'}
+      { name: 'BrowserStack', value: 'browserstack' },
+      { name: 'Sauce Labs', value: 'saucelabs' },
+      { name: 'Other providers or remote selenium-server', value: 'other' }
     ],
     when: (answers) => ['remote', 'both'].includes(answers.backend)
   },
 
-  // BROWSERS
+  // DESKTOP BROWSERS
   {
     type: 'checkbox',
     name: 'browsers',
-    message: (answers) => `${answers.backend === 'both' ? '(Local) ' : ''}Where you'll be testing on?`,
+    message: (answers) => `${answers.backend === 'both' ? '(Local) ' : ''}Which desktop browsers will you be testing on?`,
     choices: (answers) => {
       let browsers = BROWSER_CHOICES;
       if (answers.backend === 'local' && process.platform !== 'darwin') {
         browsers = browsers.filter((browser) => browser.value !== 'safari');
       }
 
-      if (['local', 'both'].includes(answers.backend)) {
-        browsers = browsers.concat({name: 'Local selenium-server', value: 'selenium-server'});
-      }
-
       return browsers;
     },
     default: ['firefox'],
     validate: (value) => {
-      if (value.length === 1 && value.includes('selenium-server')) {
-        return 'Please select at least 1 browser.';
-      }
-
       return !!value.length || 'Please select at least 1 browser.';
-    }
+    },
+    when: (answers) => !answers.mobile
   },
 
   // FOR REMOTE
@@ -118,8 +138,10 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     validate: (value) => {
       return !!value.length || 'Please select at least 1 browser.';
     },
-    when: (answers) => answers.backend === 'both'
+    when: (answers) => !answers.mobile && answers.backend === 'both'
   },
+
+  MOBILE_BROWSER_QUES,
 
   // TEST LOCATION
   {
@@ -152,44 +174,20 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     message: 'Allow Nightwatch to anonymously collect usage metrics?',
     default: false
   },
-
+  
   // Test on Mobile
   {
     type: 'list',
     name: 'mobile',
-    message: "Do you want to run on mobile?",
+    message: "Would you like to test your website on Mobile devices as well?",
     choices: () => [
-        {name: 'Yes', value: true},
-        {name: 'No, skip for now', value: false}
-      ],
-    default: false,
-    when: (answers) => answers.browsers?.filter(function (b: string) {
-      return ['chrome', 'firefox', 'safari'].indexOf(b) > -1;
-    })
+      { name: 'Yes', value: true },
+      { name: 'No, skip for now', value: false }
+    ],
+    default: false
   },
 
-  // Device Type for Mobile
-  process.platform === 'darwin' ? 
-  {
-   type: 'list',
-   name: 'mobileDevice',
-   message: "Please select device type?",
-   choices: () => {
-     let devices = [
-      {name: 'Android (for chrome, firefox)', value: 'android'},
-      {name: 'iOS (for safari)', value: 'ios'},
-      {name: 'both', value: 'both'},
-    ];
-
-     if(process.platform !== 'darwin') {
-       devices = devices.filter((device) => !['ios'].includes(device.value))
-     }
-
-     return devices;
-   },
-   default: 'android',
-   when: (answers) => answers.mobile
- } : null,
+  MOBILE_BROWSER_QUES
 ];
 
 export const CONFIG_DEST_QUES: inquirer.QuestionCollection = [
@@ -199,8 +197,8 @@ export const CONFIG_DEST_QUES: inquirer.QuestionCollection = [
     message: 'Do you want to overwrite the existing config file?',
     default: false,
     choices: [
-      {name: 'Yes', value: true},
-      {name: 'No, create a new one!', value: false}
+      { name: 'Yes', value: true },
+      { name: 'No, create a new one!', value: false }
     ]
   },
   {

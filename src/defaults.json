@@ -12,5 +12,5 @@
   "baseUrl": "http://localhost",
   "allowAnonymousMetrics": false,
   "mobile": false,
-  "mobileBrowsers": []
+  "mobileBrowsers": ["ios"]
 }

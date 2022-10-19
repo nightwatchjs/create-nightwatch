@@ -177,6 +177,7 @@ module.exports = {
     <% } %><% if (answers.mobileBrowsers.includes('firefox')) { %>
     'android.firefox': {
       desiredCapabilities: {
+        avd: '@nightwatch-android-11',
         browserName: 'firefox',
         acceptInsecureCerts: true,
         'moz:firefoxOptions': {
@@ -344,6 +345,38 @@ module.exports = {
       extends: 'browserstack.local',
       desiredCapabilities: {
         browserName: 'firefox'
+      }
+    },
+    <% } %><% if (answers.mobileRemote) { %>
+    'browserstack.samsung.chrome': {
+      extends: 'browserstack',
+      desiredCapabilities: {
+        browserName: 'chrome',
+        'browserstack.deviceName': "Samsung Galaxy S22"
+      }
+    },
+
+    'browserstack.samsung.local_chrome': {
+      extends: 'browserstack.local',
+      desiredCapabilities: {
+        browserName: 'chrome',
+        'browserstack.deviceName': "Samsung Galaxy S22"
+      }
+    },
+
+    'browserstack.ios.safari': {
+      extends: 'browserstack',
+      desiredCapabilities: {
+        browserName: 'safari',
+        'browserstack.deviceName': "iPhone 13"
+      }
+    },
+
+    'browserstack.samsung.local_chrome': {
+      extends: 'browserstack.local',
+      desiredCapabilities: {
+        browserName: 'safari',
+        'browserstack.deviceName': "iPhone 13"
       }
     },
     <% }} else if (answers.cloudProvider === 'saucelabs') { %>

@@ -24,6 +24,7 @@ export interface ConfigGeneratorAnswers {
   defaultBrowser?: string;
   remoteBrowsers?: string[];
   allowAnonymousMetrics?: boolean;
+  mobileRemote?: boolean
 }
 
 export interface ConfigDestination {

@@ -10,7 +10,7 @@ import {v4 as uuid} from 'uuid';
 import {copy, stripControlChars, symbols} from './utils';
 import Logger from './logger';
 
-import {CONFIG_INTRO, BROWSER_CHOICES, QUESTIONAIRRE, CONFIG_DEST_QUES} from './constants';
+import {CONFIG_INTRO, BROWSER_CHOICES, QUESTIONAIRRE, CONFIG_DEST_QUES, MOBILE_BROWSER_CHOICES} from './constants';
 import {ConfigGeneratorAnswers, ConfigDestination, OtherInfo, MobileResult} from './interfaces';
 import defaultAnswers from './defaults.json';
 import {AndroidSetup, IosSetup} from 'nightwatch-mobile-helper';
@@ -109,12 +109,12 @@ export class NightwatchInit {
 
     if (answers?.mobile) {
       if (answers.mobileDevice === 'ios' || answers.mobileDevice === 'both') {
-        const ios = new IosSetup({});
+        const ios = new IosSetup({setup : true, mode: ['real', 'simulator']});
         mobile_result.ios = await ios.run();
       }
 
-      if( answers.mobileDevice === 'android' || answers.mobileDevice === 'both') {
-        const android = new AndroidSetup({browsers: answers.mobileBrowsers || ['chrome']}, this.rootDir);
+      if (answers.mobileDevice === 'android' || answers.mobileDevice === 'both') {
+        const android = new AndroidSetup({browsers: answers.mobileBrowsers || ['chrome'], setup: true}, this.rootDir);
         mobile_result.android = await android.run();
       }
     }
@@ -137,9 +137,7 @@ export class NightwatchInit {
       rootDir: this.rootDir,
       onlyConfig: this.onlyConfig,
       browsers: this.options?.browser,
-      ...(this.options?.ios && {mobile: true, mobileDevice: 'ios'}),
-      ...(this.options?.android && {mobile: true, mobileDevice: 'android'}),
-      ...(this.options?.android && this.options?.ios && {mobile: true, mobileDevice: 'both'})
+      ...(this.options?.mobile && {mobile: true}),
     };
 
     return await prompt(QUESTIONAIRRE, answers);
@@ -167,48 +165,72 @@ export class NightwatchInit {
         answers.remoteEnv.access_key = 'SAUCE_ACCESS_KEY';
       }
 
-      if (!answers.remoteBrowsers) {
-        if (answers.browsers) {
-          // Copy all browsers, except selenium-server (if present)
-          answers.remoteBrowsers = [...answers.browsers].filter((browser) => browser !== 'selenium-server');
-        } else {
-          answers.remoteBrowsers = BROWSER_CHOICES.map((browser) => browser.value);
+      if (!this.options.mobile) {
+        if (!answers.remoteBrowsers) {
+          if (answers.browsers) {
+            // Copy all browsers, except selenium-server (if present)
+            answers.remoteBrowsers = [...answers.browsers].filter((browser) => browser !== 'selenium-server');
+          } else {
+            answers.remoteBrowsers = BROWSER_CHOICES.map((browser) => browser.value);
+          }
         }
+  
+        // If backend is only remote (no local), delete answers.browsers (if present)
+        // and set the defaultBrowser.
+        if (!backendHasLocal) {
+          if (answers.browsers) {
+            delete answers.browsers;
+          }
+          answers.defaultBrowser = answers.remoteBrowsers[0];
+        }
+      } else {
+        answers.remoteBrowsers = [];
+        answers.browsers = [];
       }
 
-      // If backend is only remote (no local), delete answers.browsers (if present)
-      // and set the defaultBrowser.
-      if (!backendHasLocal) {
-        if (answers.browsers) {
-          delete answers.browsers;
-        }
-        answers.defaultBrowser = answers.remoteBrowsers[0];
+      if (answers.mobile) {
+        answers.mobileRemote = true;
       }
     }
 
     if (backendHasLocal) {
-      if (!answers.browsers) {
-        answers.browsers = BROWSER_CHOICES.map((browser) => browser.value);
-      }
-
-      if (answers.browsers.includes('selenium-server')) {
-        if (!answers.seleniumServer) {
-          answers.seleniumServer = true;
+      if (!this.options.mobile) {
+        if (!answers.browsers) {
+          answers.browsers = BROWSER_CHOICES.map((browser) => browser.value);
         }
-        // Remove selenium-server from browsers
-        const pos = answers.browsers.indexOf('selenium-server');
-        answers.browsers.splice(pos, 1);
+  
+        answers.seleniumServer = true;
+  
+        // Remove safari from answers.browsers from non-mac users
+        if (process.platform !== 'darwin' && answers.browsers.includes('safari')) {
+          const pos = answers.browsers.indexOf('safari');
+          answers.browsers.splice(pos, 1);
+        }
+  
+        // Set defaultBrowser
+        if (!answers.defaultBrowser) {
+          answers.defaultBrowser = answers.browsers[0];
+        }
+      } else {
+        answers.remoteBrowsers = [];
+        answers.browsers = [];
       }
 
-      // Remove safari from answers.browsers from non-mac users
-      if (process.platform !== 'darwin' && answers.browsers.includes('safari')) {
-        const pos = answers.browsers.indexOf('safari');
-        answers.browsers.splice(pos, 1);
-      }
+      if (answers.mobile) {
+        if (!answers.mobileBrowsers) {
+          answers.mobileBrowsers = MOBILE_BROWSER_CHOICES.map((browser) => browser.value);
+        }
 
-      // Set defaultBrowser
-      if (!answers.defaultBrowser) {
-        answers.defaultBrowser = answers.browsers[0];
+        // Remove safari from answers.browsers from non-mac users
+        if (process.platform !== 'darwin' && answers.mobileBrowsers.includes('safari')) {
+          const pos = answers.mobileBrowsers.indexOf('safari');
+          answers.mobileBrowsers.splice(pos, 1);
+        }
+
+        // Set defaultBrowser
+        if (!answers.defaultBrowser && this.options.mobile) {
+          answers.defaultBrowser = answers.mobileBrowsers[0];
+        }
       }
     }
 
@@ -230,15 +252,17 @@ export class NightwatchInit {
       }
     }
 
-    if (answers.mobile) {
-      answers.mobileBrowsers = answers.browsers?.filter(function (e) {
-        return ['chrome', 'firefox', 'safari'].indexOf(e) > -1;
-      });
+    if (answers.mobile && !answers.mobileDevice) {
+      if (answers.mobileBrowsers?.includes('safari')) {
+        answers.mobileDevice = 'ios';
+      }
 
-      if (process.platform !== 'darwin') {
-        if (answers.mobileDevice !== 'ios') {
-          answers.mobileDevice = 'android';
-        }
+      if (answers.mobileBrowsers?.some(b => ['chrome', 'firefox'].includes(b))) {
+        answers.mobileDevice = 'android';
+      }
+
+      if (answers.mobileBrowsers?.every(b => ['chrome', 'firefox', 'safari'].includes(b))) {
+        answers.mobileDevice = 'both';
       }
     }
   }
