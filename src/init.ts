@@ -133,7 +133,7 @@ export class NightwatchInit {
   }
 
   async askQuestions() {
-    let answers = {
+    const answers = {
       rootDir: this.rootDir,
       onlyConfig: this.onlyConfig,
       browsers: this.options?.browser,
