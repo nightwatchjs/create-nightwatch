@@ -3,3 +3,6 @@ lib/
 .idea
 tests_output/
 test_output/
+chromedriver-mobile/
+logs/
+.env
