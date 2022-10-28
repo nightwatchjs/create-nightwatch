@@ -9,6 +9,7 @@ import {ParsedArgs} from 'minimist';
 import {v4 as uuid} from 'uuid';
 import {copy, stripControlChars, symbols} from './utils';
 import Logger from './logger';
+import boxen from 'boxen';
 
 import {CONFIG_INTRO, BROWSER_CHOICES, QUESTIONAIRRE, CONFIG_DEST_QUES, MOBILE_BROWSER_CHOICES} from './constants';
 import {ConfigGeneratorAnswers, ConfigDestination, OtherInfo, MobileResult} from './interfaces';
@@ -108,14 +109,14 @@ export class NightwatchInit {
     let mobile_result: MobileResult = {};
 
     if (answers?.mobile) {
-      if (answers.mobileDevice === 'ios' || answers.mobileDevice === 'both') {
-        const ios = new IosSetup({setup : true, mode: ['real', 'simulator']});
-        mobile_result.ios = await ios.run();
+      if (answers.mobileDevice === 'android' || answers.mobileDevice === 'both') {
+        const androidSetup = new AndroidSetup({browsers: answers.mobileBrowsers || ['chrome'], setup: true}, this.rootDir);
+        mobile_result.android = await androidSetup.run();
       }
 
-      if (answers.mobileDevice === 'android' || answers.mobileDevice === 'both') {
-        const android = new AndroidSetup({browsers: answers.mobileBrowsers || ['chrome'], setup: true}, this.rootDir);
-        mobile_result.android = await android.run();
+      if (answers.mobileDevice === 'ios' || answers.mobileDevice === 'both') {
+        const iosSetup = new IosSetup({setup : true, mode: ['simulator']});
+        mobile_result.ios = await iosSetup.run();
       }
     }
     
@@ -261,7 +262,7 @@ export class NightwatchInit {
         answers.mobileDevice = 'android';
       }
 
-      if (answers.mobileBrowsers?.every(b => ['chrome', 'firefox', 'safari'].includes(b))) {
+      if (['chrome', 'firefox', 'safari'].every(b => answers.mobileBrowsers?.includes(b))) {
         answers.mobileDevice = 'both';
       }
     }
@@ -807,35 +808,71 @@ export class NightwatchInit {
       Logger.error(colors.cyan('  https://nightwatchjs.org/guide/browser-drivers-setup/edgedriver.html'), '\n');
     }
 
-    if (answers.mobileDevice !== 'android') {
-      if (!mobile_result.ios) {
-        Logger.error("Ios setup failed");
-        Logger.error("Run command to setup `npx @nightwatch/mobile-helper ios`");
-        Logger.error("Run command for more help `npx @nightwatch/mobile-helper ios --help`");
-      } else {
-        envFlag = ` --env ios.real.safari`;
-        Logger.error('To run example on real iOS device, run:');
-        Logger.error(
-          colors.cyan(`  npx nightwatch .${path.sep}${this.otherInfo.examplesJsSrc}${envFlag}${configFlag}\n`)
-        );
+    if (answers.mobileDevice === 'android' || answers.mobileDevice === 'both') {
+      const commandMsg = `Run command to setup ${colors.gray.italic("npx @nightwatch/mobile-helper android --setup")} \n` +
+      `Run command for more help ${colors.gray.italic("npx @nightwatch/mobile-helper android --help")}`;
 
-        Logger.error('To run example on iOS simulator, run:');
-        Logger.error(
-          colors.cyan(`  npx nightwatch .${path.sep}${this.otherInfo.examplesJsSrc}${envFlag}${configFlag}\n`)
-        );
+      if (mobile_result.android === false || (typeof mobile_result.android === 'object' && mobile_result.android?.setup === true && mobile_result.android.status === false)) {
+        Logger.error(boxen(
+          colors.red("Android setup failed \n")  + commandMsg));
+      } else if (typeof mobile_result.android === 'object' && mobile_result.android.setup === false) {
+        Logger.error(boxen(commandMsg));
+      } else  {
+        if (answers.mobileBrowsers?.includes('chrome') || answers.mobileBrowsers?.includes('firefox')) {
+          answers.mobileBrowsers?.forEach((browser) => {
+            Logger.error('To run example on Android, use command:');
+  
+            if (['chrome', 'firefox'].includes(browser)) {
+              envFlag = ` --env android.${browser}`;
+  
+              Logger.error(
+                colors.cyan(
+                  `  npx nightwatch .${path.sep}${path.join(
+                    this.otherInfo.examplesJsSrc || '',
+                    EXAMPLE_TEST_FOLDER,
+                    'basic',
+                    'ecosia.js'
+                  )}${envFlag}${configFlag}\n`
+                )
+              );
+            }
+          });
+        }
       }
     }
 
-    if (answers.mobileDevice !== 'ios') {
-      if (!mobile_result.android) {
-        Logger.error(colors.yellow("Android setup failed"));
-        Logger.error("Run command to setup `npx @nightwatch/mobile-helper android`");
-        Logger.error("Run command for more help `npx @nightwatch/mobile-helper android --help`");
+    if (answers.mobileDevice === 'ios' || answers.mobileDevice === 'both') {
+      if (!mobile_result.ios) {
+        Logger.error(boxen(
+          colors.red("iOS setup failed \n\n") +
+          `Run command to setup ${colors.gray.italic("npx nightwatch-mobile-helper ios --setup")}` +
+          `\nRun command for more help ${colors.gray.italic("npx nightwatch-mobile-helper ios --help")}`, {padding: 1}
+        ));
       } else {
-        envFlag = ` --env android.firefox`;
-        Logger.error('To run example on Android, run:');
+        // envFlag = ` --env ios.real.safari`;
+        // Logger.error('To run example on real iOS device, run:');
+        // Logger.error(
+        //   colors.cyan(
+        //     `  npx nightwatch .${path.sep}${path.join(
+        //       this.otherInfo.examplesJsSrc || '',
+        //       EXAMPLE_TEST_FOLDER,
+        //       'basic',
+        //       'ecosia.js'
+        //     )}${envFlag}${configFlag}\n`
+        //   )
+        // );
+
+        envFlag = ` --env ios.simulator.safari`;
+        Logger.error('To run example on iOS simulator, run:');
         Logger.error(
-          colors.cyan(`  npx nightwatch .${path.sep}${this.otherInfo.examplesJsSrc}${envFlag}${configFlag}\n`)
+          colors.cyan(
+            `  npx nightwatch .${path.sep}${path.join(
+              this.otherInfo.examplesJsSrc || '',
+              EXAMPLE_TEST_FOLDER,
+              'basic',
+              'ecosia.js'
+            )}${envFlag}${configFlag}\n`
+          )
         );
       }
     }

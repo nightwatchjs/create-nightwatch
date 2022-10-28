@@ -42,7 +42,11 @@ export interface OtherInfo {
   nonDefaultConfigName?: string;
 }
 
+export interface AndroidResultSetup {
+  status: boolean;
+  setup: boolean;
+}
 export interface MobileResult {
-  android?: boolean,
+  android?: AndroidResultSetup | boolean;
   ios?: boolean
 };
