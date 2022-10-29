@@ -25,16 +25,16 @@ We'll setup everything for you :-)
 export const AVAILABLE_CONFIG_FLAGS = ['yes', 'generate-config', 'browser', 'y', 'b', 'mobile'];
 
 export const BROWSER_CHOICES = [
-  { name: 'Firefox', value: 'firefox' },
-  { name: 'Chrome', value: 'chrome' },
-  { name: 'Edge', value: 'edge' },
-  { name: 'Safari', value: 'safari' }
+  {name: 'Firefox', value: 'firefox'},
+  {name: 'Chrome', value: 'chrome'},
+  {name: 'Edge', value: 'edge'},
+  {name: 'Safari', value: 'safari'}
 ];
 
 export const MOBILE_BROWSER_CHOICES = [
-  { name: 'Chrome (Android)', value: 'chrome' },
-  { name: 'Firefox (Android)', value: 'firefox' },
-  { name: 'Safari (iOS)', value: 'safari' },
+  {name: 'Chrome (Android)', value: 'chrome'},
+  {name: 'Firefox (Android)', value: 'firefox'},
+  {name: 'Safari (iOS)', value: 'safari'},
 ];
 
 export const MOBILE_BROWSER_QUES: inquirer.QuestionCollection = 
@@ -46,7 +46,7 @@ export const MOBILE_BROWSER_QUES: inquirer.QuestionCollection =
     let devices = MOBILE_BROWSER_CHOICES;
 
     if (process.platform !== 'darwin') {
-      devices = devices.filter((device) => !['ios'].includes(device.value))
+      devices = devices.filter((device) => device.value !== 'safari');
     }
 
     return devices;
@@ -67,10 +67,10 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     name: 'languageRunnerSetup',
     message: 'What is your Language - Test Runner setup?',
     choices: [
-      { name: 'JavaScript - Nightwatch Test Runner', value: 'js-nightwatch' },
-      { name: 'JavaScript - Mocha Test Runner', value: 'js-mocha' },
-      { name: 'JavaScript - CucumberJS Test Runner', value: 'js-cucumber' },
-      { name: 'TypeScript - Nightwatch Test Runner', value: 'ts-nightwatch' }
+      {name: 'JavaScript - Nightwatch Test Runner', value: 'js-nightwatch'},
+      {name: 'JavaScript - Mocha Test Runner', value: 'js-mocha'},
+      {name: 'JavaScript - CucumberJS Test Runner', value: 'js-cucumber'},
+      {name: 'TypeScript - Nightwatch Test Runner', value: 'ts-nightwatch'}
       // {name: 'TypeScript - Mocha Test Runner', value: 'ts-mocha'}
       // {name: 'TypeScript - CucumberJS Test Runner', value: 'ts-cucumber'}
     ],
@@ -89,9 +89,9 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     name: 'backend',
     message: 'Where do you want to run your e2e tests?',
     choices: [
-      { name: 'On my local machine', value: 'local' },
-      { name: 'On a remote machine (cloud)', value: 'remote' },
-      { name: 'Both', value: 'both' }
+      {name: 'On my local machine', value: 'local'},
+      {name: 'On a remote machine (cloud)', value: 'remote'},
+      {name: 'Both', value: 'both'}
     ],
     default: 'local'
   },
@@ -101,9 +101,9 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     name: 'cloudProvider',
     message: '(Remote) Please select your cloud provider:',
     choices: [
-      { name: 'BrowserStack', value: 'browserstack' },
-      { name: 'Sauce Labs', value: 'saucelabs' },
-      { name: 'Other providers or remote selenium-server', value: 'other' }
+      {name: 'BrowserStack', value: 'browserstack'},
+      {name: 'Sauce Labs', value: 'saucelabs'},
+      {name: 'Other providers or remote selenium-server', value: 'other'}
     ],
     when: (answers) => ['remote', 'both'].includes(answers.backend)
   },
@@ -181,8 +181,8 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     name: 'mobile',
     message: "Would you like to test your website on Mobile devices as well?",
     choices: () => [
-      { name: 'Yes', value: true },
-      { name: 'No, skip for now', value: false }
+      {name: 'Yes', value: true},
+      {name: 'No, skip for now', value: false}
     ],
     default: false
   },
@@ -197,8 +197,8 @@ export const CONFIG_DEST_QUES: inquirer.QuestionCollection = [
     message: 'Do you want to overwrite the existing config file?',
     default: false,
     choices: [
-      { name: 'Yes', value: true },
-      { name: 'No, create a new one!', value: false }
+      {name: 'Yes', value: true},
+      {name: 'No, create a new one!', value: false}
     ]
   },
   {
