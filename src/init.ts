@@ -199,6 +199,10 @@ export class NightwatchInit {
         if (!answers.browsers) {
           answers.browsers = BROWSER_CHOICES.map((browser) => browser.value);
         }
+
+        if (!answers.mobileBrowsers) {
+          answers.mobileBrowsers = [];
+        }
   
         answers.seleniumServer = true;
   
@@ -475,13 +479,13 @@ export class NightwatchInit {
   identifyWebdriversToInstall(answers: ConfigGeneratorAnswers): string[] {
     const webdrivers: string[] = [];
 
-    if (answers.browsers?.includes('firefox')) {
+    if (answers.browsers?.includes('firefox') || answers.mobileBrowsers?.includes('firefox')) {
       webdrivers.push('geckodriver');
     }
     if (answers.browsers?.includes('chrome')) {
       webdrivers.push('chromedriver');
     }
-    if (answers.browsers?.includes('safari')) {
+    if (answers.browsers?.includes('safari') || answers.mobileBrowsers?.includes('safari')) {
       webdrivers.push('safaridriver');
     }
 
@@ -817,11 +821,10 @@ export class NightwatchInit {
           colors.red("Android setup failed \n")  + commandMsg));
       } else if (typeof mobile_result.android === 'object' && mobile_result.android.setup === false) {
         Logger.error(boxen(commandMsg));
-      } else  {
-        if (answers.mobileBrowsers?.includes('chrome') || answers.mobileBrowsers?.includes('firefox')) {
+      } else if (answers.mobileBrowsers?.includes('chrome') || answers.mobileBrowsers?.includes('firefox')) {
+          Logger.error('To run example on Android, use command:');
+
           answers.mobileBrowsers?.forEach((browser) => {
-            Logger.error('To run example on Android, use command:');
-  
             if (['chrome', 'firefox'].includes(browser)) {
               envFlag = ` --env android.${browser}`;
   
@@ -836,8 +839,7 @@ export class NightwatchInit {
                 )
               );
             }
-          });
-        }
+         });
       }
     }
 
