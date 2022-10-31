@@ -2,14 +2,9 @@
   "language": "js",
   "runner": "nightwatch",
   "backend": "both",
-  "browsers": [
-    "firefox",
-    "chrome",
-    "selenium-server"
-  ],
-  "cloudProvider": "browserstack",
   "testsLocation": "nightwatch-e2e",
   "baseUrl": "http://localhost",
   "allowAnonymousMetrics": false,
-  "mobile": false
+  "mobile": true,
+  "mobileBrowsers": ["chrome"]
 }
