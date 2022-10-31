@@ -45,7 +45,7 @@
     "ejs": "^3.1.8",
     "inquirer": "^8.2.4",
     "minimist": "^1.2.6",
-    "uuid": "^8.3.2",
-    "nightwatch-mobile-helper": "^0.0.14"
+    "nightwatch-mobile-helper": "^0.0.16",
+    "uuid": "^8.3.2"
   }
 }
