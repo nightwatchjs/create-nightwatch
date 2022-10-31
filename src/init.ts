@@ -11,7 +11,7 @@ import {copy, stripControlChars, symbols} from './utils';
 import Logger from './logger';
 import boxen from 'boxen';
 
-import {CONFIG_INTRO, BROWSER_CHOICES, QUESTIONAIRRE, CONFIG_DEST_QUES, MOBILE_BROWSER_CHOICES} from './constants';
+import {CONFIG_INTRO, QUESTIONAIRRE, CONFIG_DEST_QUES, MOBILE_BROWSER_CHOICES} from './constants';
 import {ConfigGeneratorAnswers, ConfigDestination, OtherInfo, MobileResult} from './interfaces';
 import defaultAnswers from './defaults.json';
 import defaultMobileAnswers from './defaultsMobile.json';
@@ -50,12 +50,17 @@ export class NightwatchInit {
 
     if (this.options?.yes) {
       if (this.options?.mobile) {
-        answers = defaultMobileAnswers as ConfigGeneratorAnswers
-      } else {
+        answers = defaultMobileAnswers as ConfigGeneratorAnswers;
+
         if (this.options?.browser) {
-          defaultAnswers.browsers = this.options.browser;
+          answers.mobileBrowsers = this.options.browser;
         }
+      } else {
         answers = defaultAnswers as ConfigGeneratorAnswers;
+
+        if (this.options?.browser) {
+          answers.browsers = this.options.browser;
+        }
       }
     } else {
       Logger.error(CONFIG_INTRO);
@@ -111,23 +116,24 @@ export class NightwatchInit {
 
     this.generateConfig(answers, configDestPath);
 
-    let mobile_result: MobileResult = {};
-
-    if (answers.mobile) {
-      if (answers.mobileDevice === 'android' || answers.mobileDevice === 'both') {
-        const androidSetup = new AndroidSetup({browsers: answers.mobileBrowsers || ['chrome']}, this.rootDir);
-        mobile_result.android = await androidSetup.run();
+    const mobileResult: MobileResult = {};
+    if (answers.mobile && answers.mobileDevice) {
+      // answers.mobileDevice will be undefined in case of empty or non-matching mobileBrowsers
+      // hence, no need to setup any device.
+      if (['android', 'both'].includes(answers.mobileDevice)) {
+        const androidSetup = new AndroidSetup({browsers: answers.mobileBrowsers || []}, this.rootDir);
+        mobileResult.android = await androidSetup.run();
       }
 
-      if (answers.mobileDevice === 'ios' || answers.mobileDevice === 'both') {
-        const iosSetup = new IosSetup({setup : true, mode: ['simulator']});
-        mobile_result.ios = await iosSetup.run();
+      if (['ios', 'both'].includes(answers.mobileDevice)) {
+        const iosSetup = new IosSetup({setup: true, mode: ['simulator']});
+        mobileResult.ios = await iosSetup.run();
       }
     }
     
     if (!this.onlyConfig) {
       // Post instructions to run their first test
-      this.postSetupInstructions(answers, mobile_result);
+      this.postSetupInstructions(answers, mobileResult);
     } else {
       // Post config instructions
       this.postConfigInstructions(answers);
@@ -143,7 +149,7 @@ export class NightwatchInit {
       rootDir: this.rootDir,
       onlyConfig: this.onlyConfig,
       browsers: this.options?.browser,
-      ...(this.options?.mobile && {mobile: true}),
+      ...(this.options?.mobile && {mobile: true})
     };
 
     return await prompt(QUESTIONAIRRE, answers);
@@ -173,9 +179,11 @@ export class NightwatchInit {
 
       if (!answers.remoteBrowsers) {
         if (answers.browsers) {
+          // we are testing on desktop browsers as well
           // Copy all browsers, except selenium-server (if present)
-          answers.remoteBrowsers = [...answers.browsers].filter((browser) => browser !== 'selenium-server');
+          answers.remoteBrowsers = [...answers.browsers];
         } else {
+          // we are not testing on desktop browsers
           answers.remoteBrowsers = [];
         }
       }
@@ -195,86 +203,43 @@ export class NightwatchInit {
     }
 
     if (backendHasLocal) {
-      if (!answers.browsers) {
-        answers.browsers = [];
-      }
-
-      if (answers.browsers.length) {
+      if (answers.browsers) {
         // we are testing on desktop browsers
+        answers.seleniumServer = true;
 
         // Remove safari from answers.browsers for non-mac users
         if (process.platform !== 'darwin' && answers.browsers.includes('safari')) {
           const pos = answers.browsers.indexOf('safari');
           answers.browsers.splice(pos, 1);
         }
-
-        if (answers.mobile) {
-          if (!answers.mobileBrowsers) {
-            answers.mobileBrowsers = MOBILE_BROWSER_CHOICES
-              .map((browser) => browser.value)
-              .filter((browser) => answers.browsers?.includes(browser));
-          }
-        } else {
-          answers.mobileBrowsers = [];
-        }
-
-        answers.seleniumServer = true;
       } else {
         // we are not testing on desktop browsers
-        if (!answers.mobileBrowsers) {
-          answers.mobileBrowsers = [];
-        }
-
-
-      }
-
-      // Set defaultBrowser
-      if (!answers.defaultBrowser) {
-        answers.defaultBrowser = answers.browsers[0];
-      }
-
-      
-
-
-      if (!this.options.mobile) {
-        if (!answers.browsers) {
-          answers.browsers = BROWSER_CHOICES.map((browser) => browser.value);
-        }
-
-        
-  
-        
-  
-        // Remove safari from answers.browsers for non-mac users
-        if (process.platform !== 'darwin' && answers.browsers.includes('safari')) {
-          const pos = answers.browsers.indexOf('safari');
-          answers.browsers.splice(pos, 1);
-        }
-  
-        // Set defaultBrowser
-        if (!answers.defaultBrowser) {
-          answers.defaultBrowser = answers.browsers[0];
-        }
-      } else {
-        answers.remoteBrowsers = [];
         answers.browsers = [];
       }
 
       if (answers.mobile) {
-        if (!answers.mobileBrowsers) {
-          answers.mobileBrowsers = MOBILE_BROWSER_CHOICES.map((browser) => browser.value);
+        // we are testing on mobile browsers
+        if (answers.mobileBrowsers) {
+          // Remove safari from answers.mobileBrowsers for non-mac users (if present)
+          if (process.platform !== 'darwin' && answers.mobileBrowsers.includes('safari')) {
+            const pos = answers.mobileBrowsers.indexOf('safari');
+            answers.mobileBrowsers.splice(pos, 1);
+          }
+        } else {
+          // copy browsers from `answers.browsers` (safari already removed)
+          // will be empty if `answers.browsers` is empty.
+          answers.mobileBrowsers = MOBILE_BROWSER_CHOICES
+            .map((browserObj) => browserObj.value)
+            .filter((browser) => answers.browsers?.includes(browser));
         }
+      } else {
+        // we are not testing on mobile browsers
+        answers.mobileBrowsers = [];
+      }
 
-        // Remove safari from answers.browsers from non-mac users
-        if (process.platform !== 'darwin' && answers.mobileBrowsers.includes('safari')) {
-          const pos = answers.mobileBrowsers.indexOf('safari');
-          answers.mobileBrowsers.splice(pos, 1);
-        }
-
-        // Set defaultBrowser
-        if (!answers.defaultBrowser && this.options.mobile) {
-          answers.defaultBrowser = answers.mobileBrowsers[0];
-        }
+      // Set defaultBrowser
+      if (!answers.defaultBrowser) {
+        answers.defaultBrowser = answers.browsers[0] || answers.mobileBrowsers[0];
       }
     }
 
@@ -301,7 +266,7 @@ export class NightwatchInit {
         answers.mobileDevice = 'ios';
       }
 
-      if (answers.mobileBrowsers?.some(b => ['chrome', 'firefox'].includes(b))) {
+      if (answers.mobileBrowsers?.some(browser => ['chrome', 'firefox'].includes(browser))) {
         if (answers.mobileDevice === 'ios') {
           answers.mobileDevice = 'both';
         } else {
@@ -852,42 +817,42 @@ export class NightwatchInit {
     }
 
     if (answers.mobileDevice === 'android' || answers.mobileDevice === 'both') {
-      const commandMsg = `Run command to setup ${colors.gray.italic("npx @nightwatch/mobile-helper android --setup")} \n` +
-      `Run command for more help ${colors.gray.italic("npx @nightwatch/mobile-helper android --help")}`;
+      const commandMsg = `Run command to setup ${colors.gray.italic('npx @nightwatch/mobile-helper android --setup')} \n` +
+      `Run command for more help ${colors.gray.italic('npx @nightwatch/mobile-helper android --help')}`;
 
       if (mobile_result.android === false || (typeof mobile_result.android === 'object' && mobile_result.android?.setup === true && mobile_result.android.status === false)) {
         Logger.error(boxen(
-          colors.red("Android setup failed \n")  + commandMsg));
+          colors.red('Android setup failed \n')  + commandMsg));
       } else if (typeof mobile_result.android === 'object' && mobile_result.android.setup === false) {
         Logger.error(boxen(commandMsg));
       } else if (answers.mobileBrowsers?.includes('chrome') || answers.mobileBrowsers?.includes('firefox')) {
-          Logger.error('To run example on Android, use command:');
+        Logger.error('To run example on Android, use command:');
 
-          answers.mobileBrowsers?.forEach((browser) => {
-            if (['chrome', 'firefox'].includes(browser)) {
-              envFlag = ` --env android.${browser}`;
-  
-              Logger.error(
-                colors.cyan(
-                  `  npx nightwatch .${path.sep}${path.join(
-                    this.otherInfo.examplesJsSrc || '',
-                    EXAMPLE_TEST_FOLDER,
-                    'basic',
-                    'ecosia.js'
-                  )}${envFlag}${configFlag}\n`
-                )
-              );
-            }
-         });
+        answers.mobileBrowsers?.forEach((browser) => {
+          if (['chrome', 'firefox'].includes(browser)) {
+            envFlag = ` --env android.${browser}`;
+
+            Logger.error(
+              colors.cyan(
+                `  npx nightwatch .${path.sep}${path.join(
+                  this.otherInfo.examplesJsSrc || '',
+                  EXAMPLE_TEST_FOLDER,
+                  'basic',
+                  'ecosia.js'
+                )}${envFlag}${configFlag}\n`
+              )
+            );
+          }
+        });
       }
     }
 
     if (answers.mobileDevice === 'ios' || answers.mobileDevice === 'both') {
       if (!mobile_result.ios) {
         Logger.error(boxen(
-          colors.red("iOS setup failed \n\n") +
-          `Run command to setup ${colors.gray.italic("npx nightwatch-mobile-helper ios --setup")}` +
-          `\nRun command for more help ${colors.gray.italic("npx nightwatch-mobile-helper ios --help")}`, {padding: 1}
+          colors.red('iOS setup failed \n\n') +
+          `Run command to setup ${colors.gray.italic('npx nightwatch-mobile-helper ios --setup')}` +
+          `\nRun command for more help ${colors.gray.italic('npx nightwatch-mobile-helper ios --help')}`, {padding: 1}
         ));
       } else {
         // envFlag = ` --env ios.real.safari`;
@@ -903,7 +868,7 @@ export class NightwatchInit {
         //   )
         // );
 
-        envFlag = ` --env ios.simulator.safari`;
+        envFlag = ' --env ios.simulator.safari';
         Logger.error('To run example on iOS simulator, run:');
         Logger.error(
           colors.cyan(

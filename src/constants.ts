@@ -34,14 +34,14 @@ export const BROWSER_CHOICES = [
 export const MOBILE_BROWSER_CHOICES = [
   {name: 'Chrome (Android)', value: 'chrome'},
   {name: 'Firefox (Android)', value: 'firefox'},
-  {name: 'Safari (iOS)', value: 'safari'},
+  {name: 'Safari (iOS)', value: 'safari'}
 ];
 
 export const MOBILE_BROWSER_QUES: inquirer.QuestionCollection = 
 {
   type: 'checkbox',
   name: 'mobileBrowsers',
-  message: "Which mobile browsers would you like to test on?",
+  message: 'Which mobile browsers would you like to test on?',
   choices: () => {
     let devices = MOBILE_BROWSER_CHOICES;
 
@@ -56,7 +56,7 @@ export const MOBILE_BROWSER_QUES: inquirer.QuestionCollection =
     return !!value.length || 'Please select at least 1 browser.';
   },
   when: (answers) => answers.mobile && answers.backend !== 'remote'
-}
+};
 
 export const QUESTIONAIRRE: inquirer.QuestionCollection = [
   // answers.rootDir is available to all the questions (passed in Inquirer.prompt()).
