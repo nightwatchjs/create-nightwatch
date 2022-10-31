@@ -6,5 +6,5 @@
   "baseUrl": "http://localhost",
   "allowAnonymousMetrics": false,
   "mobile": true,
-  "mobileBrowsers": ["chrome"]
+  "mobileBrowsers": ["chrome", "firefox", "safari"]
 }
