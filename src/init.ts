@@ -874,8 +874,8 @@ export class NightwatchInit {
         if (!mobileResult.ios) {
           Logger.error(boxen(
             colors.red('iOS setup failed \n\n') +
-            `To setup iOS, run: ${colors.gray.italic('npx nightwatch-mobile-helper ios --setup')}\n` +
-            `For iOS help, run: ${colors.gray.italic('npx nightwatch-mobile-helper ios --help')}`, {padding: 1}
+            `To setup iOS, run: ${colors.gray.italic('npx @nightwatch/mobile-helper ios --setup')}\n` +
+            `For iOS help, run: ${colors.gray.italic('npx @nightwatch/mobile-helper ios --help')}`, {padding: 1}
           ));
         } else {
           // envFlag = ` --env ios.real.safari`;
