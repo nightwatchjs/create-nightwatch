@@ -113,7 +113,7 @@ export class NightwatchInit {
 
     let mobile_result: MobileResult = {};
 
-    if (answers?.mobile) {
+    if (answers.mobile) {
       if (answers.mobileDevice === 'android' || answers.mobileDevice === 'both') {
         const androidSetup = new AndroidSetup({browsers: answers.mobileBrowsers || ['chrome']}, this.rootDir);
         mobile_result.android = await androidSetup.run();
@@ -302,11 +302,11 @@ export class NightwatchInit {
       }
 
       if (answers.mobileBrowsers?.some(b => ['chrome', 'firefox'].includes(b))) {
-        answers.mobileDevice = 'android';
-      }
-
-      if (['chrome', 'firefox', 'safari'].every(b => answers.mobileBrowsers?.includes(b))) {
-        answers.mobileDevice = 'both';
+        if (answers.mobileDevice === 'ios') {
+          answers.mobileDevice = 'both';
+        } else {
+          answers.mobileDevice = 'android';
+        }
       }
     }
   }

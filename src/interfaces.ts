@@ -1,3 +1,5 @@
+import {AndroidSetup} from 'nightwatch-mobile-helper';
+
 export interface ConfigGeneratorAnswers {
   rootDir?: string;
   onlyConfig?: boolean;
@@ -42,11 +44,7 @@ export interface OtherInfo {
   nonDefaultConfigName?: string;
 }
 
-export interface AndroidResultSetup {
-  status: boolean;
-  setup: boolean;
-}
 export interface MobileResult {
-  android?: AndroidResultSetup | boolean;
+  android?: Awaited<ReturnType<AndroidSetup['run']>>;
   ios?: boolean
 };
