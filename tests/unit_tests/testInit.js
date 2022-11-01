@@ -864,6 +864,7 @@ describe('init tests', () => {
         language: 'js',
         backend: 'local',
         browsers: ['chrome', 'firefox'],
+        mobileBrowsers: [],
         defaultBrowser: 'firefox',
         allowAnonymousMetrics: false
       };
@@ -887,7 +888,7 @@ describe('init tests', () => {
       fs.unlinkSync('test_config.conf.js');
     });
 
-    test('generateConfig with js and same testsLocation and examplesLocation', () => {
+    test('generateConfig with js (local with mobile) and same testsLocation and examplesLocation', () => {
       mockery.registerMock(
         './logger',
         class {
@@ -899,11 +900,13 @@ describe('init tests', () => {
         language: 'js',
         backend: 'local',
         browsers: ['chrome', 'firefox'],
+        mobileBrowsers: ['chrome', 'firefox'],
         defaultBrowser: 'firefox',
         testsLocation: 'tests',
         addExamples: true,
         examplesLocation: 'tests',
-        allowAnonymousMetrics: false
+        allowAnonymousMetrics: false,
+        mobile: true
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -919,8 +922,48 @@ describe('init tests', () => {
       assert.deepEqual(config.page_objects_path, ['tests/page-objects']);
       assert.deepEqual(config.custom_commands_path, ['tests/custom-commands']);
       assert.deepEqual(config.custom_assertions_path, ['tests/custom-assertions']);
-      assert.deepEqual(Object.keys(config.test_settings), ['default', 'firefox', 'chrome']);
+      assert.deepEqual(Object.keys(config.test_settings), ['default', 'firefox', 'chrome', 'android.firefox', 'android.chrome']);
       assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox');
+
+      fs.unlinkSync('test_config.conf.js');
+    });
+
+    test('generateConfig with js (local with mobile) with mobile flag', () => {
+      mockery.registerMock(
+        './logger',
+        class {
+          static error() {}
+        }
+      );
+
+      const answers = {
+        language: 'js',
+        backend: 'local',
+        browsers: [],
+        mobileBrowsers: ['chrome', 'firefox', 'safari'],
+        defaultBrowser: 'chrome',
+        testsLocation: 'tests',
+        addExamples: true,
+        examplesLocation: 'tests',
+        allowAnonymousMetrics: false,
+        mobile: true
+      };
+
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, []);
+
+      nightwatchInit.generateConfig(answers, 'test_config.conf.js');
+      const config = require('../../test_config.conf.js');
+
+      assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
+      assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'tests');
+
+      assert.deepEqual(config.src_folders, ['tests/examples']);
+      assert.deepEqual(config.page_objects_path, ['tests/page-objects']);
+      assert.deepEqual(config.custom_commands_path, ['tests/custom-commands']);
+      assert.deepEqual(config.custom_assertions_path, ['tests/custom-assertions']);
+      assert.deepEqual(Object.keys(config.test_settings), ['default', 'android.firefox', 'android.chrome', 'ios.real.safari', 'ios.simulator.safari']);
+      assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
 
       fs.unlinkSync('test_config.conf.js');
     });
@@ -939,6 +982,7 @@ describe('init tests', () => {
         cloudProvider: 'other',
         browsers: ['chrome'],
         remoteBrowsers: ['chrome', 'firefox'],
+        mobileBrowsers: [],
         defaultBrowser: 'chrome',
         remoteName: 'remote',
         remoteEnv: {
@@ -998,6 +1042,7 @@ describe('init tests', () => {
         cloudProvider: 'saucelabs',
         browsers: ['chrome'],
         remoteBrowsers: ['chrome', 'firefox'],
+        mobileBrowsers: [],
         defaultBrowser: 'chrome',
         remoteName: 'saucelabs',
         remoteEnv: {
@@ -1044,7 +1089,7 @@ describe('init tests', () => {
       fs.unlinkSync('test_config.conf.js');
     });
 
-    test('generateConfig with js with cucumber and different testsLocation and examplesLocation', () => {
+    test('generateConfig with js with cucumber (both and mobile with mobile flag) and different testsLocation and examplesLocation', () => {
       mockery.registerMock(
         './logger',
         class {
@@ -1052,25 +1097,28 @@ describe('init tests', () => {
         }
       );
 
+      // can be converted to sauce once we have sauce mobile configs
       const answers = {
         language: 'js',
         runner: 'cucumber',
         backend: 'both',
-        cloudProvider: 'saucelabs',
-        browsers: ['chrome'],
-        remoteBrowsers: ['chrome', 'firefox'],
+        cloudProvider: 'browserstack',
+        browsers: [],
+        remoteBrowsers: [],
+        mobileBrowsers: ['chrome', 'firefox'],
+        mobileRemote: true,
         defaultBrowser: 'chrome',
-        remoteName: 'saucelabs',
+        remoteName: 'browserstack',
         remoteEnv: {
-          username: 'SAUCE_USERNAME',
-          access_key: 'SAUCE_ACCESS_KEY'
+          username: 'BROWSERSTACK_USERNAME',
+          access_key: 'BROWSERSTACK_ACCESS_KEY'
         },
-        seleniumServer: true,
         testsLocation: 'tests',
         featurePath: path.join('tests', 'features'),
         addExamples: true,
         examplesLocation: path.join('tests', 'features', 'nightwatch-examples'),
-        allowAnonymousMetrics: false
+        allowAnonymousMetrics: false,
+        mobile: true
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1088,25 +1136,26 @@ describe('init tests', () => {
       assert.deepEqual(config.custom_assertions_path, []);
       assert.deepEqual(Object.keys(config.test_settings), [
         'default',
-        'chrome',
-        'saucelabs',
-        'saucelabs.chrome',
-        'saucelabs.firefox',
-        'selenium_server',
-        'selenium.chrome'
+        'android.firefox',
+        'android.chrome',
+        'browserstack',
+        'browserstack.local',
+        'browserstack.android.chrome',
+        'browserstack.android.firefox',
+        'browserstack.ios.safari'
       ]);
       assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
       assert.strictEqual(config.test_settings.default.test_runner.type, 'cucumber');
       assert.strictEqual(config.test_settings.default.test_runner.options.feature_path, 'tests/features');
-      assert.strictEqual(config.test_settings.saucelabs.selenium.host, 'ondemand.saucelabs.com');
-      assert.strictEqual(config.test_settings.saucelabs.selenium.port, 443);
-      assert.strictEqual(config.test_settings.saucelabs.desiredCapabilities['sauce:options'].username, '${SAUCE_USERNAME}');
-      assert.strictEqual(config.test_settings.saucelabs.desiredCapabilities['sauce:options'].accessKey, '${SAUCE_ACCESS_KEY}');
+      assert.strictEqual(config.test_settings.browserstack.selenium.host, 'hub.browserstack.com');
+      assert.strictEqual(config.test_settings.browserstack.selenium.port, 443);
+      assert.strictEqual(config.test_settings.browserstack.desiredCapabilities['bstack:options'].userName, '${BROWSERSTACK_USERNAME}');
+      assert.strictEqual(config.test_settings.browserstack.desiredCapabilities['bstack:options'].accessKey, '${BROWSERSTACK_ACCESS_KEY}');
 
       fs.unlinkSync('test_config.conf.js');
     });
 
-    test('generateConfig with ts with testsLocation and examplesLocation', () => {
+    test('generateConfig with ts (remote with mobile) with testsLocation and examplesLocation', () => {
       mockery.registerMock(
         './logger',
         class {
@@ -1120,6 +1169,7 @@ describe('init tests', () => {
         cloudProvider: 'browserstack',
         browsers: ['chrome'],
         remoteBrowsers: ['chrome', 'firefox'],
+        mobileRemote: true,
         defaultBrowser: 'chrome',
         remoteName: 'browserstack',
         remoteEnv: {
@@ -1129,7 +1179,8 @@ describe('init tests', () => {
         testsLocation: 'tests',
         addExamples: true,
         examplesLocation: 'nightwatch-examples',
-        allowAnonymousMetrics: false
+        allowAnonymousMetrics: false,
+        mobile: true
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1153,7 +1204,10 @@ describe('init tests', () => {
         'browserstack.chrome',
         'browserstack.firefox',
         'browserstack.local_chrome',
-        'browserstack.local_firefox'
+        'browserstack.local_firefox',
+        'browserstack.android.chrome',
+        'browserstack.android.firefox',
+        'browserstack.ios.safari'
       ]);
       assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
       assert.strictEqual(config.test_settings.browserstack.selenium.host, 'hub.browserstack.com');
@@ -1186,6 +1240,7 @@ describe('init tests', () => {
         language: 'js',
         backend: 'local',
         browsers: ['chrome', 'firefox'],
+        mobileBrowsers: [],
         defaultBrowser: 'firefox',
         allowAnonymousMetrics: false
       };
@@ -1218,6 +1273,7 @@ describe('init tests', () => {
         language: 'js',
         backend: 'local',
         browsers: ['chrome', 'firefox'],
+        mobileBrowsers: [],
         defaultBrowser: 'firefox',
         allowAnonymousMetrics: true
       };
