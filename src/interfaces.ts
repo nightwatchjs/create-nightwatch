@@ -1,4 +1,4 @@
-import {AndroidSetup} from '@nightwatch/mobile-helper';
+import {AndroidSetup, IosSetup} from '@nightwatch/mobile-helper';
 
 export interface ConfigGeneratorAnswers {
   rootDir?: string;
@@ -46,5 +46,5 @@ export interface OtherInfo {
 
 export interface MobileResult {
   android?: Awaited<ReturnType<AndroidSetup['run']>>;
-  ios?: boolean
-};
+  ios?: Awaited<ReturnType<IosSetup['run']>>;
+}

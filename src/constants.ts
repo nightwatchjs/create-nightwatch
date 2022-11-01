@@ -179,7 +179,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
   {
     type: 'list',
     name: 'mobile',
-    message: "Would you like to test your website on Mobile devices as well?",
+    message: 'Would you like to test your website on Mobile devices as well?',
     choices: () => [
       {name: 'Yes', value: true},
       {name: 'No, skip for now', value: false}
