@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'node:fs';
 import path from 'path';
 import ejs from 'ejs';
 import colors from 'ansi-colors';

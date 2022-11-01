@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'node:fs';
 import path from 'path';
 import {execSync} from 'child_process';
 import colors from 'ansi-colors';

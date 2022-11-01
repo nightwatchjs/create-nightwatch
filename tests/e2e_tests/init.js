@@ -1,6 +1,6 @@
 const assert = require('assert');
 const mockery = require('mockery');
-const fs = require('fs');
+const fs = require('node:fs');
 const path = require('path');
 const {execSync} = require('child_process');
 const {rmDirSync} = require('../../lib/utils');

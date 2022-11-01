@@ -1,6 +1,6 @@
 const assert = require('assert');
 const mockery = require('mockery');
-const fs = require('fs');
+const fs = require('node:fs');
 const path = require('path');
 
 const rootDir = path.join(process.cwd(), 'test_output');
@@ -51,7 +51,7 @@ describe('init tests', () => {
     });
 
     test('with just both in answers', () => {
-      mockery.registerMock('fs', {
+      mockery.registerMock('node:fs', {
         existsSync: () => false
       });
 
@@ -87,7 +87,7 @@ describe('init tests', () => {
     });
 
     test('with local and testsLocation (non-existent) in answers', () => {
-      mockery.registerMock('fs', {
+      mockery.registerMock('node:fs', {
         existsSync: () => false
       });
 
@@ -119,7 +119,7 @@ describe('init tests', () => {
     });
 
     test('with remote (browserstack) and testsLocation (exist but empty) in answers', () => {
-      mockery.registerMock('fs', {
+      mockery.registerMock('node:fs', {
         existsSync: () => true,
         readdirSync: () => []
       });
@@ -157,7 +157,7 @@ describe('init tests', () => {
     });
 
     test('with remote (saucelabs) and testsLocation (exist and non-empty) in answers', () => {
-      mockery.registerMock('fs', {
+      mockery.registerMock('node:fs', {
         existsSync: () => true,
         readdirSync: () => ['file.txt']
       });
@@ -195,7 +195,7 @@ describe('init tests', () => {
     });
 
     test('with remote (other) in answers and onlyConfig flag', () => {
-      mockery.registerMock('fs', {
+      mockery.registerMock('node:fs', {
         existsSync: () => false
       });
 
@@ -278,7 +278,7 @@ describe('init tests', () => {
     });
 
     test('correct packages are installed with ts-mocha-seleniumServer', () => {
-      mockery.registerMock('fs', {
+      mockery.registerMock('node:fs', {
         readFileSync(path, encoding) {
           return `{
             "devDependencies": {
@@ -307,7 +307,7 @@ describe('init tests', () => {
     });
 
     test('correct packages are installed with js-cucumber', () => {
-      mockery.registerMock('fs', {
+      mockery.registerMock('node:fs', {
         readFileSync(path, encoding) {
           return `{
             "dependencies": {
@@ -335,7 +335,7 @@ describe('init tests', () => {
     });
 
     test('correct packages are installed with ts-cucumber-seleniumServer without initial packages', () => {
-      mockery.registerMock('fs', {
+      mockery.registerMock('node:fs', {
         readFileSync(path, encoding) {
           return '{}';
         }
@@ -427,7 +427,7 @@ describe('init tests', () => {
     test('with both tsconfig not present', () => {
       let nwTsconfigCopied = false;
 
-      mockery.registerMock('fs', {
+      mockery.registerMock('node:fs', {
         existsSync() {
           return false;
         },
@@ -458,7 +458,7 @@ describe('init tests', () => {
     test('with both tsconfig already present', () => {
       let nwTsconfigCopied = false;
 
-      mockery.registerMock('fs', {
+      mockery.registerMock('node:fs', {
         existsSync() {
           return true;
         },
@@ -487,7 +487,7 @@ describe('init tests', () => {
     test('with tsconfig.nightwatch.json already present', () => {
       let nwTsconfigCopied = false;
 
-      mockery.registerMock('fs', {
+      mockery.registerMock('node:fs', {
         existsSync(path) {
           if (path.endsWith('tsconfig.nightwatch.json')) {
             return true;
@@ -542,7 +542,7 @@ describe('init tests', () => {
         }
       );
 
-      mockery.registerMock('fs', {
+      mockery.registerMock('node:fs', {
         existsSync(path) {
           return false;
         }
@@ -570,7 +570,7 @@ describe('init tests', () => {
         }
       );
 
-      mockery.registerMock('fs', {
+      mockery.registerMock('node:fs', {
         existsSync(path) {
           return true;
         }
@@ -605,7 +605,7 @@ describe('init tests', () => {
         }
       );
 
-      mockery.registerMock('fs', {
+      mockery.registerMock('node:fs', {
         existsSync(path) {
           return true;
         }
