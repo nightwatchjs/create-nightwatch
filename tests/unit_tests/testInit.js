@@ -17,7 +17,7 @@ describe('init tests', () => {
       mockery.disable();
     });
 
-    test('if answers passed to inquirer prompt contains rootDir and onlyConfig', async (done) => {
+    test('if answers passed to inquirer contains rootDir and onlyConfig by default', async () => {
       mockery.registerMock('inquirer', {
         async prompt(questions, answers) {
           return answers;
@@ -25,17 +25,55 @@ describe('init tests', () => {
       });
 
       const {NightwatchInit} = require('../../lib/init');
-      const nightwatchInit = new NightwatchInit(rootDir, []);
+      const nightwatchInit = new NightwatchInit(rootDir, {});
+      const answers = await nightwatchInit.askQuestions();
+
+      assert.deepStrictEqual(Object.keys(answers), ['rootDir', 'onlyConfig', 'browsers']);
+
+      assert.strictEqual(answers['rootDir'], rootDir);
+      assert.strictEqual(answers['onlyConfig'], false);
+      assert.strictEqual(answers['browsers'], undefined);
+    });
+
+    test('if answers passed to inquirer also contains browsers and mobile when flags passed', async () => {
+      mockery.registerMock('inquirer', {
+        async prompt(questions, answers) {
+          return answers;
+        }
+      });
+
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, {browser: ['firefox'], mobile: true, 'generate-config': true});
+      // marking it here because nightwatchInit.run is not run
       nightwatchInit.onlyConfig = true;
       const answers = await nightwatchInit.askQuestions();
 
-      assert.strictEqual('rootDir' in answers, true);
-      assert.strictEqual('onlyConfig' in answers, true);
+      assert.deepStrictEqual(Object.keys(answers), ['rootDir', 'onlyConfig', 'browsers', 'mobile']);
 
-      assert.equal(answers['rootDir'], rootDir);
-      assert.equal(answers['onlyConfig'], true);
+      assert.strictEqual(answers['rootDir'], rootDir);
+      assert.strictEqual(answers['onlyConfig'], true);
+      assert.deepStrictEqual(answers['browsers'], ['firefox']);
+      assert.strictEqual(answers['mobile'], true);
+    });
 
-      done();
+    test('if answers passed to inquirer contains correct property when mobile flag passed with wrong type', async () => {
+      mockery.registerMock('inquirer', {
+        async prompt(questions, answers) {
+          return answers;
+        }
+      });
+
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, {browser: ['firefox'], mobile: 'random'});
+      const answers = await nightwatchInit.askQuestions();
+
+      
+      assert.deepStrictEqual(Object.keys(answers), ['rootDir', 'onlyConfig', 'browsers', 'mobile']);
+
+      assert.strictEqual(answers['rootDir'], rootDir);
+      assert.strictEqual(answers['onlyConfig'], false);
+      assert.deepStrictEqual(answers['browsers'], ['firefox']);
+      assert.strictEqual(answers['mobile'], true);
     });
   });
 
@@ -62,6 +100,10 @@ describe('init tests', () => {
       nightwatchInit.refineAnswers(answers);
       assert.strictEqual('browsers' in answers, true);
       assert.strictEqual('remoteBrowsers' in answers, true);
+      assert.strictEqual('mobile' in answers, false);
+      assert.strictEqual('mobileBrowsers' in answers, true);
+      assert.strictEqual('mobileRemote' in answers, false);
+      assert.strictEqual('mobileDevice' in answers, false);
       assert.strictEqual('defaultBrowser' in answers, true);
       assert.strictEqual('cloudProvider' in answers, false);
       assert.strictEqual('remoteName' in answers, true);
@@ -71,22 +113,19 @@ describe('init tests', () => {
       assert.strictEqual('addExamples' in answers, true);
       assert.strictEqual('examplesLocation' in answers, true);
 
-      const browsers = ['firefox', 'chrome', 'edge', 'safari'];
-      assert.deepEqual(answers['remoteBrowsers'], browsers);
-      if (process.platform !== 'darwin') {browsers.splice(3, 1)}
-      assert.deepEqual(answers['browsers'], browsers);
-
+      assert.deepEqual(answers['browsers'], []);
+      assert.deepEqual(answers['remoteBrowsers'], []);
+      assert.deepEqual(answers['mobileBrowsers'], []);
       assert.strictEqual(answers['remoteName'], undefined);
       assert.strictEqual(answers['remoteEnv'].username, 'REMOTE_USERNAME');
       assert.strictEqual(answers['remoteEnv'].access_key, 'REMOTE_ACCESS_KEY');
-      assert.strictEqual(answers['defaultBrowser'], 'firefox');
+      assert.strictEqual(answers['defaultBrowser'], 'chrome');
       assert.strictEqual(answers['testsLocation'], 'nightwatch-e2e');
       assert.strictEqual(answers['addExamples'], true);
       assert.strictEqual(answers['examplesLocation'], 'nightwatch');
-      assert.strictEqual(answers['seleniumServer'], undefined);
     });
 
-    test('with local and testsLocation (non-existent) in answers', () => {
+    test('with local and no mobile and testsLocation (non-existent) in answers', () => {
       mockery.registerMock('node:fs', {
         existsSync: () => false
       });
@@ -96,12 +135,105 @@ describe('init tests', () => {
 
       let answers = {
         backend: 'local',
-        browsers: ['firefox', 'chrome', 'edge'],
+        browsers: ['firefox', 'chrome', 'edge', 'safari'],
         testsLocation: 'tests'
       };
       nightwatchInit.refineAnswers(answers);
       assert.strictEqual('browsers' in answers, true);
       assert.strictEqual('remoteBrowsers' in answers, false);
+      assert.strictEqual('mobile' in answers, false);
+      assert.strictEqual('mobileBrowsers' in answers, true);
+      assert.strictEqual('mobileRemote' in answers, false);
+      assert.strictEqual('mobileDevice' in answers, false);
+      assert.strictEqual('defaultBrowser' in answers, true);
+      assert.strictEqual('cloudProvider' in answers, false);
+      assert.strictEqual('remoteName' in answers, false);
+      assert.strictEqual('remoteEnv' in answers, false);
+      assert.strictEqual('testsLocation' in answers, true);
+      assert.strictEqual('addExamples' in answers, true);
+      assert.strictEqual('examplesLocation' in answers, true);
+      assert.strictEqual('seleniumServer' in answers, true);
+
+      const browsers = ['firefox', 'chrome', 'edge', 'safari'];
+      if (process.platform !== 'darwin') {browsers.splice(3, 1)}
+      assert.deepEqual(answers['browsers'], browsers);
+
+      assert.deepEqual(answers['mobileBrowsers'], []);
+      assert.strictEqual(answers['defaultBrowser'], 'firefox');
+      assert.strictEqual(answers['testsLocation'], 'tests');
+      assert.strictEqual(answers['addExamples'], true);
+      assert.strictEqual(answers['examplesLocation'], 'nightwatch');
+      assert.strictEqual(answers['seleniumServer'], true);
+    });
+
+    test('with local and mobile with no mobileBrowsers', () => {
+      mockery.registerMock('node:fs', {
+        existsSync: () => false
+      });
+
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, []);
+
+      let answers = {
+        backend: 'local',
+        browsers: ['chrome', 'firefox', 'edge', 'safari'],
+        mobile: true
+      };
+      nightwatchInit.refineAnswers(answers);
+      assert.strictEqual('browsers' in answers, true);
+      assert.strictEqual('remoteBrowsers' in answers, false);
+      assert.strictEqual('mobile' in answers, true);
+      assert.strictEqual('mobileBrowsers' in answers, true);
+      assert.strictEqual('mobileRemote' in answers, false);
+      assert.strictEqual('mobileDevice' in answers, true);
+      assert.strictEqual('defaultBrowser' in answers, true);
+      assert.strictEqual('cloudProvider' in answers, false);
+      assert.strictEqual('remoteName' in answers, false);
+      assert.strictEqual('remoteEnv' in answers, false);
+      assert.strictEqual('testsLocation' in answers, true);
+      assert.strictEqual('addExamples' in answers, true);
+      assert.strictEqual('examplesLocation' in answers, true);
+      assert.strictEqual('seleniumServer' in answers, true);
+
+      const browsers = ['chrome', 'firefox', 'edge', 'safari'];
+      if (process.platform !== 'darwin') {browsers.splice(3, 1)}
+      assert.deepEqual(answers['browsers'], browsers);
+
+      const mobileBrowsers = ['chrome', 'firefox', 'safari'];
+      if (process.platform !== 'darwin') {mobileBrowsers.splice(2, 1)}
+      assert.deepEqual(answers['mobileBrowsers'], mobileBrowsers);
+
+      assert.strictEqual(answers['defaultBrowser'], 'chrome');
+      assert.strictEqual(answers['testsLocation'], 'nightwatch-e2e');
+      assert.strictEqual(answers['addExamples'], true);
+      assert.strictEqual(answers['examplesLocation'], 'nightwatch');
+      assert.strictEqual(answers['seleniumServer'], true);
+      if (process.platform === 'darwin') {
+        assert.strictEqual(answers['mobileDevice'], 'both');
+      } else {
+        assert.strictEqual(answers['mobileDevice'], 'android');
+      }
+    });
+
+    test('with local and mobile with mobile flag', () => {
+      mockery.registerMock('node:fs', {
+        existsSync: () => false
+      });
+
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, []);
+
+      let answers = {
+        backend: 'local',
+        mobileBrowsers: ['safari'],
+        mobile: true
+      };
+      nightwatchInit.refineAnswers(answers);
+      assert.strictEqual('browsers' in answers, true);
+      assert.strictEqual('remoteBrowsers' in answers, false);
+      assert.strictEqual('mobile' in answers, true);
+      assert.strictEqual('mobileBrowsers' in answers, true);
+      assert.strictEqual('mobileRemote' in answers, false);
       assert.strictEqual('defaultBrowser' in answers, true);
       assert.strictEqual('cloudProvider' in answers, false);
       assert.strictEqual('remoteName' in answers, false);
@@ -111,11 +243,20 @@ describe('init tests', () => {
       assert.strictEqual('examplesLocation' in answers, true);
       assert.strictEqual('seleniumServer' in answers, false);
 
-      assert.deepEqual(answers['browsers'], ['firefox', 'chrome', 'edge']);
-      assert.strictEqual(answers['defaultBrowser'], 'firefox');
-      assert.strictEqual(answers['testsLocation'], 'tests');
+      assert.deepEqual(answers['browsers'], []);
+      assert.strictEqual(answers['testsLocation'], 'nightwatch-e2e');
       assert.strictEqual(answers['addExamples'], true);
       assert.strictEqual(answers['examplesLocation'], 'nightwatch');
+      if (process.platform === 'darwin') {
+        assert.deepEqual(answers['mobileBrowsers'], ['safari']);
+        assert.strictEqual(answers['defaultBrowser'], 'safari');
+        assert.strictEqual('mobileDevice' in answers, true);
+        assert.strictEqual(answers['mobileDevice'], 'ios');
+      } else {
+        assert.deepEqual(answers['mobileBrowsers'], []);
+        assert.strictEqual(answers['defaultBrowser'], 'chrome');
+        assert.strictEqual('mobileDevice' in answers, false);
+      }
     });
 
     test('with remote (browserstack) and testsLocation (exist but empty) in answers', () => {
@@ -136,6 +277,11 @@ describe('init tests', () => {
       nightwatchInit.refineAnswers(answers);
       assert.strictEqual('browsers' in answers, false);
       assert.strictEqual('remoteBrowsers' in answers, true);
+      assert.strictEqual('mobile' in answers, false);
+      assert.strictEqual('mobileBrowsers' in answers, false);
+      assert.strictEqual('mobileRemote' in answers, false);
+      assert.strictEqual('mobileDevice' in answers, false);
+      assert.strictEqual('defaultBrowser' in answers, true);
       assert.strictEqual('defaultBrowser' in answers, true);
       assert.strictEqual('cloudProvider' in answers, true);
       assert.strictEqual('remoteName' in answers, true);
@@ -156,7 +302,7 @@ describe('init tests', () => {
       assert.strictEqual(answers['examplesLocation'], 'nightwatch');
     });
 
-    test('with remote (saucelabs) and testsLocation (exist and non-empty) in answers', () => {
+    test('with remote (saucelabs) and mobile and testsLocation (exist and non-empty) in answers', () => {
       mockery.registerMock('node:fs', {
         existsSync: () => true,
         readdirSync: () => ['file.txt']
@@ -169,11 +315,16 @@ describe('init tests', () => {
         backend: 'remote',
         cloudProvider: 'saucelabs',
         browsers: ['firefox', 'chrome', 'safari'],
-        testsLocation: 'tests'
+        testsLocation: 'tests',
+        mobile: true
       };
       nightwatchInit.refineAnswers(answers);
       assert.strictEqual('browsers' in answers, false);
       assert.strictEqual('remoteBrowsers' in answers, true);
+      assert.strictEqual('mobile' in answers, true);
+      assert.strictEqual('mobileBrowsers' in answers, false);
+      assert.strictEqual('mobileRemote' in answers, true);
+      assert.strictEqual('mobileDevice' in answers, false);
       assert.strictEqual('defaultBrowser' in answers, true);
       assert.strictEqual('cloudProvider' in answers, true);
       assert.strictEqual('remoteName' in answers, true);
@@ -183,7 +334,8 @@ describe('init tests', () => {
       assert.strictEqual('examplesLocation' in answers, true);
       assert.strictEqual('seleniumServer' in answers, false);
 
-      assert.deepEqual(answers['remoteBrowsers'], ['firefox', 'chrome', 'safari']);
+      assert.deepStrictEqual(answers['remoteBrowsers'], ['firefox', 'chrome', 'safari']);
+      assert.strictEqual(answers['mobileRemote'], true);
       assert.strictEqual(answers['defaultBrowser'], 'firefox');
       assert.strictEqual(answers['cloudProvider'], 'saucelabs');
       assert.strictEqual(answers['remoteName'], 'saucelabs');
@@ -194,7 +346,7 @@ describe('init tests', () => {
       assert.strictEqual(answers['examplesLocation'], 'nightwatch');
     });
 
-    test('with remote (other) in answers and onlyConfig flag', () => {
+    test('with remote (other) in answers and onlyConfig flag and mobile with mobile flag', () => {
       mockery.registerMock('node:fs', {
         existsSync: () => false
       });
@@ -205,14 +357,18 @@ describe('init tests', () => {
       let answers = {
         backend: 'remote',
         cloudProvider: 'other',
-        browsers: ['firefox', 'chrome', 'edge'],
-        testsLocation: 'tests'
+        testsLocation: 'tests',
+        mobile: true
       };
       nightwatchInit.onlyConfig = true;
 
       nightwatchInit.refineAnswers(answers);
       assert.strictEqual('browsers' in answers, false);
       assert.strictEqual('remoteBrowsers' in answers, true);
+      assert.strictEqual('mobile' in answers, true);
+      assert.strictEqual('mobileBrowsers' in answers, false);
+      assert.strictEqual('mobileRemote' in answers, true);
+      assert.strictEqual('mobileDevice' in answers, false);
       assert.strictEqual('defaultBrowser' in answers, true);
       assert.strictEqual('cloudProvider' in answers, true);
       assert.strictEqual('remoteName' in answers, true);
@@ -221,8 +377,9 @@ describe('init tests', () => {
       assert.strictEqual('addExamples' in answers, false);
       assert.strictEqual('examplesLocation' in answers, false);
 
-      assert.deepEqual(answers['remoteBrowsers'], ['firefox', 'chrome', 'edge']);
-      assert.strictEqual(answers['defaultBrowser'], 'firefox');
+      assert.deepEqual(answers['remoteBrowsers'], []);
+      assert.strictEqual(answers['mobileRemote'], true);
+      assert.strictEqual(answers['defaultBrowser'], 'chrome');
       assert.strictEqual(answers['cloudProvider'], 'other');
       assert.strictEqual(answers['remoteName'], 'remote');
       assert.strictEqual(answers['remoteEnv'].username, 'REMOTE_USERNAME');
@@ -237,12 +394,16 @@ describe('init tests', () => {
         backend: 'both',
         cloudProvider: 'other',
         runner: 'cucumber',
-        browsers: ['firefox', 'chrome', 'edge', 'selenium-server'],
+        browsers: ['firefox', 'chrome', 'edge'],
         testsLocation: 'tests'
       };
       nightwatchInit.refineAnswers(answers);
       assert.strictEqual('browsers' in answers, true);
       assert.strictEqual('remoteBrowsers' in answers, true);
+      assert.strictEqual('mobile' in answers, false);
+      assert.strictEqual('mobileBrowsers' in answers, true);
+      assert.strictEqual('mobileRemote' in answers, false);
+      assert.strictEqual('mobileDevice' in answers, false);
       assert.strictEqual('defaultBrowser' in answers, true);
       assert.strictEqual('cloudProvider' in answers, true);
       assert.strictEqual('remoteName' in answers, true);
@@ -254,12 +415,60 @@ describe('init tests', () => {
 
       assert.deepEqual(answers['browsers'], ['firefox', 'chrome', 'edge']);
       assert.deepEqual(answers['remoteBrowsers'], ['firefox', 'chrome', 'edge']);
+      assert.deepEqual(answers['mobileBrowsers'], []);
       assert.strictEqual(answers['defaultBrowser'], 'firefox');
       assert.strictEqual(answers['cloudProvider'], 'other');
       assert.strictEqual(answers['remoteName'], 'remote');
       assert.strictEqual(answers['remoteEnv'].username, 'REMOTE_USERNAME');
       assert.strictEqual(answers['remoteEnv'].access_key, 'REMOTE_ACCESS_KEY');
       assert.strictEqual(answers['seleniumServer'], true);
+      assert.strictEqual(answers['testsLocation'], 'tests');
+      assert.strictEqual(answers['addExamples'], true);
+      assert.strictEqual(answers['examplesLocation'], 'nightwatch');
+    });
+
+    test('with both (remote - other) and mobile with mobile flag', () => {
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, []);
+
+      let answers = {
+        backend: 'both',
+        cloudProvider: 'other',
+        mobileBrowsers: ['firefox', 'chrome', 'safari'],
+        testsLocation: 'tests',
+        mobile: true
+      };
+      nightwatchInit.refineAnswers(answers);
+      assert.strictEqual('browsers' in answers, true);
+      assert.strictEqual('remoteBrowsers' in answers, true);
+      assert.strictEqual('mobile' in answers, true);
+      assert.strictEqual('mobileBrowsers' in answers, true);
+      assert.strictEqual('mobileRemote' in answers, true);
+      assert.strictEqual('mobileDevice' in answers, true);
+      assert.strictEqual('defaultBrowser' in answers, true);
+      assert.strictEqual('cloudProvider' in answers, true);
+      assert.strictEqual('remoteName' in answers, true);
+      assert.strictEqual('remoteEnv' in answers, true);
+      assert.strictEqual('seleniumServer' in answers, false);
+      assert.strictEqual('testsLocation' in answers, true);
+      assert.strictEqual('addExamples' in answers, true);
+      assert.strictEqual('examplesLocation' in answers, true);
+
+      assert.deepStrictEqual(answers['browsers'], []);
+      assert.deepStrictEqual(answers['remoteBrowsers'], []);
+      if (process.platform === 'darwin') {
+        assert.deepStrictEqual(answers['mobileBrowsers'], ['firefox', 'chrome', 'safari']);
+        assert.strictEqual(answers['mobileDevice'], 'both');
+      } else {
+        assert.deepStrictEqual(answers['mobileBrowsers'], ['firefox', 'chrome']);
+        assert.strictEqual(answers['mobileDevice'], 'android');
+      }
+      assert.strictEqual(answers['mobileRemote'], true);
+      assert.strictEqual(answers['defaultBrowser'], 'firefox');
+      assert.strictEqual(answers['cloudProvider'], 'other');
+      assert.strictEqual(answers['remoteName'], 'remote');
+      assert.strictEqual(answers['remoteEnv'].username, 'REMOTE_USERNAME');
+      assert.strictEqual(answers['remoteEnv'].access_key, 'REMOTE_ACCESS_KEY');
       assert.strictEqual(answers['testsLocation'], 'tests');
       assert.strictEqual(answers['addExamples'], true);
       assert.strictEqual(answers['examplesLocation'], 'nightwatch');
