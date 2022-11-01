@@ -126,7 +126,7 @@ export class NightwatchInit {
       }
 
       if (['ios', 'both'].includes(answers.mobileDevice)) {
-        const iosSetup = new IosSetup({mode: ['simulator'], setup: true});
+        const iosSetup = new IosSetup({mode: ['simulator', 'real'], setup : true});
         mobileResult.ios = await iosSetup.run();
       }
     }
@@ -869,40 +869,51 @@ export class NightwatchInit {
           }
         }
       }
-  
+    
       if (['ios', 'both'].includes(answers.mobileDevice)) {
-        if (!mobileResult.ios) {
-          Logger.error(boxen(
-            colors.red('iOS setup failed \n\n') +
-            `To setup iOS, run: ${colors.gray.italic('npx @nightwatch/mobile-helper ios --setup')}\n` +
-            `For iOS help, run: ${colors.gray.italic('npx @nightwatch/mobile-helper ios --help')}`, {padding: 1}
-          ));
-        } else {
-          // envFlag = ` --env ios.real.safari`;
-          // Logger.error('To run example on real iOS device, run:');
-          // Logger.error(
-          //   colors.cyan(
-          //     `  npx nightwatch .${path.sep}${path.join(
-          //       this.otherInfo.examplesJsSrc || '',
-          //       EXAMPLE_TEST_FOLDER,
-          //       'basic',
-          //       'ecosia.js'
-          //     )}${envFlag}${configFlag}\n`
-          //   )
-          // );
+        const commandMsg = `To setup iOS requirements, run: ${colors.gray.italic("npx @nightwatch/mobile-helper ios")}` +
+        `\n\nFor iOS help, run: ${colors.gray.italic("npx @nightwatch/mobile-helper ios --help")}`
   
-          envFlag = ' --env ios.simulator.safari';
-          Logger.error('To run an example test on iOS simulator, run:');
+        if (!mobileResult.ios) {
           Logger.error(
-            colors.cyan(
-              `  npx nightwatch .${path.sep}${path.join(
-                this.otherInfo.examplesJsSrc || '',
-                EXAMPLE_TEST_FOLDER,
-                'basic',
-                'ecosia.js'
-              )}${envFlag}${configFlag}\n`
-            )
+            boxen(colors.red("iOS setup failed \n\n") + commandMsg, {padding: 1})
           );
+        } else if (typeof mobileResult.ios === 'object') {
+          if (mobileResult.ios.real) {
+            envFlag = ` --env ios.real.safari`;
+            Logger.error('To run example on real iOS device, run:');
+            Logger.error(
+              colors.cyan(
+                `  npx nightwatch .${path.sep}${path.join(
+                  this.otherInfo.examplesJsSrc || '',
+                  EXAMPLE_TEST_FOLDER,
+                  'basic',
+                  'ecosia.js'
+                )}${envFlag}${configFlag}\n`
+              )
+            );
+          }
+          
+          if (mobileResult.ios.simulator) {
+            envFlag = ` --env ios.simulator.safari`;
+            Logger.error('To run example on iOS simulator, run:');
+            Logger.error(
+              colors.cyan(
+                `  npx nightwatch .${path.sep}${path.join(
+                  this.otherInfo.examplesJsSrc || '',
+                  EXAMPLE_TEST_FOLDER,
+                  'basic',
+                  'ecosia.js'
+                )}${envFlag}${configFlag}\n`
+              )
+            );
+          }
+  
+          if (!mobileResult.ios.real || !mobileResult.ios.simulator) {
+            Logger.error(
+              boxen(commandMsg, {padding: 1})
+            );
+          }
         }
       }
     }
