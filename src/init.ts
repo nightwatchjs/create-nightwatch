@@ -15,7 +15,7 @@ import {CONFIG_INTRO, QUESTIONAIRRE, CONFIG_DEST_QUES, MOBILE_BROWSER_CHOICES} f
 import {ConfigGeneratorAnswers, ConfigDestination, OtherInfo, MobileResult} from './interfaces';
 import defaultAnswers from './defaults.json';
 import defaultMobileAnswers from './defaultsMobile.json';
-import {AndroidSetup, IosSetup} from 'nightwatch-mobile-helper';
+import {AndroidSetup, IosSetup} from '@nightwatch/mobile-helper';
 
 
 const EXAMPLE_TEST_FOLDER = 'examples';

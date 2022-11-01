@@ -1,4 +1,4 @@
-import {AndroidSetup} from 'nightwatch-mobile-helper';
+import {AndroidSetup} from '@nightwatch/mobile-helper';
 
 export interface ConfigGeneratorAnswers {
   rootDir?: string;
