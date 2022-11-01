@@ -705,12 +705,6 @@ export class NightwatchInit {
       Logger.error();
     }
 
-    Logger.error(colors.green('RUN NIGHTWATCH TESTS'), '\n');
-    if (this.rootDir !== process.cwd()) {
-      Logger.error('First, change directory to the root dir of your project:');
-      Logger.error(colors.cyan(`  cd ${relativeToRootDir}`), '\n');
-    }
-
     let envFlag = '';
     if (answers.backend === 'remote') {
       envFlag = ` --env ${answers.remoteName}`;
@@ -721,80 +715,88 @@ export class NightwatchInit {
       configFlag = ` --config ${this.otherInfo.nonDefaultConfigName}`;
     }
 
-    if (answers.runner === Runner.Cucumber) {
-      Logger.error('To run your tests with CucumberJS, simply run:');
-      Logger.error(colors.cyan(`  npx nightwatch${envFlag}${configFlag}`), '\n');
-
-      if (this.otherInfo.cucumberExamplesAdded) {
-        Logger.error('To run an example test with CucumberJS, run:');
-        Logger.error(colors.cyan(`  npx nightwatch ${answers.examplesLocation}${envFlag}${configFlag}`), '\n');
+    if (!this.options?.mobile) {
+      Logger.error(colors.green('RUN NIGHTWATCH TESTS'), '\n');
+      if (this.rootDir !== process.cwd()) {
+        Logger.error('First, change directory to the root dir of your project:');
+        Logger.error(colors.cyan(`  cd ${relativeToRootDir}`), '\n');
       }
 
-      Logger.error('For more details on using CucumberJS with Nightwatch, visit:');
-      Logger.error(
-        colors.cyan('  https://nightwatchjs.org/guide/third-party-runners/cucumberjs-nightwatch-integration.html')
-      );
-    } else if (answers.addExamples) {
-      if (answers.language === 'ts') {
-        Logger.error('To run all examples, run:');
-        Logger.error(
-          colors.cyan(`  npx nightwatch .${path.sep}${this.otherInfo.examplesJsSrc}${envFlag}${configFlag}\n`)
-        );
+      if (answers.runner === Runner.Cucumber) {
+        Logger.error('To run your tests with CucumberJS, simply run:');
+        Logger.error(colors.cyan(`  npx nightwatch${envFlag}${configFlag}`), '\n');
 
-        Logger.error('To run a single example (github.ts), run:');
+        if (this.otherInfo.cucumberExamplesAdded) {
+          Logger.error('To run an example test with CucumberJS, run:');
+          Logger.error(colors.cyan(`  npx nightwatch ${answers.examplesLocation}${envFlag}${configFlag}`), '\n');
+        }
+
+        Logger.error('For more details on using CucumberJS with Nightwatch, visit:');
         Logger.error(
-          colors.cyan(
-            `  npx nightwatch .${path.sep}${path.join(
-              this.otherInfo.examplesJsSrc || '',
-              'github.ts'
-            )}${envFlag}${configFlag}\n`
-          )
+          colors.cyan('  https://nightwatchjs.org/guide/third-party-runners/cucumberjs-nightwatch-integration.html')
         );
+      } else if (answers.addExamples) {
+        if (answers.language === 'ts') {
+          Logger.error('To run all examples, run:');
+          Logger.error(
+            colors.cyan(`  npx nightwatch .${path.sep}${this.otherInfo.examplesJsSrc}${envFlag}${configFlag}\n`)
+          );
+
+          Logger.error('To run a single example (github.ts), run:');
+          Logger.error(
+            colors.cyan(
+              `  npx nightwatch .${path.sep}${path.join(
+                this.otherInfo.examplesJsSrc || '',
+                'github.ts'
+              )}${envFlag}${configFlag}\n`
+            )
+          );
+        } else {
+          Logger.error('To run all examples, run:');
+          Logger.error(
+            colors.cyan(
+              `  npx nightwatch .${path.sep}${path.join(
+                this.otherInfo.examplesJsSrc || '',
+                EXAMPLE_TEST_FOLDER
+              )}${envFlag}${configFlag}\n`
+            )
+          );
+
+          Logger.error('To run a single example (ecosia.js), run:');
+          Logger.error(
+            colors.cyan(
+              `  npx nightwatch .${path.sep}${path.join(
+                this.otherInfo.examplesJsSrc || '',
+                EXAMPLE_TEST_FOLDER,
+                'basic',
+                'ecosia.js'
+              )}${envFlag}${configFlag}\n`
+            )
+          );
+        }
       } else {
-        Logger.error('To run all examples, run:');
+        Logger.error(`A few examples are available at '${path.join('node_modules', 'nightwatch', 'examples')}'.\n`);
+
+        Logger.error('To run a single example (ecosia.js), try:');
         Logger.error(
           colors.cyan(
-            `  npx nightwatch .${path.sep}${path.join(
-              this.otherInfo.examplesJsSrc || '',
-              EXAMPLE_TEST_FOLDER
-            )}${envFlag}${configFlag}\n`
-          )
+            `  npx nightwatch ${path.join(
+              'node_modules',
+              'nightwatch',
+              'examples',
+              'tests',
+              'ecosia.js'
+            )}${envFlag}${configFlag}`
+          ),
+          '\n'
         );
 
-        Logger.error('To run a single example (ecosia.js), run:');
+        Logger.error('To run all examples, try:');
         Logger.error(
-          colors.cyan(
-            `  npx nightwatch .${path.sep}${path.join(
-              this.otherInfo.examplesJsSrc || '',
-              EXAMPLE_TEST_FOLDER,
-              'basic',
-              'ecosia.js'
-            )}${envFlag}${configFlag}\n`
-          )
+          colors.cyan(`  npx nightwatch ${path.join('node_modules', 'nightwatch', 'examples')}${envFlag}${configFlag}`),
+          '\n'
         );
       }
-    } else {
-      Logger.error(`A few examples are available at '${path.join('node_modules', 'nightwatch', 'examples')}'.\n`);
-
-      Logger.error('To run a single example (ecosia.js), try:');
-      Logger.error(
-        colors.cyan(
-          `  npx nightwatch ${path.join(
-            'node_modules',
-            'nightwatch',
-            'examples',
-            'tests',
-            'ecosia.js'
-          )}${envFlag}${configFlag}`
-        ),
-        '\n'
-      );
-
-      Logger.error('To run all examples, try:');
-      Logger.error(
-        colors.cyan(`  npx nightwatch ${path.join('node_modules', 'nightwatch', 'examples')}${envFlag}${configFlag}`),
-        '\n'
-      );
     }
 
     if (answers.seleniumServer) {
@@ -819,7 +821,7 @@ export class NightwatchInit {
     }
 
     if (answers.mobileDevice) {
-      Logger.error(colors.green('RUN NIGHTWATCH TESTS ON MOBILE'), '\n');
+      Logger.error(colors.green('RUN NIGHTWATCH TESTS ON MOBILE'));
 
       if (['android', 'both'].includes(answers.mobileDevice)) {
         const errorHelp = 'Please go through the setup logs above to know the actual cause of failure. Otherwise, re-run the setup commands:';
@@ -852,7 +854,7 @@ export class NightwatchInit {
             browsers.push('chrome');
           }
 
-          Logger.error('To run an example test on Android Emulator, run:');
+          Logger.error('\nTo run an example test on Android Emulator, run:');
           for (const browser of browsers) {
             envFlag = ` --env android.emulator.${browser}`;
   
@@ -863,26 +865,30 @@ export class NightwatchInit {
                   EXAMPLE_TEST_FOLDER,
                   'basic',
                   'ecosia.js'
-                )}${envFlag}${configFlag}\n`
+                )}${envFlag}${configFlag}`
               )
             );
           }
 
-          Logger.error('To run an example test on Real Android device, run:');
-          for (const browser of browsers) {
-            envFlag = ` --env android.real.${browser}`;
-  
-            Logger.error(
-              colors.cyan(
-                `  npx nightwatch .${path.sep}${path.join(
-                  this.otherInfo.examplesJsSrc || '',
-                  EXAMPLE_TEST_FOLDER,
-                  'basic',
-                  'ecosia.js'
-                )}${envFlag}${configFlag}\n`
-              )
-            );
-          }
+          /**
+           * TODO: Uncomment below code and add contion after passing the android mode from @nightwatch/mobile-helper
+           */
+
+          //  Logger.error('\nTo run an example test on Real Android device, run:');
+          //  for (const browser of browsers) {
+          //    envFlag = ` --env android.real.${browser}`;
+   
+          //    Logger.error(
+          //      colors.cyan(
+          //        `  npx nightwatch .${path.sep}${path.join(
+          //          this.otherInfo.examplesJsSrc || '',
+          //          EXAMPLE_TEST_FOLDER,
+          //          'basic',
+          //          'ecosia.js'
+          //        )}${envFlag}${configFlag}`
+          //      )
+          //    );
+          //  }
         }
       }
     
@@ -905,14 +911,14 @@ export class NightwatchInit {
                   EXAMPLE_TEST_FOLDER,
                   'basic',
                   'ecosia.js'
-                )}${envFlag}${configFlag}\n`
+                )}${envFlag}${configFlag}`
               )
             );
           }
           
           if (mobileResult.ios.simulator) {
             envFlag = ` --env ios.simulator.safari`;
-            Logger.error('To run example on iOS simulator, run:');
+            Logger.error('\nTo run example on iOS simulator, run:');
             Logger.error(
               colors.cyan(
                 `  npx nightwatch .${path.sep}${path.join(
@@ -920,7 +926,7 @@ export class NightwatchInit {
                   EXAMPLE_TEST_FOLDER,
                   'basic',
                   'ecosia.js'
-                )}${envFlag}${configFlag}\n`
+                )}${envFlag}${configFlag}`
               )
             );
           }
