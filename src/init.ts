@@ -852,9 +852,25 @@ export class NightwatchInit {
             browsers.push('chrome');
           }
 
-          Logger.error('To run an example test on Android, run:');
+          Logger.error('To run an example test on Android Emulator, run:');
           for (const browser of browsers) {
-            envFlag = ` --env android.${browser}`;
+            envFlag = ` --env android.emulator.${browser}`;
+  
+            Logger.error(
+              colors.cyan(
+                `  npx nightwatch .${path.sep}${path.join(
+                  this.otherInfo.examplesJsSrc || '',
+                  EXAMPLE_TEST_FOLDER,
+                  'basic',
+                  'ecosia.js'
+                )}${envFlag}${configFlag}\n`
+              )
+            );
+          }
+
+          Logger.error('To run an example test on Real Android device, run:');
+          for (const browser of browsers) {
+            envFlag = ` --env android.real.${browser}`;
   
             Logger.error(
               colors.cyan(

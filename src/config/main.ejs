@@ -175,8 +175,35 @@ module.exports = {
       }
     },
     <% } %><% if (answers.mobileBrowsers.includes('firefox')) { %>
-    'android.firefox': {
+    'android.real.firefox': {
       desiredCapabilities: {
+        real_mobile: true,
+        browserName: 'firefox',
+        acceptInsecureCerts: true,
+        'moz:firefoxOptions': {
+          args: [
+            // '-headless',
+            // '-verbose'
+          ],
+          androidPackage: 'org.mozilla.firefox',
+          // add the device serial to run tests on, if multiple devices are online
+          // Run command: `$ANDROID_HOME/platform-tools/adb devices`
+          // androidDeviceSerial: 'ZD2222W62Y'
+        }
+      },
+      webdriver: {
+        start_process: true,
+        server_path: '',
+        cli_args: [
+          // very verbose geckodriver logs
+          // '-vv'
+        ]
+      }
+    },
+
+    'android.emulator.firefox': {
+      desiredCapabilities: {
+        real_mobile: false,
         avd: 'nightwatch-android-11',
         browserName: 'firefox',
         acceptInsecureCerts: true,
@@ -201,8 +228,41 @@ module.exports = {
       }
     },
     <% } %><% if (answers.mobileBrowsers.includes('chrome')) { %>
-    'android.chrome': {
+    'android.real.chrome': {
       desiredCapabilities: {
+        real_mobile: true,
+        avd: 'nightwatch-android-11',
+        browserName: 'chrome',
+        'goog:chromeOptions': {
+          // More info on Chromedriver: https://sites.google.com/a/chromium.org/chromedriver/
+          //
+          // w3c:false tells Chromedriver to run using the legacy JSONWire protocol (not required in Chrome 78)
+          w3c: true,
+          args: [
+            //'--no-sandbox',
+            //'--ignore-certificate-errors',
+            //'--allow-insecure-localhost',
+            //'--headless'
+          ],
+          androidPackage: 'com.android.chrome',
+          // add the device serial to run tests on, if multiple devices are online
+          // Run command: `$ANDROID_HOME/platform-tools/adb devices`
+          // androidDeviceSerial: ''
+        },
+      },
+    
+      webdriver: {
+        start_process: true,
+        server_path: 'chromedriver-mobile/chromedriver',
+        cli_args: [
+          // --verbose
+        ]
+      }
+    },
+
+    'android.emulator.chrome': {
+      desiredCapabilities: {
+        real_mobile: false,
         avd: 'nightwatch-android-11',
         browserName: 'chrome',
         'goog:chromeOptions': {

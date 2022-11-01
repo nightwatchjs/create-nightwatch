@@ -55,7 +55,15 @@ export const MOBILE_BROWSER_QUES: inquirer.QuestionCollection =
   validate: (value) => {
     return !!value.length || 'Please select at least 1 browser.';
   },
-  when: (answers) => answers.mobile && answers.backend !== 'remote'
+  when: (answers) => {
+    if (answers.browsers?.includes('edge') && answers.mobile) {
+      return true;
+    } else if (answers.browsers) {
+      return false;
+    }
+    
+    return answers.mobile && answers.backend !== 'remote';
+  }
 };
 
 export const QUESTIONAIRRE: inquirer.QuestionCollection = [
