@@ -348,7 +348,7 @@ module.exports = {
       }
     },
     <% } %><% if (answers.mobileRemote) { %>
-    'browserstack.samsung.chrome': {
+    'browserstack.android.chrome': {
       extends: 'browserstack',
       desiredCapabilities: {
         browserName: 'chrome',
@@ -356,7 +356,7 @@ module.exports = {
       }
     },
 
-    'browserstack.samsung.firefox': {
+    'browserstack.android.firefox': {
       extends: 'browserstack',
       desiredCapabilities: {
         browserName: 'firefox',
