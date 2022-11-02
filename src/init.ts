@@ -836,6 +836,18 @@ export class NightwatchInit {
       'ecosia.js'
     )}${configFlag}`;
 
+    const exampleCommand = (envFlag: string) => {
+      if (answers.runner === Runner.Cucumber) {
+        return `${cucumberExample}${envFlag}`;
+      } else if (answers.addExamples) {
+        if (answers.language === 'ts') {
+          return `${tsExample}${envFlag}`;
+        } else {
+          return `${jsExample}${envFlag}`;
+        }
+      }
+    };
+
     if (answers.mobileDevice) {
       Logger.error(colors.green('RUN NIGHTWATCH TESTS ON MOBILE'), '\n');
 
@@ -882,16 +894,7 @@ export class NightwatchInit {
             Logger.error('  Run:');
             for (const browser of browsers) {
               const envFlag = ` --env android.real.${browser}`;
-    
-              if (answers.runner === Runner.Cucumber) {
-                Logger.error('    ', colors.cyan(`${cucumberExample}${envFlag}`), '\n');
-              } else if (answers.addExamples) {
-                if (answers.language === 'ts') {
-                  Logger.error('    ', colors.cyan(`${tsExample}${envFlag}`), '\n');
-                } else {
-                  Logger.error('    ', colors.cyan(`${jsExample}${envFlag}`), '\n');
-                }
-              }
+              Logger.error(`    ${colors.cyan(exampleCommand(envFlag) || '')}\n`);
             }
           }
 
@@ -899,16 +902,7 @@ export class NightwatchInit {
             Logger.error('To run an example test on Android Emulator, run:');
             for (const browser of browsers) {
               const envFlag = ` --env android.emulator.${browser}`;
-    
-              if (answers.runner === Runner.Cucumber) {
-                Logger.error('  ', colors.cyan(`${cucumberExample}${envFlag}`), '\n');
-              } else if (answers.addExamples) {
-                if (answers.language === 'ts') {
-                  Logger.error('  ', colors.cyan(`${tsExample}${envFlag}`), '\n');
-                } else {
-                  Logger.error('  ', colors.cyan(`${jsExample}${envFlag}`), '\n');
-                }
-              }
+              Logger.error(`  ${colors.cyan(exampleCommand(envFlag) || '')}\n`);
             }
           }
         }
@@ -926,31 +920,13 @@ export class NightwatchInit {
           if (mobileResult.ios.real) {
             const envFlag = ' --env ios.real.safari';
             Logger.error('To run an example test on real iOS device, run:');
-
-            if (answers.runner === Runner.Cucumber) {
-              Logger.error('  ', colors.cyan(`${cucumberExample}${envFlag}`), '\n');
-            } else if (answers.addExamples) {
-              if (answers.language === 'ts') {
-                Logger.error('  ', colors.cyan(`${tsExample}${envFlag}`), '\n');
-              } else {
-                Logger.error('  ', colors.cyan(`${jsExample}${envFlag}`), '\n');
-              }
-            }
+            Logger.error(`  ${colors.cyan(exampleCommand(envFlag) || '')}\n`);
           }
           
           if (mobileResult.ios.simulator) {
             const envFlag = ' --env ios.simulator.safari';
             Logger.error('To run an example test on iOS simulator, run:');
-
-            if (answers.runner === Runner.Cucumber) {
-              Logger.error('  ', colors.cyan(`${cucumberExample}${envFlag}`), '\n');
-            } else if (answers.addExamples) {
-              if (answers.language === 'ts') {
-                Logger.error('  ', colors.cyan(`${tsExample}${envFlag}`), '\n');
-              } else {
-                Logger.error('  ', colors.cyan(`${jsExample}${envFlag}`), '\n');
-              }
-            }
+            Logger.error(`  ${colors.cyan(exampleCommand(envFlag) || '')}\n`);
           }
   
           if (!mobileResult.ios.real || !mobileResult.ios.simulator) {
