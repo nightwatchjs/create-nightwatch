@@ -2,6 +2,7 @@
   "language": "js",
   "runner": "nightwatch",
   "backend": "both",
+  "cloudProvider": "browserstack",
   "testsLocation": "nightwatch-e2e",
   "baseUrl": "http://localhost",
   "allowAnonymousMetrics": false,

@@ -56,13 +56,13 @@ export const MOBILE_BROWSER_QUES: inquirer.QuestionCollection =
     return !!value.length || 'Please select at least 1 browser.';
   },
   when: (answers) => {
-    if (answers.browsers?.includes('edge') && answers.mobile) {
-      return true;
-    } else if (answers.browsers) {
-      return false;
-    }
+    const mobileBrowserValues = MOBILE_BROWSER_CHOICES
+      .map((browserObj) => browserObj.value);
+
+    const browsersHasMobileBrowsers = (answers.browsers as string[] | undefined)
+      ?.some(((browser: string) => mobileBrowserValues.includes(browser)));
     
-    return answers.mobile && answers.backend !== 'remote';
+    return answers.mobile && answers.backend !== 'remote' && !browsersHasMobileBrowsers;
   }
 };
 

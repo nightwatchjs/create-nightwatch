@@ -126,7 +126,7 @@ export class NightwatchInit {
       }
 
       if (['ios', 'both'].includes(answers.mobileDevice)) {
-        const iosSetup = new IosSetup({mode: ['simulator', 'real'], setup : true});
+        const iosSetup = new IosSetup({mode: ['simulator', 'real'], setup: true});
         mobileResult.ios = await iosSetup.run();
       }
     }
@@ -704,12 +704,7 @@ export class NightwatchInit {
       Logger.error(colors.cyan(`  2. Login (${path.join(relativeToRootDir, answers.examplesLocation || '', 'templates', 'login.js')})`));
       Logger.error();
     }
-
-    let envFlag = '';
-    if (answers.backend === 'remote') {
-      envFlag = ` --env ${answers.remoteName}`;
-    }
-
+  
     let configFlag = '';
     if (this.otherInfo.nonDefaultConfigName) {
       configFlag = ` --config ${this.otherInfo.nonDefaultConfigName}`;
@@ -720,6 +715,11 @@ export class NightwatchInit {
       if (this.rootDir !== process.cwd()) {
         Logger.error('First, change directory to the root dir of your project:');
         Logger.error(colors.cyan(`  cd ${relativeToRootDir}`), '\n');
+      }
+
+      let envFlag = '';
+      if (answers.backend === 'remote') {
+        envFlag = ` --env ${answers.remoteName}.${answers.defaultBrowser}`;
       }
 
       if (answers.runner === Runner.Cucumber) {
@@ -820,8 +820,24 @@ export class NightwatchInit {
       Logger.error(colors.cyan('  https://nightwatchjs.org/guide/browser-drivers-setup/edgedriver.html'), '\n');
     }
 
+    // MOBILE TESTS
+
+    const cucumberExample = `npx nightwatch${configFlag}`;
+
+    const tsExample = `npx nightwatch .${path.sep}${path.join(
+      this.otherInfo.examplesJsSrc || '',
+      'github.ts'
+    )}${configFlag}`;
+
+    const jsExample = `npx nightwatch .${path.sep}${path.join(
+      this.otherInfo.examplesJsSrc || '',
+      EXAMPLE_TEST_FOLDER,
+      'basic',
+      'ecosia.js'
+    )}${configFlag}`;
+
     if (answers.mobileDevice) {
-      Logger.error(colors.green('RUN NIGHTWATCH TESTS ON MOBILE'));
+      Logger.error(colors.green('RUN NIGHTWATCH TESTS ON MOBILE'), '\n');
 
       if (['android', 'both'].includes(answers.mobileDevice)) {
         const errorHelp = 'Please go through the setup logs above to know the actual cause of failure. Otherwise, re-run the setup commands:';
@@ -832,7 +848,7 @@ export class NightwatchInit {
         if (!mobileResult.android) {
           // mobileResult.android is undefined or false
           Logger.error(
-            boxen(`${colors.red('Android setup failed...')}\n${errorHelp}\n${commandMsg}`)
+            boxen(`${colors.red('Android setup failed...')}\n\n${errorHelp}\n${commandMsg}`, {padding: 1})
           );
         } else if (mobileResult.android === true) {
           // do nothing (command passed but verification/setup not initiated)
@@ -840,11 +856,11 @@ export class NightwatchInit {
         } else if (mobileResult.android.status === false) {
           if (mobileResult.android.setup) {
             Logger.error(
-              boxen(`${colors.red('Android setup failed...')}\n${errorHelp}\n${commandMsg}`)
+              boxen(`${colors.red('Android setup failed...')}\n\n${errorHelp}\n${commandMsg}`, {padding: 1})
             );
           } else {
             Logger.error(
-              boxen(`${colors.red('Android setup skipped...')}\n${commandMsg}`)
+              boxen(`${colors.red('Android setup skipped...')}\n\n${commandMsg}`, {padding: 1})
             );
           }
         } else {
@@ -854,81 +870,87 @@ export class NightwatchInit {
             browsers.push('chrome');
           }
 
-          Logger.error('\nTo run an example test on Android Emulator, run:');
-          for (const browser of browsers) {
-            envFlag = ` --env android.emulator.${browser}`;
-  
-            Logger.error(
-              colors.cyan(
-                `  npx nightwatch .${path.sep}${path.join(
-                  this.otherInfo.examplesJsSrc || '',
-                  EXAMPLE_TEST_FOLDER,
-                  'basic',
-                  'ecosia.js'
-                )}${envFlag}${configFlag}`
-              )
-            );
+          if (this.rootDir !== process.cwd()) {
+            Logger.error('First, change directory to the root dir of your project:');
+            Logger.error(colors.cyan(`  cd ${relativeToRootDir}`), '\n');
           }
 
-          /**
-           * TODO: Uncomment below code and add contion after passing the android mode from @nightwatch/mobile-helper
-           */
+          if (['real', 'both'].includes(mobileResult.android.mode)) {
+            Logger.error('To run an example test on Real Android device');
+            Logger.error('  * Make sure your device is connected with USB Debugging turned on.');
+            Logger.error('  * Make sure required browsers are installed.');
+            Logger.error('  Run:');
+            for (const browser of browsers) {
+              const envFlag = ` --env android.real.${browser}`;
+    
+              if (answers.runner === Runner.Cucumber) {
+                Logger.error('    ', colors.cyan(`${cucumberExample}${envFlag}`), '\n');
+              } else if (answers.addExamples) {
+                if (answers.language === 'ts') {
+                  Logger.error('    ', colors.cyan(`${tsExample}${envFlag}`), '\n');
+                } else {
+                  Logger.error('    ', colors.cyan(`${jsExample}${envFlag}`), '\n');
+                }
+              }
+            }
+          }
 
-          //  Logger.error('\nTo run an example test on Real Android device, run:');
-          //  for (const browser of browsers) {
-          //    envFlag = ` --env android.real.${browser}`;
-   
-          //    Logger.error(
-          //      colors.cyan(
-          //        `  npx nightwatch .${path.sep}${path.join(
-          //          this.otherInfo.examplesJsSrc || '',
-          //          EXAMPLE_TEST_FOLDER,
-          //          'basic',
-          //          'ecosia.js'
-          //        )}${envFlag}${configFlag}`
-          //      )
-          //    );
-          //  }
+          if (['emulator', 'both'].includes(mobileResult.android.mode)) {
+            Logger.error('To run an example test on Android Emulator, run:');
+            for (const browser of browsers) {
+              const envFlag = ` --env android.emulator.${browser}`;
+    
+              if (answers.runner === Runner.Cucumber) {
+                Logger.error('  ', colors.cyan(`${cucumberExample}${envFlag}`), '\n');
+              } else if (answers.addExamples) {
+                if (answers.language === 'ts') {
+                  Logger.error('  ', colors.cyan(`${tsExample}${envFlag}`), '\n');
+                } else {
+                  Logger.error('  ', colors.cyan(`${jsExample}${envFlag}`), '\n');
+                }
+              }
+            }
+          }
         }
       }
     
       if (['ios', 'both'].includes(answers.mobileDevice)) {
-        const commandMsg = `To setup iOS requirements, run: ${colors.gray.italic("npx @nightwatch/mobile-helper ios")}` +
-        `\n\nFor iOS help, run: ${colors.gray.italic("npx @nightwatch/mobile-helper ios --help")}`
+        const commandMsg = `To setup iOS requirements, run: ${colors.gray.italic('npx @nightwatch/mobile-helper ios')}` +
+        `\n\nFor iOS help, run: ${colors.gray.italic('npx @nightwatch/mobile-helper ios --help')}`
   
         if (!mobileResult.ios) {
           Logger.error(
-            boxen(colors.red("iOS setup failed \n\n") + commandMsg, {padding: 1})
+            boxen(colors.red('iOS setup failed \n\n') + commandMsg, {padding: 1})
           );
         } else if (typeof mobileResult.ios === 'object') {
           if (mobileResult.ios.real) {
-            envFlag = ` --env ios.real.safari`;
-            Logger.error('To run example on real iOS device, run:');
-            Logger.error(
-              colors.cyan(
-                `  npx nightwatch .${path.sep}${path.join(
-                  this.otherInfo.examplesJsSrc || '',
-                  EXAMPLE_TEST_FOLDER,
-                  'basic',
-                  'ecosia.js'
-                )}${envFlag}${configFlag}`
-              )
-            );
+            const envFlag = ' --env ios.real.safari';
+            Logger.error('To run an example test on real iOS device, run:');
+
+            if (answers.runner === Runner.Cucumber) {
+              Logger.error('  ', colors.cyan(`${cucumberExample}${envFlag}`), '\n');
+            } else if (answers.addExamples) {
+              if (answers.language === 'ts') {
+                Logger.error('  ', colors.cyan(`${tsExample}${envFlag}`), '\n');
+              } else {
+                Logger.error('  ', colors.cyan(`${jsExample}${envFlag}`), '\n');
+              }
+            }
           }
           
           if (mobileResult.ios.simulator) {
-            envFlag = ` --env ios.simulator.safari`;
-            Logger.error('\nTo run example on iOS simulator, run:');
-            Logger.error(
-              colors.cyan(
-                `  npx nightwatch .${path.sep}${path.join(
-                  this.otherInfo.examplesJsSrc || '',
-                  EXAMPLE_TEST_FOLDER,
-                  'basic',
-                  'ecosia.js'
-                )}${envFlag}${configFlag}`
-              )
-            );
+            const envFlag = ' --env ios.simulator.safari';
+            Logger.error('To run an example test on iOS simulator, run:');
+
+            if (answers.runner === Runner.Cucumber) {
+              Logger.error('  ', colors.cyan(`${cucumberExample}${envFlag}`), '\n');
+            } else if (answers.addExamples) {
+              if (answers.language === 'ts') {
+                Logger.error('  ', colors.cyan(`${tsExample}${envFlag}`), '\n');
+              } else {
+                Logger.error('  ', colors.cyan(`${jsExample}${envFlag}`), '\n');
+              }
+            }
           }
   
           if (!mobileResult.ios.real || !mobileResult.ios.simulator) {
@@ -936,6 +958,32 @@ export class NightwatchInit {
               boxen(commandMsg, {padding: 1})
             );
           }
+        }
+      }
+    } else if (this.options?.mobile && answers.mobileRemote && answers.cloudProvider === 'browserstack') {
+      // no other test run commands are printed and remote mobile is selected.
+      Logger.error(colors.green('RUN NIGHTWATCH TESTS ON MOBILE'), '\n');
+      if (this.rootDir !== process.cwd()) {
+        Logger.error('First, change directory to the root dir of your project:');
+        Logger.error(colors.cyan(`  cd ${relativeToRootDir}`), '\n');
+      }
+
+      const chromeEnvFlag = ' --env browserstack.android.chrome';
+      const safariEnvFlag = ' --env browserstack.ios.safari';
+
+      if (answers.runner === Runner.Cucumber) {
+        Logger.error('To run your tests with CucumberJS, simply run:');
+        Logger.error('  Chrome: ', colors.cyan(`${cucumberExample}${chromeEnvFlag}`), '\n');
+        Logger.error('  Safari: ', colors.cyan(`${cucumberExample}${safariEnvFlag}`), '\n');
+      } else if (answers.addExamples) {
+        if (answers.language === 'ts') {
+          Logger.error('To run an example test (github.ts), run:');
+          Logger.error('  Chrome: ', colors.cyan(`${tsExample}${chromeEnvFlag}`), '\n');
+          Logger.error('  Safari: ', colors.cyan(`${tsExample}${safariEnvFlag}`), '\n');
+        } else {
+          Logger.error('To run an example test (ecosia.js), run:');
+          Logger.error('  Chrome: ', colors.cyan(`${jsExample}${chromeEnvFlag}`), '\n');
+          Logger.error('  Safari: ', colors.cyan(`${jsExample}${safariEnvFlag}`), '\n');
         }
       }
     }
