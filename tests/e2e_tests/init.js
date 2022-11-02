@@ -1308,11 +1308,19 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Please go through the setup logs above'), true);
     assert.strictEqual(output.includes('To setup Android, run:'), true);
     assert.strictEqual(output.includes('For Android help, run:'), true);
+    assert.strictEqual(output.includes('Once setup is complete...'), true);
+    assert.strictEqual(output.includes('To run an example test on Real Android device'), true);
+    assert.strictEqual(output.includes('To run an example test on Android Emulator, run:'), true);
     if (process.platform === 'darwin') {
       assert.strictEqual(output.includes('To run an example test on real iOS device, run:'), true);
       assert.strictEqual(output.includes('ecosia.js --env ios.real.safari'), true);
-      assert.strictEqual(output.includes('To setup iOS requirements, run:'), true);
+      assert.strictEqual(output.includes('iOS setup incomplete...'), true);
+      assert.strictEqual(output.includes('Please follow the guide above'), true);
+      assert.strictEqual(output.includes('For iOS setup, run:'), true);
       assert.strictEqual(output.includes('For iOS help, run:'), true);
+      assert.strictEqual(output.includes('After completing the setup...'), true);
+      assert.strictEqual(output.includes('To run an example test on real iOS device, run:'), true);
+      assert.strictEqual(output.includes('To run an example test on iOS simulator, run:'), true);
     }
 
     rmDirSync(rootDir);

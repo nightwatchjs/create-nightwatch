@@ -121,11 +121,13 @@ export class NightwatchInit {
       // answers.mobileDevice will be undefined in case of empty or non-matching mobileBrowsers
       // hence, no need to setup any device.
       if (['android', 'both'].includes(answers.mobileDevice)) {
+        Logger.error('Running Android Setup...\n');
         const androidSetup = new AndroidSetup({browsers: answers.mobileBrowsers || []}, this.rootDir);
         mobileResult.android = await androidSetup.run();
       }
 
       if (['ios', 'both'].includes(answers.mobileDevice)) {
+        Logger.error('Running iOS Setup...\n');
         const iosSetup = new IosSetup({mode: ['simulator', 'real'], setup: true});
         mobileResult.ios = await iosSetup.run();
       }
@@ -852,15 +854,51 @@ export class NightwatchInit {
       Logger.error(colors.green('RUN NIGHTWATCH TESTS ON MOBILE'), '\n');
 
       if (['android', 'both'].includes(answers.mobileDevice)) {
-        const errorHelp = 'Please go through the setup logs above to know the actual cause of failure. Otherwise, re-run the setup commands:';
+        const errorHelp = 'Please go through the setup logs above to know the actual cause of failure.\n\nOr, re-run the following commands:';
 
-        const commandMsg = `  To setup Android, run: ${colors.gray.italic('npx @nightwatch/mobile-helper android --setup')}\n` +
+        const setupMsg = `  To setup Android, run: ${colors.gray.italic('npx @nightwatch/mobile-helper android --setup')}\n` +
           `  For Android help, run: ${colors.gray.italic('npx @nightwatch/mobile-helper android --help')}`;
 
+        const browsers = answers.mobileBrowsers?.filter((browser) => ['chrome', 'firefox'].includes(browser)) || [];
+        if (browsers.length === 0) {
+          browsers.push('chrome');
+        }
+
+        const realAndroidTestCommand = (newline = '') => {
+          const commands: string[] = [];
+          commands.push('To run an example test on Real Android device');
+          commands.push('  * Make sure your device is connected with USB Debugging turned on.');
+          commands.push('  * Make sure required browsers are installed.');
+          commands.push('  Run:');
+
+          for (const browser of browsers) {
+            const envFlag = ` --env android.real.${browser}`;
+            commands.push(`    ${colors.cyan(exampleCommand(envFlag) || '')}${newline}`);
+          }
+
+          return commands.join('\n');
+        };
+
+        const emulatorAndroidTestCommand = (newline = '') => {
+          const commands: string[] = [];
+          commands.push('To run an example test on Android Emulator, run:');
+
+          for (const browser of browsers) {
+            const envFlag = ` --env android.emulator.${browser}`;
+            commands.push(`  ${colors.cyan(exampleCommand(envFlag) || '')}${newline}`);
+          }
+
+          return commands.join('\n');
+        };
+
+        const testCommands = `Once setup is complete...\n\n${realAndroidTestCommand()}\n\n${emulatorAndroidTestCommand()}`;
+        
         if (!mobileResult.android) {
           // mobileResult.android is undefined or false
           Logger.error(
-            boxen(`${colors.red('Android setup failed...')}\n\n${errorHelp}\n${commandMsg}`, {padding: 1})
+            boxen(`${colors.red(
+              'Android setup failed...'
+            )}\n\n${errorHelp}\n${setupMsg}\n\n${testCommands}`, {padding: 1})
           );
         } else if (mobileResult.android === true) {
           // do nothing (command passed but verification/setup not initiated)
@@ -868,70 +906,72 @@ export class NightwatchInit {
         } else if (mobileResult.android.status === false) {
           if (mobileResult.android.setup) {
             Logger.error(
-              boxen(`${colors.red('Android setup failed...')}\n\n${errorHelp}\n${commandMsg}`, {padding: 1})
+              boxen(`${colors.red(
+                'Android setup failed...'
+              )}\n\n${errorHelp}\n${setupMsg}\n\n${testCommands}`, {padding: 1})
             );
           } else {
             Logger.error(
-              boxen(`${colors.red('Android setup skipped...')}\n\n${commandMsg}`, {padding: 1})
+              boxen(`${colors.red(
+                'Android setup skipped...'
+              )}\n\n${setupMsg}\n\n${testCommands}`, {padding: 1})
             );
           }
         } else {
           // mobileResult.android.status is true.
-          const browsers = answers.mobileBrowsers?.filter((browser) => ['chrome', 'firefox'].includes(browser)) || [];
-          if (browsers.length === 0) {
-            browsers.push('chrome');
-          }
-
           if (this.rootDir !== process.cwd()) {
             Logger.error('First, change directory to the root dir of your project:');
             Logger.error(colors.cyan(`  cd ${relativeToRootDir}`), '\n');
           }
 
           if (['real', 'both'].includes(mobileResult.android.mode)) {
-            Logger.error('To run an example test on Real Android device');
-            Logger.error('  * Make sure your device is connected with USB Debugging turned on.');
-            Logger.error('  * Make sure required browsers are installed.');
-            Logger.error('  Run:');
-            for (const browser of browsers) {
-              const envFlag = ` --env android.real.${browser}`;
-              Logger.error(`    ${colors.cyan(exampleCommand(envFlag) || '')}\n`);
-            }
+            Logger.error(realAndroidTestCommand(), '\n');
           }
 
           if (['emulator', 'both'].includes(mobileResult.android.mode)) {
-            Logger.error('To run an example test on Android Emulator, run:');
-            for (const browser of browsers) {
-              const envFlag = ` --env android.emulator.${browser}`;
-              Logger.error(`  ${colors.cyan(exampleCommand(envFlag) || '')}\n`);
-            }
+            Logger.error(emulatorAndroidTestCommand(), '\n');
           }
         }
       }
     
       if (['ios', 'both'].includes(answers.mobileDevice)) {
-        const commandMsg = `To setup iOS requirements, run: ${colors.gray.italic('npx @nightwatch/mobile-helper ios')}` +
-        `\n\nFor iOS help, run: ${colors.gray.italic('npx @nightwatch/mobile-helper ios --help')}`;
-  
+        const setupHelp = 'Please follow the guide above to complete the setup.\n\nOr, re-run the following commands:';
+
+        const setupCommand = `  For iOS setup, run: ${colors.gray.italic('npx @nightwatch/mobile-helper ios --setup')}\n` +
+          `  For iOS help, run: ${colors.gray.italic('npx @nightwatch/mobile-helper ios --help')}`;
+
+        const realIosTestCommand = 
+          `To run an example test on real iOS device, run:\n  ${colors.cyan(
+            exampleCommand(' --env ios.real.safari') || ''
+          )}`;
+
+        const simulatorIosTestCommand = 
+          `To run an example test on iOS simulator, run:\n  ${colors.cyan(
+            exampleCommand(' --env ios.simulator.safari') || ''
+          )}`;
+
+        const testCommand = `After completing the setup...\n\n${realIosTestCommand}\n\n${simulatorIosTestCommand}`;
+
         if (!mobileResult.ios) {
           Logger.error(
-            boxen(colors.red('iOS setup failed \n\n') + commandMsg, {padding: 1})
+            boxen(`${colors.red(
+              'iOS setup failed...'
+            )}\n\n${setupCommand}\n\n${testCommand}`, {padding: 1})
           );
         } else if (typeof mobileResult.ios === 'object') {
           if (mobileResult.ios.real) {
-            const envFlag = ' --env ios.real.safari';
-            Logger.error('To run an example test on real iOS device, run:');
-            Logger.error(`  ${colors.cyan(exampleCommand(envFlag) || '')}\n`);
+            Logger.error(realIosTestCommand, '\n');
           }
           
           if (mobileResult.ios.simulator) {
-            const envFlag = ' --env ios.simulator.safari';
-            Logger.error('To run an example test on iOS simulator, run:');
-            Logger.error(`  ${colors.cyan(exampleCommand(envFlag) || '')}\n`);
+            Logger.error(simulatorIosTestCommand, '\n');
           }
   
           if (!mobileResult.ios.real || !mobileResult.ios.simulator) {
             Logger.error(
-              boxen(commandMsg, {padding: 1})
+              boxen(`${colors.yellow(
+                'iOS setup incomplete...'
+              )}\n\n${setupHelp}\n${setupCommand}\n\n${testCommand}`, {padding: 1})
             );
           }
         }
