@@ -922,7 +922,15 @@ describe('init tests', () => {
       assert.deepEqual(config.page_objects_path, ['tests/page-objects']);
       assert.deepEqual(config.custom_commands_path, ['tests/custom-commands']);
       assert.deepEqual(config.custom_assertions_path, ['tests/custom-assertions']);
-      assert.deepEqual(Object.keys(config.test_settings), ['default', 'firefox', 'chrome', 'android.firefox', 'android.chrome']);
+      assert.deepEqual(Object.keys(config.test_settings), [
+        'default',
+        'firefox',
+        'chrome',
+        'android.real.firefox',
+        'android.emulator.firefox',
+        'android.real.chrome',
+        'android.emulator.chrome'
+      ]);
       assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox');
 
       fs.unlinkSync('test_config.conf.js');
@@ -962,7 +970,15 @@ describe('init tests', () => {
       assert.deepEqual(config.page_objects_path, ['tests/page-objects']);
       assert.deepEqual(config.custom_commands_path, ['tests/custom-commands']);
       assert.deepEqual(config.custom_assertions_path, ['tests/custom-assertions']);
-      assert.deepEqual(Object.keys(config.test_settings), ['default', 'android.firefox', 'android.chrome', 'ios.real.safari', 'ios.simulator.safari']);
+      assert.deepEqual(Object.keys(config.test_settings), [
+        'default',
+        'android.real.firefox',
+        'android.emulator.firefox',
+        'android.real.chrome',
+        'android.emulator.chrome',
+        'ios.real.safari',
+        'ios.simulator.safari'
+      ]);
       assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
 
       fs.unlinkSync('test_config.conf.js');
@@ -1136,8 +1152,10 @@ describe('init tests', () => {
       assert.deepEqual(config.custom_assertions_path, []);
       assert.deepEqual(Object.keys(config.test_settings), [
         'default',
-        'android.firefox',
-        'android.chrome',
+        'android.real.firefox',
+        'android.emulator.firefox',
+        'android.real.chrome',
+        'android.emulator.chrome',
         'browserstack',
         'browserstack.local',
         'browserstack.android.chrome',
