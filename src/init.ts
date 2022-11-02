@@ -916,7 +916,7 @@ export class NightwatchInit {
     
       if (['ios', 'both'].includes(answers.mobileDevice)) {
         const commandMsg = `To setup iOS requirements, run: ${colors.gray.italic('npx @nightwatch/mobile-helper ios')}` +
-        `\n\nFor iOS help, run: ${colors.gray.italic('npx @nightwatch/mobile-helper ios --help')}`
+        `\n\nFor iOS help, run: ${colors.gray.italic('npx @nightwatch/mobile-helper ios --help')}`;
   
         if (!mobileResult.ios) {
           Logger.error(

@@ -25,10 +25,10 @@ We'll setup everything for you :-)
 export const AVAILABLE_CONFIG_FLAGS = ['yes', 'generate-config', 'browser', 'y', 'b', 'mobile'];
 
 export const BROWSER_CHOICES = [
-  {name: 'Firefox', value: 'firefox'},
   {name: 'Chrome', value: 'chrome'},
-  {name: 'Edge', value: 'edge'},
-  {name: 'Safari', value: 'safari'}
+  {name: 'Safari', value: 'safari'},
+  {name: 'Firefox', value: 'firefox'},
+  {name: 'Edge', value: 'edge'}
 ];
 
 export const MOBILE_BROWSER_CHOICES = [
@@ -120,7 +120,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
   {
     type: 'checkbox',
     name: 'browsers',
-    message: (answers) => `${answers.backend === 'both' ? '(Local) ' : ''}Which desktop browsers will you be testing on?`,
+    message: 'Which desktop browsers will you be testing on?',
     choices: (answers) => {
       let browsers = BROWSER_CHOICES;
       if (answers.backend === 'local' && process.platform !== 'darwin') {
@@ -129,24 +129,11 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
 
       return browsers;
     },
-    default: ['firefox'],
+    default: ['chrome'],
     validate: (value) => {
       return !!value.length || 'Please select at least 1 browser.';
     },
     when: (answers) => !answers.mobile
-  },
-
-  // FOR REMOTE
-  {
-    type: 'checkbox',
-    name: 'remoteBrowsers',
-    message: '(Remote) Where you\'ll be testing on?',
-    choices: BROWSER_CHOICES,
-    default: (answers: { browsers: string[] }) => answers.browsers,
-    validate: (value) => {
-      return !!value.length || 'Please select at least 1 browser.';
-    },
-    when: (answers) => !answers.mobile && answers.backend === 'both'
   },
 
   MOBILE_BROWSER_QUES,
