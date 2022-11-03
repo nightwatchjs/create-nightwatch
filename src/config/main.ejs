@@ -410,16 +410,14 @@ module.exports = {
     'browserstack.android.chrome': {
       extends: 'browserstack',
       desiredCapabilities: {
+        'bstack:options' : {
+          osVersion: '12.0',
+          deviceName: 'Samsung Galaxy S22'
+        },
         browserName: 'chrome',
-        'browserstack.deviceName': "Samsung Galaxy S22"
-      }
-    },
-
-    'browserstack.android.firefox': {
-      extends: 'browserstack',
-      desiredCapabilities: {
-        browserName: 'firefox',
-        'browserstack.deviceName': "Samsung Galaxy S22"
+        'goog:chromeOptions': {
+          // w3c: false
+        }
       }
     },
 
@@ -427,9 +425,11 @@ module.exports = {
       extends: 'browserstack',
       desiredCapabilities: {
         browserName: 'safari',
-        device : 'iPhone 13',
-        os_version : '14',
-        real_mobile : 'true'
+        'bstack:options' : {
+          osVersion: "15.5",
+          deviceName: "iPhone 13"
+        },
+        browserName: 'safari'
       }
     },
     <% }} else if (answers.cloudProvider === 'saucelabs') { %>

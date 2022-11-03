@@ -1159,7 +1159,6 @@ describe('init tests', () => {
         'browserstack',
         'browserstack.local',
         'browserstack.android.chrome',
-        'browserstack.android.firefox',
         'browserstack.ios.safari'
       ]);
       assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
@@ -1224,7 +1223,6 @@ describe('init tests', () => {
         'browserstack.local_chrome',
         'browserstack.local_firefox',
         'browserstack.android.chrome',
-        'browserstack.android.firefox',
         'browserstack.ios.safari'
       ]);
       assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');

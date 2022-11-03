@@ -863,7 +863,6 @@ describe('e2e tests for init', () => {
         'browserstack.chrome',
         'browserstack.local_chrome',
         'browserstack.android.chrome',
-        'browserstack.android.firefox',
         'browserstack.ios.safari',
         'selenium_server',
         'selenium.firefox'
@@ -879,7 +878,6 @@ describe('e2e tests for init', () => {
         'browserstack.chrome',
         'browserstack.local_chrome',
         'browserstack.android.chrome',
-        'browserstack.android.firefox',
         'browserstack.ios.safari',
         'selenium_server',
         'selenium.firefox'
@@ -1249,7 +1247,6 @@ describe('e2e tests for init', () => {
         'browserstack',
         'browserstack.local',
         'browserstack.android.chrome',
-        'browserstack.android.firefox',
         'browserstack.ios.safari'
       ]);
     } else {
@@ -1262,7 +1259,6 @@ describe('e2e tests for init', () => {
         'browserstack',
         'browserstack.local',
         'browserstack.android.chrome',
-        'browserstack.android.firefox',
         'browserstack.ios.safari'
       ]);
     }
