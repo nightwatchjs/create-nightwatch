@@ -25,7 +25,7 @@ describe('test initializeNodeProject', () => {
     );
 
     let newDirCreated = false;
-    mockery.registerMock('fs', {
+    mockery.registerMock('node:fs', {
       existsSync() {
         return true;
       },
@@ -76,7 +76,7 @@ describe('test initializeNodeProject', () => {
     );
 
     let newDirCreatedRecursively = false;
-    mockery.registerMock('fs', {
+    mockery.registerMock('node:fs', {
       existsSync() {
         return false;
       },

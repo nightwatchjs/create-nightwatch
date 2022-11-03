@@ -43,7 +43,7 @@ describe('index tests', () => {
       }
     );
 
-    mockery.registerMock('fs', {
+    mockery.registerMock('node:fs', {
       existsSync() {
         return false;
       },
@@ -96,7 +96,7 @@ describe('index tests', () => {
       }
     );
 
-    mockery.registerMock('fs', {
+    mockery.registerMock('node:fs', {
       existsSync() {
         return false;
       },
@@ -134,7 +134,7 @@ describe('index tests', () => {
       }
     );
 
-    mockery.registerMock('fs', {
+    mockery.registerMock('node:fs', {
       existsSync() {
         return false;
       },

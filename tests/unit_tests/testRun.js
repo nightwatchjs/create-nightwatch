@@ -91,7 +91,7 @@ describe('test run function', () => {
       extend
     });
 
-    mockery.registerMock('fs', {
+    mockery.registerMock('node:fs', {
       readdirSync() {
         return [];
       }
@@ -151,7 +151,7 @@ describe('test run function', () => {
       extend
     });
 
-    mockery.registerMock('fs', {
+    mockery.registerMock('node:fs', {
       readdirSync() {
         return ['sample.txt'];
       }
@@ -212,7 +212,7 @@ describe('test run function', () => {
       }
     );
 
-    mockery.registerMock('fs', {
+    mockery.registerMock('node:fs', {
       existsSync() {
         return true;
       },
@@ -256,7 +256,7 @@ describe('test run function', () => {
     );
 
     let newDirCreatedRecursively = false;
-    mockery.registerMock('fs', {
+    mockery.registerMock('node:fs', {
       existsSync() {
         return false;
       }
@@ -307,7 +307,7 @@ describe('test run function', () => {
       }
     );
 
-    mockery.registerMock('fs', {
+    mockery.registerMock('node:fs', {
       existsSync() {
         return true;
       }
@@ -355,7 +355,7 @@ describe('test run function', () => {
       }
     );
 
-    mockery.registerMock('fs', {
+    mockery.registerMock('node:fs', {
       existsSync() {
         return false;
       }
@@ -408,7 +408,7 @@ describe('test run function', () => {
       }
     );
 
-    mockery.registerMock('fs', {
+    mockery.registerMock('node:fs', {
       existsSync() {
         return true;
       }
@@ -458,7 +458,7 @@ describe('test run function', () => {
       extend
     });
 
-    mockery.registerMock('fs', {
+    mockery.registerMock('node:fs', {
       readdirSync() {
         return [];
       }
@@ -511,7 +511,7 @@ describe('test run function', () => {
       }
     );
 
-    mockery.registerMock('fs', {
+    mockery.registerMock('node:fs', {
       existsSync() {
         return true;
       }

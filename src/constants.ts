@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'node:fs';
 import inquirer from 'inquirer';
 import path from 'path';
 
@@ -22,14 +22,49 @@ Just answer a few questions to get started with Nightwatch:
 We'll setup everything for you :-)
 `;
 
-export const AVAILABLE_CONFIG_FLAGS = ['yes', 'generate-config', 'browser', 'y', 'b'];
+export const AVAILABLE_CONFIG_FLAGS = ['yes', 'generate-config', 'browser', 'y', 'b', 'mobile'];
 
 export const BROWSER_CHOICES = [
-  {name: 'Firefox', value: 'firefox'},
   {name: 'Chrome', value: 'chrome'},
-  {name: 'Edge', value: 'edge'},
-  {name: 'Safari', value: 'safari'}
+  {name: 'Safari', value: 'safari'},
+  {name: 'Firefox', value: 'firefox'},
+  {name: 'Edge', value: 'edge'}
 ];
+
+export const MOBILE_BROWSER_CHOICES = [
+  {name: 'Chrome (Android)', value: 'chrome'},
+  {name: 'Firefox (Android)', value: 'firefox'},
+  {name: 'Safari (iOS)', value: 'safari'}
+];
+
+export const MOBILE_BROWSER_QUES: inquirer.QuestionCollection = 
+{
+  type: 'checkbox',
+  name: 'mobileBrowsers',
+  message: 'Which mobile browsers would you like to test on?',
+  choices: () => {
+    let devices = MOBILE_BROWSER_CHOICES;
+
+    if (process.platform !== 'darwin') {
+      devices = devices.filter((device) => device.value !== 'safari');
+    }
+
+    return devices;
+  },
+  default: ['chrome'],
+  validate: (value) => {
+    return !!value.length || 'Please select at least 1 browser.';
+  },
+  when: (answers) => {
+    const mobileBrowserValues = MOBILE_BROWSER_CHOICES
+      .map((browserObj) => browserObj.value);
+
+    const browsersHasMobileBrowsers = (answers.browsers as string[] | undefined)
+      ?.some(((browser: string) => mobileBrowserValues.includes(browser)));
+    
+    return answers.mobile && answers.backend !== 'remote' && !browsersHasMobileBrowsers;
+  }
+};
 
 export const QUESTIONAIRRE: inquirer.QuestionCollection = [
   // answers.rootDir is available to all the questions (passed in Inquirer.prompt()).
@@ -81,45 +116,27 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     when: (answers) => ['remote', 'both'].includes(answers.backend)
   },
 
-  // BROWSERS
+  // DESKTOP BROWSERS
   {
     type: 'checkbox',
     name: 'browsers',
-    message: (answers) => `${answers.backend === 'both' ? '(Local) ' : ''}Where you'll be testing on?`,
+    message: 'Which desktop browsers will you be testing on?',
     choices: (answers) => {
       let browsers = BROWSER_CHOICES;
       if (answers.backend === 'local' && process.platform !== 'darwin') {
         browsers = browsers.filter((browser) => browser.value !== 'safari');
       }
 
-      if (['local', 'both'].includes(answers.backend)) {
-        browsers = browsers.concat({name: 'Local selenium-server', value: 'selenium-server'});
-      }
-
       return browsers;
     },
-    default: ['firefox'],
-    validate: (value) => {
-      if (value.length === 1 && value.includes('selenium-server')) {
-        return 'Please select at least 1 browser.';
-      }
-
-      return !!value.length || 'Please select at least 1 browser.';
-    }
-  },
-
-  // FOR REMOTE
-  {
-    type: 'checkbox',
-    name: 'remoteBrowsers',
-    message: '(Remote) Where you\'ll be testing on?',
-    choices: BROWSER_CHOICES,
-    default: (answers: { browsers: string[] }) => answers.browsers,
+    default: ['chrome'],
     validate: (value) => {
       return !!value.length || 'Please select at least 1 browser.';
     },
-    when: (answers) => answers.backend === 'both'
+    when: (answers) => !answers.mobile
   },
+
+  MOBILE_BROWSER_QUES,
 
   // TEST LOCATION
   {
@@ -151,7 +168,21 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     name: 'allowAnonymousMetrics',
     message: 'Allow Nightwatch to anonymously collect usage metrics?',
     default: false
-  }
+  },
+  
+  // Test on Mobile
+  {
+    type: 'list',
+    name: 'mobile',
+    message: 'Would you like to test your website on Mobile devices as well?',
+    choices: () => [
+      {name: 'Yes', value: true},
+      {name: 'No, skip for now', value: false}
+    ],
+    default: false
+  },
+
+  MOBILE_BROWSER_QUES
 ];
 
 export const CONFIG_DEST_QUES: inquirer.QuestionCollection = [

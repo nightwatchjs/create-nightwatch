@@ -1,3 +1,5 @@
+import {AndroidSetup, IosSetup} from '@nightwatch/mobile-helper';
+
 export interface ConfigGeneratorAnswers {
   rootDir?: string;
   onlyConfig?: boolean;
@@ -18,9 +20,13 @@ export interface ConfigGeneratorAnswers {
   addExamples?: boolean;
   examplesLocation?: string;
   browsers?: string[];
+  mobile?: boolean;
+  mobileDevice?: 'ios' | 'android' | 'both';
+  mobileBrowsers?: string[];
   defaultBrowser?: string;
   remoteBrowsers?: string[];
   allowAnonymousMetrics?: boolean;
+  mobileRemote?: boolean
 }
 
 export interface ConfigDestination {
@@ -36,4 +42,9 @@ export interface OtherInfo {
   cucumberExamplesAdded?: boolean;
   javaNotInstalled?: boolean;
   nonDefaultConfigName?: string;
+}
+
+export interface MobileResult {
+  android?: Awaited<ReturnType<AndroidSetup['run']>>;
+  ios?: Awaited<ReturnType<IosSetup['run']>>;
 }

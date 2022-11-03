@@ -174,6 +174,160 @@ module.exports = {
         ]
       }
     },
+    <% } %><% if (answers.mobileBrowsers.includes('firefox')) { %>
+    'android.real.firefox': {
+      desiredCapabilities: {
+        real_mobile: true,
+        browserName: 'firefox',
+        acceptInsecureCerts: true,
+        'moz:firefoxOptions': {
+          args: [
+            // '-headless',
+            // '-verbose'
+          ],
+          androidPackage: 'org.mozilla.firefox',
+          // add the device serial to run tests on, if multiple devices are online
+          // Run command: `$ANDROID_HOME/platform-tools/adb devices`
+          // androidDeviceSerial: 'ZD2222W62Y'
+        }
+      },
+      webdriver: {
+        start_process: true,
+        server_path: '',
+        cli_args: [
+          // very verbose geckodriver logs
+          // '-vv'
+        ]
+      }
+    },
+
+    'android.emulator.firefox': {
+      desiredCapabilities: {
+        real_mobile: false,
+        avd: 'nightwatch-android-11',
+        browserName: 'firefox',
+        acceptInsecureCerts: true,
+        'moz:firefoxOptions': {
+          args: [
+            // '-headless',
+            // '-verbose'
+          ],
+          androidPackage: 'org.mozilla.firefox',
+          // add the device serial to run tests on, if multiple devices are online
+          // Run command: `$ANDROID_HOME/platform-tools/adb devices`
+          // androidDeviceSerial: 'ZD2222W62Y'
+        }
+      },
+      webdriver: {
+        start_process: true,
+        server_path: '',
+        cli_args: [
+          // very verbose geckodriver logs
+          // '-vv'
+        ]
+      }
+    },
+    <% } %><% if (answers.mobileBrowsers.includes('chrome')) { %>
+    'android.real.chrome': {
+      desiredCapabilities: {
+        real_mobile: true,
+        browserName: 'chrome',
+        'goog:chromeOptions': {
+          // More info on Chromedriver: https://sites.google.com/a/chromium.org/chromedriver/
+          //
+          // w3c:false tells Chromedriver to run using the legacy JSONWire protocol (not required in Chrome 78)
+          w3c: true,
+          args: [
+            //'--no-sandbox',
+            //'--ignore-certificate-errors',
+            //'--allow-insecure-localhost',
+            //'--headless'
+          ],
+          androidPackage: 'com.android.chrome',
+          // add the device serial to run tests on, if multiple devices are online
+          // Run command: `$ANDROID_HOME/platform-tools/adb devices`
+          // androidDeviceSerial: ''
+        },
+      },
+    
+      webdriver: {
+        start_process: true,
+        server_path: 'chromedriver-mobile/chromedriver',
+        cli_args: [
+          // --verbose
+        ]
+      }
+    },
+
+    'android.emulator.chrome': {
+      desiredCapabilities: {
+        real_mobile: false,
+        avd: 'nightwatch-android-11',
+        browserName: 'chrome',
+        'goog:chromeOptions': {
+          // More info on Chromedriver: https://sites.google.com/a/chromium.org/chromedriver/
+          //
+          // w3c:false tells Chromedriver to run using the legacy JSONWire protocol (not required in Chrome 78)
+          w3c: true,
+          args: [
+            //'--no-sandbox',
+            //'--ignore-certificate-errors',
+            //'--allow-insecure-localhost',
+            //'--headless'
+          ],
+          androidPackage: 'com.android.chrome',
+          // add the device serial to run tests on, if multiple devices are online
+          // Run command: `$ANDROID_HOME/platform-tools/adb devices`
+          // androidDeviceSerial: ''
+        },
+      },
+    
+      webdriver: {
+        start_process: true,
+        server_path: 'chromedriver-mobile/chromedriver',
+        cli_args: [
+          // --verbose
+        ]
+      }
+    },
+    <% } %><% if (answers.mobileBrowsers.includes('safari')) { %>
+    'ios.real.safari': {
+      desiredCapabilities: {
+        browserName: 'safari',
+        platformName: 'iOS',
+        // add the device UDID to run tests on (necessary)
+        // Run command: `xcrun simctl list devices`
+        // 'safari:deviceUDID': '00008030-00024C2C3453402E',
+      },
+    
+      webdriver: {
+        start_process: true,
+        server_path: '',
+        cli_args: [
+          // --verbose
+        ]
+      }
+    },
+    
+    'ios.simulator.safari': {
+      desiredCapabilities: {
+        browserName: 'safari',
+        platformName: 'iOS',
+        'safari:useSimulator': true,
+        // change the deviceName, platformVersion accordingly to run tests on 
+        // Run command: `xcrun simctl list devices`
+        // 'safari:platformVersion': '15.0',
+        'safari:deviceName': 'iPhone 13'
+      },
+    
+      webdriver: {
+        start_process: true,
+        server_path: '',
+        cli_args: [
+          // --verbose
+        ]
+      }
+    },
     <% }} %><% if (answers.cloudProvider === 'browserstack') { %>
     //////////////////////////////////////////////////////////////////////////////////
     // Configuration for using the browserstack.com cloud service                    |
@@ -250,6 +404,32 @@ module.exports = {
       extends: 'browserstack.local',
       desiredCapabilities: {
         browserName: 'firefox'
+      }
+    },
+    <% } %><% if (answers.mobileRemote) { %>
+    'browserstack.android.chrome': {
+      extends: 'browserstack',
+      desiredCapabilities: {
+        'bstack:options' : {
+          osVersion: '12.0',
+          deviceName: 'Samsung Galaxy S22'
+        },
+        browserName: 'chrome',
+        'goog:chromeOptions': {
+          // w3c: false
+        }
+      }
+    },
+
+    'browserstack.ios.safari': {
+      extends: 'browserstack',
+      desiredCapabilities: {
+        browserName: 'safari',
+        'bstack:options' : {
+          osVersion: "15.5",
+          deviceName: "iPhone 13"
+        },
+        browserName: 'safari'
       }
     },
     <% }} else if (answers.cloudProvider === 'saucelabs') { %>
