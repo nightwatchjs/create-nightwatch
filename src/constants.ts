@@ -120,7 +120,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
   {
     type: 'checkbox',
     name: 'browsers',
-    message: 'Which desktop browsers will you be testing on?',
+    message: 'Which browsers will you be testing on?',
     choices: (answers) => {
       let browsers = BROWSER_CHOICES;
       if (answers.backend === 'local' && process.platform !== 'darwin') {
