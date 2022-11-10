@@ -125,7 +125,7 @@ describe('init tests', () => {
       assert.strictEqual(answers['examplesLocation'], 'nightwatch');
     });
 
-    test('with local and no mobile and testsLocation (non-existent) in answers', () => {
+    test('with local, seleniumServer and no mobile and testsLocation (non-existent) in answers', () => {
       mockery.registerMock('node:fs', {
         existsSync: () => false
       });
@@ -136,7 +136,8 @@ describe('init tests', () => {
       let answers = {
         backend: 'local',
         browsers: ['firefox', 'chrome', 'edge', 'safari'],
-        testsLocation: 'tests'
+        testsLocation: 'tests',
+        seleniumServer: true
       };
       nightwatchInit.refineAnswers(answers);
       assert.strictEqual('browsers' in answers, true);
@@ -193,7 +194,7 @@ describe('init tests', () => {
       assert.strictEqual('testsLocation' in answers, true);
       assert.strictEqual('addExamples' in answers, true);
       assert.strictEqual('examplesLocation' in answers, true);
-      assert.strictEqual('seleniumServer' in answers, true);
+      assert.strictEqual('seleniumServer' in answers, false);
 
       const browsers = ['chrome', 'firefox', 'edge', 'safari'];
       if (process.platform !== 'darwin') {browsers.splice(3, 1)}
@@ -207,7 +208,6 @@ describe('init tests', () => {
       assert.strictEqual(answers['testsLocation'], 'nightwatch-e2e');
       assert.strictEqual(answers['addExamples'], true);
       assert.strictEqual(answers['examplesLocation'], 'nightwatch');
-      assert.strictEqual(answers['seleniumServer'], true);
       if (process.platform === 'darwin') {
         assert.strictEqual(answers['mobileDevice'], 'both');
       } else {
@@ -386,7 +386,7 @@ describe('init tests', () => {
       assert.strictEqual(answers['remoteEnv'].access_key, 'REMOTE_ACCESS_KEY');
     });
 
-    test('with both (remote - other) and cucumber runner in answers', () => {
+    test('with both (remote - other) and cucumber runner and seleniumServer false', () => {
       const {NightwatchInit} = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
@@ -395,7 +395,8 @@ describe('init tests', () => {
         cloudProvider: 'other',
         runner: 'cucumber',
         browsers: ['firefox', 'chrome', 'edge'],
-        testsLocation: 'tests'
+        testsLocation: 'tests',
+        seleniumServer: false
       };
       nightwatchInit.refineAnswers(answers);
       assert.strictEqual('browsers' in answers, true);
@@ -421,7 +422,7 @@ describe('init tests', () => {
       assert.strictEqual(answers['remoteName'], 'remote');
       assert.strictEqual(answers['remoteEnv'].username, 'REMOTE_USERNAME');
       assert.strictEqual(answers['remoteEnv'].access_key, 'REMOTE_ACCESS_KEY');
-      assert.strictEqual(answers['seleniumServer'], true);
+      assert.strictEqual(answers['seleniumServer'], false);
       assert.strictEqual(answers['testsLocation'], 'tests');
       assert.strictEqual(answers['addExamples'], true);
       assert.strictEqual(answers['examplesLocation'], 'nightwatch');
