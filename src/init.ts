@@ -294,6 +294,10 @@ export class NightwatchInit {
       packages.push('@nightwatch/selenium-server');
     }
 
+    if (answers.mobile) {
+      packages.push('@nightwatch/mobile-helper');
+    }
+
     // Identify packages already installed and don't install them again
     const packageJson = JSON.parse(fs.readFileSync(path.join(this.rootDir, 'package.json'), 'utf-8'));
 
