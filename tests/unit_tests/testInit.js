@@ -487,7 +487,7 @@ describe('init tests', () => {
       mockery.disable();
     });
 
-    test('correct packages are installed with ts-mocha-seleniumServer', () => {
+    test('correct packages are installed with ts-mocha-seleniumServer-mobile', () => {
       mockery.registerMock('node:fs', {
         readFileSync(path, encoding) {
           return `{
@@ -501,7 +501,8 @@ describe('init tests', () => {
       const answers = {
         language: 'ts',
         runner: 'mocha',
-        seleniumServer: true
+        seleniumServer: true,
+        mobile: true
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -514,6 +515,7 @@ describe('init tests', () => {
       assert.strictEqual(packagesToInstall.includes('@types/nightwatch'), true);
       assert.strictEqual(packagesToInstall.includes('@cucumber/cucumber'), false);
       assert.strictEqual(packagesToInstall.includes('@nightwatch/selenium-server'), true);
+      assert.strictEqual(packagesToInstall.includes('@nightwatch/mobile-helper'), true);
     });
 
     test('correct packages are installed with js-cucumber', () => {
@@ -542,6 +544,7 @@ describe('init tests', () => {
       assert.strictEqual(packagesToInstall.includes('@types/nightwatch'), false);
       assert.strictEqual(packagesToInstall.includes('@cucumber/cucumber'), true);
       assert.strictEqual(packagesToInstall.includes('@nightwatch/selenium-server'), false);
+      assert.strictEqual(packagesToInstall.includes('@nightwatch/mobile-helper'), false);
     });
 
     test('correct packages are installed with ts-cucumber-seleniumServer without initial packages', () => {
@@ -599,27 +602,29 @@ describe('init tests', () => {
         }
       });
 
-      const packagesToInstall = ['nightwatch', '@types/nightwatch', '@nightwatch/selenium-server'];
+      const packagesToInstall = ['nightwatch', '@types/nightwatch', '@nightwatch/selenium-server', '@nightwatch/mobile-helper'];
 
       const {NightwatchInit} = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
       nightwatchInit.installPackages(packagesToInstall);
 
       // Check the commands executed
-      assert.strictEqual(commandsExecuted.length, 3);
+      assert.strictEqual(commandsExecuted.length, 4);
       assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
       assert.strictEqual(commandsExecuted[1], 'npm install @types/nightwatch --save-dev');
       assert.strictEqual(commandsExecuted[2], 'npm install @nightwatch/selenium-server --save-dev');
+      assert.strictEqual(commandsExecuted[3], 'npm install @nightwatch/mobile-helper --save-dev');
 
       const output = consoleOutput.toString();
       // 3 packages are installed
-      assert.strictEqual((output.match(/- /g) || []).length, 3);
-      assert.strictEqual((output.match(/Installing/g) || []).length, 4);
-      assert.strictEqual((output.match(/Done!/g) || []).length, 3);
+      assert.strictEqual((output.match(/- /g) || []).length, 4);
+      assert.strictEqual((output.match(/Installing/g) || []).length, 5);
+      assert.strictEqual((output.match(/Done!/g) || []).length, 4);
       // Check the packages installed
       assert.strictEqual(output.includes('nightwatch'), true);
       assert.strictEqual(output.includes('@types/nightwatch'), true);
       assert.strictEqual(output.includes('@nightwatch/selenium-server'), true);
+      assert.strictEqual(output.includes('@nightwatch/mobile-helper'), true);
     });
   });
 

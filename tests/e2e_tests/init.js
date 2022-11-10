@@ -633,12 +633,13 @@ describe('e2e tests for init', () => {
     ]);
 
     // Test Packages and webdrivers installed
-    assert.strictEqual(commandsExecuted.length, 5);
+    assert.strictEqual(commandsExecuted.length, 6);
     assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[1], 'npm install typescript --save-dev');
     assert.strictEqual(commandsExecuted[2], 'npm install @types/nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[3], 'npm install ts-node --save-dev');
-    assert.strictEqual(commandsExecuted[4], 'npx tsc --init');
+    assert.strictEqual(commandsExecuted[4], 'npm install @nightwatch/mobile-helper --save-dev');
+    assert.strictEqual(commandsExecuted[5], 'npx tsc --init');
 
     // Test examples copied
     const examplesPath = path.join(rootDir, answers.examplesLocation);
@@ -652,6 +653,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Installing nightwatch'), true);
     assert.strictEqual(output.includes('Installing typescript'), true);
     assert.strictEqual(output.includes('Installing @types/nightwatch'), true);
+    assert.strictEqual(output.includes('Installing @nightwatch/mobile-helper'), true);
     assert.strictEqual(
       output.includes(`Success! Configuration file generated at: "${path.join(rootDir, 'nightwatch.conf.js')}"`),
       true
@@ -863,13 +865,14 @@ describe('e2e tests for init', () => {
     }
 
     // Test Packages and webdrivers installed
-    assert.strictEqual(commandsExecuted.length, 6);
+    assert.strictEqual(commandsExecuted.length, 7);
     assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[1], 'npm install typescript --save-dev');
     assert.strictEqual(commandsExecuted[2], 'npm install @types/nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[3], 'npm install ts-node --save-dev');
-    assert.strictEqual(commandsExecuted[4], 'npx tsc --init');
-    assert.strictEqual(commandsExecuted[5], 'npm install geckodriver --save-dev');
+    assert.strictEqual(commandsExecuted[4], 'npm install @nightwatch/mobile-helper --save-dev');
+    assert.strictEqual(commandsExecuted[5], 'npx tsc --init');
+    assert.strictEqual(commandsExecuted[6], 'npm install geckodriver --save-dev');
 
     // Test examples copied
     const examplesPath = path.join(rootDir, answers.examplesLocation);
@@ -884,6 +887,7 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Installing nightwatch'), true);
     assert.strictEqual(output.includes('Installing typescript'), true);
     assert.strictEqual(output.includes('Installing @types/nightwatch'), true);
+    assert.strictEqual(output.includes('Installing @nightwatch/mobile-helper'), true);
     assert.strictEqual(
       output.includes(`Success! Configuration file generated at: "${path.join(rootDir, configFileName)}"`),
       true
@@ -1240,14 +1244,15 @@ describe('e2e tests for init', () => {
 
     // Test Packages and webdrivers installed
     if (process.platform === 'darwin') {
-      assert.strictEqual(commandsExecuted.length, 4);
-      assert.strictEqual(commandsExecuted[3], 'sudo safaridriver --enable');
+      assert.strictEqual(commandsExecuted.length, 5);
+      assert.strictEqual(commandsExecuted[4], 'sudo safaridriver --enable');
     } else {
-      assert.strictEqual(commandsExecuted.length, 3);
+      assert.strictEqual(commandsExecuted.length, 4);
     }
     assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
-    assert.strictEqual(commandsExecuted[1], 'npm install geckodriver --save-dev');
-    assert.strictEqual(commandsExecuted[2], 'npm install chromedriver --save-dev');
+    assert.strictEqual(commandsExecuted[1], 'npm install @nightwatch/mobile-helper --save-dev');
+    assert.strictEqual(commandsExecuted[2], 'npm install geckodriver --save-dev');
+    assert.strictEqual(commandsExecuted[3], 'npm install chromedriver --save-dev');
 
     // Test examples copied
     const examplesPath = path.join(rootDir, answers.examplesLocation);
@@ -1259,6 +1264,7 @@ describe('e2e tests for init', () => {
     // Test console output
     const output = consoleOutput.toString();
     assert.strictEqual(output.includes('Installing nightwatch'), true);
+    assert.strictEqual(output.includes('Installing @nightwatch/mobile-helper'), true);
     assert.strictEqual(output.includes('Success! Configuration file generated at:'), true);
     assert.strictEqual(output.includes('Installing webdriver for Firefox (geckodriver)...'), true);
     assert.strictEqual(output.includes('Installing webdriver for Chrome (chromedriver)...'), true);
