@@ -116,7 +116,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     when: (answers) => ['remote', 'both'].includes(answers.backend)
   },
 
-  // DESKTOP BROWSERS
+  // BROWSERS
   {
     type: 'checkbox',
     name: 'browsers',
@@ -170,11 +170,11 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     default: false
   },
   
-  // Test on Mobile
+  // TEST ON MOBILE
   {
     type: 'list',
     name: 'mobile',
-    message: 'Would you like to test your website on Mobile devices as well?',
+    message: 'Would you like to run your e2e tests on Mobile devices as well?',
     choices: () => [
       {name: 'Yes', value: true},
       {name: 'No, skip for now', value: false}
