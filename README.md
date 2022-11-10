@@ -24,6 +24,9 @@ $ npm init nightwatch
 # if you want to initialize a new project
 $ npm init nightwatch path/to/new/project
 
+# for testing on mobile browsers only
+$ npm init nightwatch -- --mobile
+
 # generate a new config file in your existing
 # Nightwatch project (also installs webdrivers
 # and other required packages).
@@ -34,9 +37,11 @@ $ npm init nightwatch -- --generate-config
 
 - What is your Language - Test Runner setup? 
 - Where do you want to run your e2e tests? 
-- Where you'll be testing on? 
+- Which browsers will you be testing on? 
 - Where do you plan to keep your end-to-end tests? 
 - What is the base_url of your project? 
+- Allow Nightwatch to anonymously collect usage metrics?
+- Would you like to run your e2e tests on Mobile devices as well?
 
 Nightwatch will do the entire setup for you based on your answers.
 
