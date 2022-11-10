@@ -2,12 +2,12 @@
   "language": "js",
   "runner": "nightwatch",
   "backend": "both",
+  "cloudProvider": "browserstack",
   "browsers": [
     "firefox",
-    "chrome",
-    "selenium-server"
+    "chrome"
   ],
-  "cloudProvider": "browserstack",
+  "seleniumServer": true,
   "testsLocation": "nightwatch-e2e",
   "baseUrl": "http://localhost",
   "allowAnonymousMetrics": false,

@@ -209,7 +209,6 @@ export class NightwatchInit {
     if (backendHasLocal) {
       if (answers.browsers) {
         // we are testing on desktop browsers
-        answers.seleniumServer = true;
 
         // Remove safari from answers.browsers for non-mac users
         if (process.platform !== 'darwin' && answers.browsers.includes('safari')) {
