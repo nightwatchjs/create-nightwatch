@@ -19,18 +19,18 @@ function mockLoger(consoleOutput) {
   );
 }
 
-describe('test confirmRootDir', async () => {
-  beforeEach(() => {
+describe('test confirmRootDir', async function () {
+  beforeEach(function () {
     mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
   });
 
-  afterEach(() => {
+  afterEach(function () {
     mockery.deregisterAll();
     mockery.resetCache();
     mockery.disable();
   });
 
-  test('when given root dir is confirmed', async () => {
+  it('when given root dir is confirmed', async function () {
     const consoleOutput = [];
     mockLoger(consoleOutput);
 
@@ -52,7 +52,7 @@ describe('test confirmRootDir', async () => {
     assert.strictEqual(output.includes('Current working directory is not a node project'), true);
   });
 
-  test('when given root dir is not confirmed and new path is provided', async () => {
+  it('when given root dir is not confirmed and new path is provided', async function () {
     const consoleOutput = [];
     mockLoger(consoleOutput);
 

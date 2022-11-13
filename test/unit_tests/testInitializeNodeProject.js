@@ -18,18 +18,18 @@ function mockLoger(consoleOutput) {
   );
 }
 
-describe('test initializeNodeProject', () => {
-  beforeEach(() => {
+describe('test initializeNodeProject', function () {
+  beforeEach(function () {
     mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
   });
 
-  afterEach(() => {
+  afterEach(function () {
     mockery.deregisterAll();
     mockery.resetCache();
     mockery.disable();
   });
 
-  test('when rootDir exists', () => {
+  it('when rootDir exists', function () {
     const consoleOutput = [];
     mockLoger(consoleOutput);
 
@@ -71,7 +71,7 @@ describe('test initializeNodeProject', () => {
     assert.strictEqual(output.includes('Initializing a new NPM project'), true);
   });
 
-  test('when rootDir does not exists', () => {
+  it('when rootDir does not exists', function () {
     const rootDir = 'someDirPath';
 
     const consoleOutput = [];

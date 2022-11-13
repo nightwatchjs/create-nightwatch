@@ -723,7 +723,7 @@ export class NightwatchInit {
 
     // Join Discord and GitHub
     Logger.info('💬 Join our Discord community to find answers to your issues or queries. Or just join and say hi.');
-    Logger.info(colors.cyan('  https://discord.gg/SN8Da2X'), '\n');
+    Logger.info(colors.cyan('   https://discord.gg/SN8Da2X'), '\n');
 
     if (!this.options?.mobile) {
       Logger.info(colors.green('🚀 RUN EXAMPLE TESTS'), '\n');

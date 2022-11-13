@@ -172,7 +172,7 @@ describe('index tests',  function () {
     const index = require('../../lib/index');
     await index.run();
     const output = consoleOutput.toString();
-    console.log(consoleOutput)
+
     assert.strictEqual(
       output.includes(`We\'ve updated this onboarding tool: ${VERSION} -> 1.0.2. To get the latest experience, run: npm init nightwatch@latest`),
       true

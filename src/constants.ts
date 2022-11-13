@@ -71,7 +71,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
   {
     type: 'list',
     name: 'languageRunnerSetup',
-    message: 'Select language & test runner variant',
+    message: 'Select language + test runner variant',
     choices: [
       {name: 'JavaScript / default', value: 'js-nightwatch'},
       {name: 'TypeScript / default', value: 'ts-nightwatch'},
@@ -90,36 +90,13 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     }
   },
 
-  // TESTING BACKEND
-  {
-    type: 'list',
-    name: 'backend',
-    message: 'Select where to run end-to-end tests',
-    choices: [
-      {name: 'On localhost', value: 'local'},
-      {name: 'On a remote/cloud service', value: 'remote'},
-      {name: 'Both', value: 'both'}
-    ],
-    default: 'local'
-  },
 
-  {
-    type: 'list',
-    name: 'cloudProvider',
-    message: '(Remote) Select your cloud provider:',
-    choices: [
-      {name: 'BrowserStack', value: 'browserstack'},
-      {name: 'Sauce Labs', value: 'saucelabs'},
-      {name: 'Other providers or remote selenium-server', value: 'other'}
-    ],
-    when: (answers) => ['remote', 'both'].includes(answers.backend)
-  },
 
   // BROWSERS
   {
     type: 'checkbox',
     name: 'browsers',
-    message: 'Choose target browsers',
+    message: 'Select target browsers',
     choices: (answers) => {
       let browsers = BROWSER_CHOICES;
       if (answers.backend === 'local' && process.platform !== 'darwin') {
@@ -141,8 +118,8 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
   {
     type: 'input',
     name: 'testsLocation',
-    message: 'Enter source folder where test files will be located',
-    default: 'tests'
+    message: 'Enter source folder where test files are stored',
+    default: 'test'
   },
 
   {
@@ -159,6 +136,31 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     name: 'baseUrl',
     message: 'Enter the base_url of the project',
     default: 'http://localhost'
+  },
+
+  // TESTING BACKEND
+  {
+    type: 'list',
+    name: 'backend',
+    message: 'Select where to run Nightwatch tests',
+    choices: [
+      {name: 'On localhost', value: 'local'},
+      {name: 'On a remote/cloud service', value: 'remote'},
+      {name: 'Both', value: 'both'}
+    ],
+    default: 'local'
+  },
+
+  {
+    type: 'list',
+    name: 'cloudProvider',
+    message: '(Remote) Select cloud provider:',
+    choices: [
+      {name: 'BrowserStack', value: 'browserstack'},
+      {name: 'Sauce Labs', value: 'saucelabs'},
+      {name: 'Other providers or remote selenium-server', value: 'other'}
+    ],
+    when: (answers) => ['remote', 'both'].includes(answers.backend)
   },
 
   // ANONYMOUS METRIC COLLECTION
