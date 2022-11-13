@@ -260,8 +260,10 @@ describe('e2e tests for init', function () {
     nightwatchInit.askQuestions = function() {
       return answers;
     };
-    const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestPath = function() {
+    const configPath = path.join(rootDir, 'nightwatch.conf.cjs');
+    nightwatchInit.getConfigDestPath = () => {
+      nightwatchInit.otherInfo.usingESM = true;
+
       return configPath;
     };
 
@@ -332,7 +334,7 @@ describe('e2e tests for init', function () {
     );
 
     assert.strictEqual(output.includes('IMPORTANT'), true);
-    assert.strictEqual(output.includes('To run tests on your remote device, please set the host and port property in your nightwatch.conf.js file.'), true);
+    assert.strictEqual(output.includes('To run tests on your remote device, please set the host and port property in your nightwatch.conf.cjs file.'), true);
     assert.strictEqual(output.includes('These can be located at:'), true);
     assert.strictEqual(output.includes('Please set the credentials (if any) required to run tests'), true);
     assert.strictEqual(output.includes('- REMOTE_USERNAME'), true);

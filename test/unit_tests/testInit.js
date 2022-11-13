@@ -755,13 +755,16 @@ describe('init tests', () => {
       mockery.disable();
     });
 
-    test('if config file is not already present', async (done) => {
+    test('if config file is not already present', async () => {
       const consoleOutput = [];
       mockLoger(consoleOutput);
 
       mockery.registerMock('node:fs', {
         existsSync(path) {
           return false;
+        },
+        readFileSync() {
+          return '{}';
         }
       });
 
@@ -772,17 +775,20 @@ describe('init tests', () => {
       const configExpPath = path.join(rootDir, 'nightwatch.conf.js');
 
       assert.strictEqual(configDestPath, configExpPath);
-
-      done();
+      assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, undefined);
+      assert.strictEqual(nightwatchInit.otherInfo.usingESM, false);
     });
 
-    test('if config file is already present and overwrite in prompt', async (done) => {
+    test('if config file is already present and overwrite in prompt', async () => {
       const consoleOutput = [];
       mockLoger(consoleOutput);
 
       mockery.registerMock('node:fs', {
         existsSync(path) {
           return true;
+        },
+        readFileSync() {
+          return '{}';
         }
       });
 
@@ -798,24 +804,25 @@ describe('init tests', () => {
 
       const configExpPath = path.join(rootDir, 'nightwatch.conf.js');
 
-      assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, undefined);
       assert.strictEqual(configDestPath, configExpPath);
-
-      done();
+      assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, undefined);
+      assert.strictEqual(nightwatchInit.otherInfo.usingESM, false);
     });
 
-    test('if config file is already present and new file in prompt', async (done) => {
+    test('if config file is already present and new file in prompt', async () => {
       const consoleOutput = [];
       mockLoger(consoleOutput);
 
       mockery.registerMock('node:fs', {
         existsSync(path) {
           return true;
+        },
+        readFileSync() {
+          return '{}';
         }
       });
 
       const configFileNameInitials = 'new-config';
-      const configFileName = `${configFileNameInitials}.conf.js`;
       mockery.registerMock('inquirer', {
         async prompt() {
           return {overwrite: false, newFileName: configFileNameInitials};
@@ -826,12 +833,87 @@ describe('init tests', () => {
       const nightwatchInit = new NightwatchInit(rootDir, []);
       const configDestPath = await nightwatchInit.getConfigDestPath();
 
+      const configFileName = `${configFileNameInitials}.conf.js`;
       const configExpPath = path.join(rootDir, configFileName);
 
-      assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, configFileName);
       assert.strictEqual(configDestPath, configExpPath);
+      assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, configFileName);
+      assert.strictEqual(nightwatchInit.otherInfo.usingESM, false);
+    });
 
-      done();
+    test('if config file is not already present (ESM)', async () => {
+      const consoleOutput = [];
+      mockery.registerMock(
+        './logger',
+        class {
+          static error(...msgs) {
+            consoleOutput.push(...msgs);
+          }
+        }
+      );
+
+      mockery.registerMock('node:fs', {
+        existsSync(path) {
+          return false;
+        },
+        readFileSync() {
+          return '{"type": "module"}';
+        }
+      });
+
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, []);
+      const configDestPath = await nightwatchInit.getConfigDestPath();
+
+      const configExpPath = path.join(rootDir, 'nightwatch.conf.cjs');
+
+      assert.strictEqual(configDestPath, configExpPath);
+      assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, undefined);
+      assert.strictEqual(nightwatchInit.otherInfo.usingESM, true);
+    });
+
+    test('if config file is already present and new file in prompt (ESM)', async () => {
+      const consoleOutput = [];
+      mockery.registerMock(
+        './logger',
+        class {
+          static error(...msgs) {
+            consoleOutput.push(...msgs);
+          }
+        }
+      );
+
+      mockery.registerMock('node:fs', {
+        existsSync(path) {
+          return true;
+        },
+        readFileSync() {
+          return '{"type": "module"}';
+        }
+      });
+
+      const configFileNameInitials = 'new-config';
+      let answersPassedToInquirer;
+      mockery.registerMock('inquirer', {
+        async prompt(questions, answers) {
+          answersPassedToInquirer = answers;
+
+          return {overwrite: false, newFileName: configFileNameInitials};
+        }
+      });
+
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, []);
+      const configDestPath = await nightwatchInit.getConfigDestPath();
+
+      assert.deepStrictEqual(answersPassedToInquirer, {rootDir: rootDir, configExt: '.conf.cjs'});
+
+      const configFileName = `${configFileNameInitials}.conf.cjs`;
+      const configExpPath = path.join(rootDir, configFileName);
+
+      assert.strictEqual(configDestPath, configExpPath);
+      assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, configFileName);
+      assert.strictEqual(nightwatchInit.otherInfo.usingESM, true);
     });
   });
 

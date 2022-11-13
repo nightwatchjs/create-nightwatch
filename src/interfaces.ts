@@ -42,6 +42,7 @@ export interface OtherInfo {
   cucumberExamplesAdded?: boolean;
   javaNotInstalled?: boolean;
   nonDefaultConfigName?: string;
+  usingESM?: boolean;
 }
 
 export interface MobileResult {

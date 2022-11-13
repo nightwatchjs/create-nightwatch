@@ -202,13 +202,13 @@ export const CONFIG_DEST_QUES: inquirer.QuestionCollection = [
     validate: (value, answers) => {
       if (!value.length) {
         return 'File name cannot be empty.';
-      } else if (answers && fs.existsSync(path.join(answers.rootDir, `${value}.conf.js`))) {
-        return `File with name "${value}.conf.js" already exists.`;
+      } else if (answers && fs.existsSync(path.join(answers.rootDir, `${value}${answers.configExt}`))) {
+        return `File with name "${value}${answers.configExt}" already exists.`;
       }
 
       return true;
     },
-    transformer: (value) => value + '.conf.js',
+    transformer: (value, answers) => value + answers.configExt,
     when: (answers) => !answers.overwrite
   }
 ];

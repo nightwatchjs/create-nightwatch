@@ -386,17 +386,24 @@ export class NightwatchInit {
       Logger.info('Generating a configuration file based on your responses...\n');
     }
 
-    const configDestPath = path.join(this.rootDir, 'nightwatch.conf.js');
+    // check for ESM project
+    const packageJson = JSON.parse(fs.readFileSync(path.join(this.rootDir, 'package.json'), 'utf-8'));
+    const usingESM = packageJson.type === 'module';
+    this.otherInfo.usingESM = usingESM;
+
+    const configExt = usingESM ? '.conf.cjs' : '.conf.js';
+
+    const configDestPath = path.join(this.rootDir, `nightwatch${configExt}`);
 
     if (fs.existsSync(configDestPath)) {
       Logger.info(colors.yellow(`There seems to be another config file located at "${configDestPath}".\n`));
 
-      const answers: ConfigDestination = await prompt(CONFIG_DEST_QUES, {rootDir: this.rootDir});
+      const answers: ConfigDestination = await prompt(CONFIG_DEST_QUES, {rootDir: this.rootDir, configExt});
       // Adding a newline after questions.
       Logger.info();
 
       if (!answers.overwrite) {
-        const configFileName = `${answers.newFileName}.conf.js`;
+        const configFileName = `${answers.newFileName}${configExt}`;
         this.otherInfo.nonDefaultConfigName = configFileName;
 
         return path.join(this.rootDir, configFileName);
@@ -663,7 +670,7 @@ export class NightwatchInit {
     if (answers.backend && ['remote', 'both'].includes(answers.backend)) {
       Logger.info(colors.red('IMPORTANT'));
       if (answers.cloudProvider === 'other') {
-        let configFileName = 'nightwatch.conf.js';
+        let configFileName = this.otherInfo.usingESM ? 'nightwatch.conf.cjs' : 'nightwatch.conf.js';
         if (this.otherInfo.nonDefaultConfigName) {
           configFileName = this.otherInfo.nonDefaultConfigName;
         }
