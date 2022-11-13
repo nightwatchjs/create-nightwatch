@@ -1,6 +1,22 @@
 const assert = require('assert');
 const mockery = require('mockery');
 
+function mockLoger(consoleOutput) {
+  mockery.registerMock(
+    './logger',
+    class {
+      static error(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+      static info(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+      static warn(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+    }
+  );
+}
 
 describe('test initializeNodeProject', () => {
   beforeEach(() => {
@@ -15,14 +31,7 @@ describe('test initializeNodeProject', () => {
 
   test('when rootDir exists', () => {
     const consoleOutput = [];
-    mockery.registerMock(
-      './logger',
-      class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
-        }
-      }
-    );
+    mockLoger(consoleOutput);
 
     let newDirCreated = false;
     mockery.registerMock('node:fs', {
@@ -66,14 +75,7 @@ describe('test initializeNodeProject', () => {
     const rootDir = 'someDirPath';
 
     const consoleOutput = [];
-    mockery.registerMock(
-      './logger',
-      class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
-        }
-      }
-    );
+    mockLoger(consoleOutput);
 
     let newDirCreatedRecursively = false;
     mockery.registerMock('node:fs', {

@@ -3,8 +3,24 @@ const mockery = require('mockery');
 const fs = require('node:fs');
 const path = require('path');
 
-const rootDir = path.join(process.cwd(), 'test_output');
+function mockLoger(consoleOutput) {
+  mockery.registerMock(
+    './logger',
+    class {
+      static error(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+      static info(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+      static warn(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+    }
+  );
+}
 
+const rootDir = path.join(process.cwd(), 'test_output');
 describe('init tests', () => {
   describe('test askQuestions', () => {
     beforeEach(() => {
@@ -586,14 +602,7 @@ describe('init tests', () => {
 
     test('packages are installed correctly with correct output', () => {
       const consoleOutput = [];
-      mockery.registerMock(
-        './logger',
-        class {
-          static error(...msgs) {
-            consoleOutput.push(...msgs);
-          }
-        }
-      );
+      mockLoger(consoleOutput);
 
       const commandsExecuted = [];
       mockery.registerMock('child_process', {
@@ -748,14 +757,7 @@ describe('init tests', () => {
 
     test('if config file is not already present', async (done) => {
       const consoleOutput = [];
-      mockery.registerMock(
-        './logger',
-        class {
-          static error(...msgs) {
-            consoleOutput.push(...msgs);
-          }
-        }
-      );
+      mockLoger(consoleOutput);
 
       mockery.registerMock('node:fs', {
         existsSync(path) {
@@ -776,14 +778,7 @@ describe('init tests', () => {
 
     test('if config file is already present and overwrite in prompt', async (done) => {
       const consoleOutput = [];
-      mockery.registerMock(
-        './logger',
-        class {
-          static error(...msgs) {
-            consoleOutput.push(...msgs);
-          }
-        }
-      );
+      mockLoger(consoleOutput);
 
       mockery.registerMock('node:fs', {
         existsSync(path) {
@@ -811,14 +806,7 @@ describe('init tests', () => {
 
     test('if config file is already present and new file in prompt', async (done) => {
       const consoleOutput = [];
-      mockery.registerMock(
-        './logger',
-        class {
-          static error(...msgs) {
-            consoleOutput.push(...msgs);
-          }
-        }
-      );
+      mockLoger(consoleOutput);
 
       mockery.registerMock('node:fs', {
         existsSync(path) {
@@ -1276,9 +1264,7 @@ describe('init tests', () => {
       nightwatchInit.generateConfig(answers, 'test_config.conf.js');
       const config = require('../../test_config.conf.js');
 
-      assert.strictEqual(config.usage_analytics.enabled, false);
-      assert.strictEqual(config.usage_analytics.log_path, './logs/analytics');
-      assert.strictEqual(config.usage_analytics.client_id, '3141-5926-5358-9793');
+      assert.strictEqual(typeof config.usage_analytics, 'undefined');
 
       fs.unlinkSync('test_config.conf.js');
     });

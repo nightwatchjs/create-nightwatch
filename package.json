@@ -10,8 +10,9 @@
     "build": "tsc",
     "prepublishOnly": "tsc --outDir dist",
     "create-nightwatch": "tsc && node dev-run.js",
-    "test:unit": "npx nightwatch tests/unit_tests",
-    "test:e2e": "npx nightwatch tests/e2e_tests"
+    "esbuild": "esbuild --bundle src/index.ts --outdir=dist --platform=node --target=ES2019",
+    "test:unit": "npx nightwatch test/unit_tests",
+    "test:e2e": "npx nightwatch test/e2e_tests"
   },
   "keywords": [],
   "author": "Priyansh Garg",
@@ -31,9 +32,11 @@
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.27.1",
     "@typescript-eslint/parser": "^5.27.1",
-    "eslint": "^8.17.0",
+    "chromedriver": "^107.0.3",
+    "eslint": "^8.27.0",
+    "mocha": "^10.1.0",
     "mockery": "^2.1.0",
-    "nightwatch": "^2.1.8",
+    "nightwatch": "^2.5.0",
     "nock": "^13.2.9",
     "typescript": "^4.7.3"
   },
@@ -45,6 +48,6 @@
     "ejs": "^3.1.8",
     "inquirer": "^8.2.4",
     "minimist": "^1.2.6",
-    "uuid": "^8.3.2"
+    "uuid": "^9.0.0"
   }
 }

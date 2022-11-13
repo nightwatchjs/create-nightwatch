@@ -8,19 +8,37 @@ const nock = require('nock');
 
 const rootDir = path.join(process.cwd(), 'test_output');
 
-describe('e2e tests for init', () => {
-  before(() => {
+function mockLoger(consoleOutput) {
+  mockery.registerMock(
+    './logger',
+    class {
+      static error(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+      static info(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+      static warn(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+    }
+  );
+}
+
+
+describe('e2e tests for init', function () {
+  before(function()  {
     if (!nock.isActive()) {
       nock.activate();
     }
   });
 
-  after(() => {
+  after(function() {
     nock.cleanAll();
     nock.restore();
   });
 
-  beforeEach(() => {
+  beforeEach(function() {
     rmDirSync(rootDir);
 
     mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
@@ -36,22 +54,15 @@ describe('e2e tests for init', () => {
     }
   });
 
-  afterEach(() => {
+  afterEach(function() {
     mockery.deregisterAll();
     mockery.resetCache();
     mockery.disable();
   });
 
-  test('with js-nightwatch-local', async () => {
+  it('with js-nightwatch-local', async function () {
     const consoleOutput = [];
-    mockery.registerMock(
-      './logger',
-      class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
-        }
-      }
-    );
+    mockLoger(consoleOutput);
 
     const commandsExecuted = [];
     mockery.registerMock('child_process', {
@@ -92,11 +103,11 @@ describe('e2e tests for init', () => {
     const {NightwatchInit} = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, []);
 
-    nightwatchInit.askQuestions = () => {
+    nightwatchInit.askQuestions = function() {
       return answers;
     };
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestPath = () => {
+    nightwatchInit.getConfigDestPath = function() {
       return configPath;
     };
 
@@ -154,13 +165,16 @@ describe('e2e tests for init', () => {
 
     // Test Packages and webdrivers installed
     if (process.platform === 'darwin') {
-      assert.strictEqual(commandsExecuted.length, 3);
+      assert.strictEqual(commandsExecuted.length, 4);
       assert.strictEqual(commandsExecuted[2], 'sudo safaridriver --enable');
+      assert.strictEqual(commandsExecuted[3], 'npx nightwatch --version');
     } else {
-      assert.strictEqual(commandsExecuted.length, 2);
+      assert.strictEqual(commandsExecuted.length, 3);
+      assert.strictEqual(commandsExecuted[2], 'npx nightwatch --version');
     }
     assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[1], 'npm install chromedriver --save-dev');
+
 
     // Test examples copied
     const examplesPath = path.join(rootDir, answers.examplesLocation);
@@ -179,10 +193,9 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Success! Generated some example files at \'nightwatch\'.'), true);
     assert.strictEqual(output.includes('Generating template files...'), true);
     assert.strictEqual(output.includes(`Success! Generated some templates files at '${path.join('nightwatch', 'templates')}'.`), true);
-    assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
-    assert.strictEqual(output.includes('Join our Discord community and instantly find answers to your issues or queries.'), true);
-    assert.strictEqual(output.includes('Visit our GitHub page to report bugs or raise feature requests:'), true);
-    assert.strictEqual(output.includes('RUN NIGHTWATCH TESTS'), true);
+    assert.strictEqual(output.includes('✨ SETUP COMPLETE'), true);
+    assert.strictEqual(output.includes('💬 Join our Discord community to find answers to your issues or queries.'), true);
+    assert.strictEqual(output.includes('RUN EXAMPLE TESTS'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
     assert.strictEqual(
@@ -199,16 +212,9 @@ describe('e2e tests for init', () => {
 
   });
 
-  test('with js-cucumber-remote', async () => {
+  it('with js-cucumber-remote', async function () {
     const consoleOutput = [];
-    mockery.registerMock(
-      './logger',
-      class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
-        }
-      }
-    );
+    mockLoger(consoleOutput);
 
     const commandsExecuted = [];
     mockery.registerMock('child_process', {
@@ -251,11 +257,11 @@ describe('e2e tests for init', () => {
     const {NightwatchInit} = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, []);
 
-    nightwatchInit.askQuestions = () => {
+    nightwatchInit.askQuestions = function() {
       return answers;
     };
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestPath = () => {
+    nightwatchInit.getConfigDestPath = function() {
       return configPath;
     };
 
@@ -301,7 +307,7 @@ describe('e2e tests for init', () => {
     assert.deepEqual(Object.keys(config.test_settings), ['default', 'remote', 'remote.chrome', 'remote.edge']);
 
     // Test Packages and webdrivers installed
-    assert.strictEqual(commandsExecuted.length, 2);
+    assert.strictEqual(commandsExecuted.length, 3);
     assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[1], 'npm install @cucumber/cucumber --save-dev');
 
@@ -324,9 +330,7 @@ describe('e2e tests for init', () => {
       ),
       true
     );
-    assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
-    assert.strictEqual(output.includes('Join our Discord community and instantly find answers to your issues or queries.'), true);
-    assert.strictEqual(output.includes('Visit our GitHub page to report bugs or raise feature requests:'), true);
+
     assert.strictEqual(output.includes('IMPORTANT'), true);
     assert.strictEqual(output.includes('To run tests on your remote device, please set the host and port property in your nightwatch.conf.js file.'), true);
     assert.strictEqual(output.includes('These can be located at:'), true);
@@ -334,7 +338,6 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('- REMOTE_USERNAME'), true);
     assert.strictEqual(output.includes('- REMOTE_ACCESS_KEY'), true);
     assert.strictEqual(output.includes('(.env files are also supported)'), true);
-    assert.strictEqual(output.includes('RUN NIGHTWATCH TESTS'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
     assert.strictEqual(output.includes('To run your tests with CucumberJS, simply run:'), true);
@@ -351,16 +354,9 @@ describe('e2e tests for init', () => {
 
   });
 
-  test('with js-mocha-both', async () => {
+  it('with js-mocha-both', async function () {
     const consoleOutput = [];
-    mockery.registerMock(
-      './logger',
-      class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
-        }
-      }
-    );
+    mockLoger(consoleOutput);
 
     const commandsExecuted = [];
     mockery.registerMock('child_process', {
@@ -405,11 +401,11 @@ describe('e2e tests for init', () => {
     const {NightwatchInit} = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, []);
 
-    nightwatchInit.askQuestions = () => {
+    nightwatchInit.askQuestions = function() {
       return answers;
     };
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestPath = () => {
+    nightwatchInit.getConfigDestPath = function() {
       return configPath;
     };
 
@@ -479,7 +475,7 @@ describe('e2e tests for init', () => {
     }
 
     // Test Packages and webdrivers installed
-    assert.strictEqual(commandsExecuted.length, 2);
+    assert.strictEqual(commandsExecuted.length, 3);
     assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[1], 'npm install chromedriver --save-dev');
 
@@ -503,14 +499,10 @@ describe('e2e tests for init', () => {
     }
     assert.strictEqual(output.includes('Generating example files...'), true);
     assert.strictEqual(output.includes('Success! Generated some example files at \'nightwatch\'.'), true);
-    assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
-    assert.strictEqual(output.includes('Join our Discord community and instantly find answers to your issues or queries.'), true);
-    assert.strictEqual(output.includes('Visit our GitHub page to report bugs or raise feature requests:'), true);
     assert.strictEqual(output.includes('Please set the credentials required to run tests on your cloud provider'), true);
     assert.strictEqual(output.includes('- BROWSERSTACK_USERNAME'), true);
     assert.strictEqual(output.includes('- BROWSERSTACK_ACCESS_KEY'), true);
     assert.strictEqual(output.includes('(.env files are also supported)'), true);
-    assert.strictEqual(output.includes('RUN NIGHTWATCH TESTS'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
     assert.strictEqual(output.includes(`npx nightwatch .${path.sep}${path.join('nightwatch', 'examples')}`), true);
@@ -524,16 +516,9 @@ describe('e2e tests for init', () => {
 
   });
 
-  test('with ts-nightwatch-remote-mobile', async () => {
+  it('with ts-nightwatch-remote-mobile', async function () {
     const consoleOutput = [];
-    mockery.registerMock(
-      './logger',
-      class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
-        }
-      }
-    );
+    mockLoger(consoleOutput);
 
     const commandsExecuted = [];
     mockery.registerMock('child_process', {
@@ -580,11 +565,11 @@ describe('e2e tests for init', () => {
     const {NightwatchInit} = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, []);
 
-    nightwatchInit.askQuestions = () => {
+    nightwatchInit.askQuestions = function() {
       return answers;
     };
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestPath = () => {
+    nightwatchInit.getConfigDestPath = function() {
       return configPath;
     };
 
@@ -633,13 +618,14 @@ describe('e2e tests for init', () => {
     ]);
 
     // Test Packages and webdrivers installed
-    assert.strictEqual(commandsExecuted.length, 6);
+    assert.strictEqual(commandsExecuted.length, 7);
     assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[1], 'npm install typescript --save-dev');
     assert.strictEqual(commandsExecuted[2], 'npm install @types/nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[3], 'npm install ts-node --save-dev');
     assert.strictEqual(commandsExecuted[4], 'npm install @nightwatch/mobile-helper --save-dev');
     assert.strictEqual(commandsExecuted[5], 'npx tsc --init');
+    assert.strictEqual(commandsExecuted[6], 'npx nightwatch --version');
 
     // Test examples copied
     const examplesPath = path.join(rootDir, answers.examplesLocation);
@@ -663,14 +649,11 @@ describe('e2e tests for init', () => {
       output.includes('Success! Generated some example files at \'nightwatch\'.'),
       true
     );
-    assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
-    assert.strictEqual(output.includes('Join our Discord community and instantly find answers to your issues or queries.'), true);
-    assert.strictEqual(output.includes('Visit our GitHub page to report bugs or raise feature requests:'), true);
+
     assert.strictEqual(output.includes('Please set the credentials required to run tests on your cloud provider'), true);
     assert.strictEqual(output.includes('- SAUCE_USERNAME'), true);
     assert.strictEqual(output.includes('- SAUCE_ACCESS_KEY'), true);
     assert.strictEqual(output.includes('(.env files are also supported)'), true);
-    assert.strictEqual(output.includes('RUN NIGHTWATCH TESTS'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
     assert.strictEqual(output.includes(`npx nightwatch .${path.sep}${path.join('nightwatch')} --env saucelabs.chrome`), true);
@@ -686,16 +669,9 @@ describe('e2e tests for init', () => {
 
   });
 
-  test('with ts-mocha-both-browserstack-mobile and non-default config', async () => {
+  it('with ts-mocha-both-browserstack-mobile and non-default config', async function () {
     const consoleOutput = [];
-    mockery.registerMock(
-      './logger',
-      class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
-        }
-      }
-    );
+    mockLoger(consoleOutput);
 
     const commandsExecuted = [];
     mockery.registerMock('child_process', {
@@ -773,13 +749,13 @@ describe('e2e tests for init', () => {
     const {NightwatchInit} = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, []);
 
-    nightwatchInit.askQuestions = () => {
+    nightwatchInit.askQuestions = function() {
       return answers;
     };
 
     const configFileName = 'new-config.conf.js';
     const configPath = path.join(rootDir, configFileName);
-    nightwatchInit.getConfigDestPath = () => {
+    nightwatchInit.getConfigDestPath = function() {
       nightwatchInit.otherInfo.nonDefaultConfigName = configFileName;
 
       return configPath;
@@ -865,7 +841,7 @@ describe('e2e tests for init', () => {
     }
 
     // Test Packages and webdrivers installed
-    assert.strictEqual(commandsExecuted.length, 7);
+    assert.strictEqual(commandsExecuted.length, 8);
     assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[1], 'npm install typescript --save-dev');
     assert.strictEqual(commandsExecuted[2], 'npm install @types/nightwatch --save-dev');
@@ -899,14 +875,10 @@ describe('e2e tests for init', () => {
       output.includes('Examples already exists at \'nightwatch\'. Skipping...'),
       true
     );
-    assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
-    assert.strictEqual(output.includes('Join our Discord community and instantly find answers to your issues or queries.'), true);
-    assert.strictEqual(output.includes('Visit our GitHub page to report bugs or raise feature requests:'), true);
     assert.strictEqual(output.includes('Please set the credentials required to run tests on your cloud provider'), true);
     assert.strictEqual(output.includes('- BROWSERSTACK_USERNAME'), true);
     assert.strictEqual(output.includes('- BROWSERSTACK_ACCESS_KEY'), true);
     assert.strictEqual(output.includes('(.env files are also supported)'), true);
-    assert.strictEqual(output.includes('RUN NIGHTWATCH TESTS'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
     assert.strictEqual(output.includes(`npx nightwatch .${path.sep}${path.join('nightwatch')} --config new-config.conf.js`), true);
@@ -941,16 +913,9 @@ describe('e2e tests for init', () => {
 
   });
 
-  test('with yes and browser flag', async () => {
+  it('with yes and browser flag', async function () {
     const consoleOutput = [];
-    mockery.registerMock(
-      './logger',
-      class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
-        }
-      }
-    );
+    mockLoger(consoleOutput);
 
     const commandsExecuted = [];
     mockery.registerMock('child_process', {
@@ -989,7 +954,7 @@ describe('e2e tests for init', () => {
     });
 
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestPath = () => {
+    nightwatchInit.getConfigDestPath = function() {
       return configPath;
     };
 
@@ -1047,7 +1012,7 @@ describe('e2e tests for init', () => {
     ]);
 
     // Test Packages and webdrivers installed
-    assert.strictEqual(commandsExecuted.length, 5);
+    assert.strictEqual(commandsExecuted.length, 6);
     assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[1], 'npm install @nightwatch/selenium-server --save-dev');
     assert.strictEqual(commandsExecuted[2], 'java -version');
@@ -1070,14 +1035,10 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Installing webdriver for Chrome (chromedriver)...'), true);
     assert.strictEqual(output.includes('Generating example files...'), true);
     assert.strictEqual(output.includes('Success! Generated some example files at \'nightwatch\'.'), true);
-    assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
-    assert.strictEqual(output.includes('Join our Discord community and instantly find answers to your issues or queries.'), true);
-    assert.strictEqual(output.includes('Visit our GitHub page to report bugs or raise feature requests:'), true);
     assert.strictEqual(output.includes('Please set the credentials required to run tests on your cloud provider'), true);
     assert.strictEqual(output.includes('- BROWSERSTACK_USERNAME'), true);
     assert.strictEqual(output.includes('- BROWSERSTACK_ACCESS_KEY'), true);
     assert.strictEqual(output.includes('(.env files are also supported)'), true);
-    assert.strictEqual(output.includes('RUN NIGHTWATCH TESTS'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
     assert.strictEqual(output.includes(`npx nightwatch .${path.sep}${path.join('nightwatch', 'examples')}`), true);
@@ -1092,16 +1053,9 @@ describe('e2e tests for init', () => {
     rmDirSync(rootDir);
   });
 
-  test('with yes, browser and mobile flag', async () => {
+  it('with yes, browser and mobile flag', async function () {
     const consoleOutput = [];
-    mockery.registerMock(
-      './logger',
-      class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
-        }
-      }
-    );
+    mockLoger(consoleOutput);
 
     const commandsExecuted = [];
     mockery.registerMock('child_process', {
@@ -1165,7 +1119,7 @@ describe('e2e tests for init', () => {
     });
 
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestPath = () => {
+    nightwatchInit.getConfigDestPath = function() {
       return configPath;
     };
 
@@ -1244,10 +1198,10 @@ describe('e2e tests for init', () => {
 
     // Test Packages and webdrivers installed
     if (process.platform === 'darwin') {
-      assert.strictEqual(commandsExecuted.length, 5);
+      assert.strictEqual(commandsExecuted.length, 6);
       assert.strictEqual(commandsExecuted[4], 'sudo safaridriver --enable');
     } else {
-      assert.strictEqual(commandsExecuted.length, 4);
+      assert.strictEqual(commandsExecuted.length, 5);
     }
     assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[1], 'npm install @nightwatch/mobile-helper --save-dev');
@@ -1271,14 +1225,10 @@ describe('e2e tests for init', () => {
     if (process.platform === 'darwin') {assert.strictEqual(output.includes('Enabling safaridriver...'), true)}
     assert.strictEqual(output.includes('Generating example files...'), true);
     assert.strictEqual(output.includes('Success! Generated some example files at \'nightwatch\'.'), true);
-    assert.strictEqual(output.includes('Nightwatch setup complete!!'), true);
-    assert.strictEqual(output.includes('Join our Discord community and instantly find answers to your issues or queries.'), true);
-    assert.strictEqual(output.includes('Visit our GitHub page to report bugs or raise feature requests:'), true);
     assert.strictEqual(output.includes('Please set the credentials required to run tests on your cloud provider'), true);
     assert.strictEqual(output.includes('- BROWSERSTACK_USERNAME'), true);
     assert.strictEqual(output.includes('- BROWSERSTACK_ACCESS_KEY'), true);
     assert.strictEqual(output.includes('(.env files are also supported)'), true);
-    assert.strictEqual(output.includes('RUN NIGHTWATCH TESTS\n'), false);
 
     assert.strictEqual(output.includes('RUN NIGHTWATCH TESTS ON MOBILE'), true);
     assert.strictEqual(output.includes('Android setup failed...'), true);
@@ -1303,16 +1253,9 @@ describe('e2e tests for init', () => {
     rmDirSync(rootDir);
   });
 
-  test('generate-config with js-nightwatch-local and seleniumServer false', async () => {
+  it('generate-config with js-nightwatch-local and seleniumServer false', async function () {
     const consoleOutput = [];
-    mockery.registerMock(
-      './logger',
-      class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
-        }
-      }
-    );
+    mockLoger(consoleOutput);
 
     const commandsExecuted = [];
     mockery.registerMock('child_process', {
@@ -1354,11 +1297,11 @@ describe('e2e tests for init', () => {
     const {NightwatchInit} = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, {'generate-config': true});
 
-    nightwatchInit.askQuestions = () => {
+    nightwatchInit.askQuestions = function() {
       return answers;
     };
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestPath = () => {
+    nightwatchInit.getConfigDestPath = function() {
       return configPath;
     };
 
@@ -1430,22 +1373,14 @@ describe('e2e tests for init', () => {
     assert.strictEqual(output.includes('Success! Configuration file generated at:'), true);
     assert.strictEqual(output.includes('Installing webdriver for Chrome (chromedriver)...'), true);
     if (process.platform === 'darwin') {assert.strictEqual(output.includes('Enabling safaridriver...'), true)}
-    assert.strictEqual(output.includes('Happy Testing!!!'), true);
 
     rmDirSync(rootDir);
 
   });
 
-  test('generate-config with ts-nightwatch-both', async () => {
+  it('generate-config with ts-nightwatch-both', async function () {
     const consoleOutput = [];
-    mockery.registerMock(
-      './logger',
-      class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
-        }
-      }
-    );
+    mockLoger(consoleOutput);
 
     const commandsExecuted = [];
     mockery.registerMock('child_process', {
@@ -1488,11 +1423,11 @@ describe('e2e tests for init', () => {
     const {NightwatchInit} = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, {'generate-config': true});
 
-    nightwatchInit.askQuestions = () => {
+    nightwatchInit.askQuestions = function() {
       return answers;
     };
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestPath = () => {
+    nightwatchInit.getConfigDestPath = function() {
       return configPath;
     };
 
@@ -1561,21 +1496,13 @@ describe('e2e tests for init', () => {
       true
     );
     assert.strictEqual(output.includes('Installing webdriver for Firefox (geckodriver)...'), true);
-    assert.strictEqual(output.includes('Happy Testing!!!'), true);
 
     rmDirSync(rootDir);
   });
 
-  test('make sure we send analytics data if allowAnalytics is set to true', async (done) => {
+  it('make sure we send analytics data if allowAnalytics is set to true', async function () {
     const consoleOutput = [];
-    mockery.registerMock(
-      './logger',
-      class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
-        }
-      }
-    );
+    mockLoger(consoleOutput);
 
     const commandsExecuted = [];
     mockery.registerMock('child_process', {
@@ -1623,35 +1550,30 @@ describe('e2e tests for init', () => {
     const {NightwatchInit} = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, {'generate-config': true});
 
-    nightwatchInit.askQuestions = () => {
+    nightwatchInit.askQuestions = function() {
       return answers;
     };
 
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestPath = () => {
+    nightwatchInit.getConfigDestPath = function() {
       return configPath;
     };
 
     await nightwatchInit.run();
-    
-    setTimeout(() => {
-      assert.ok(scope.isDone());
-      done();
-    }, 0);
 
-    rmDirSync(rootDir);
+    new Promise(resolve => {
+      setTimeout(function() {
+        assert.ok(scope.isDone());
+        resolve();
+      }, 0);
+
+      rmDirSync(rootDir);
+    });
   });
 
-  test('make sure we do not send analytics data if allowAnalytics is set to false', async (done) => {
+  it('make sure we do not send analytics data if allowAnalytics is set to false', async function () {
     const consoleOutput = [];
-    mockery.registerMock(
-      './logger',
-      class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
-        }
-      }
-    );
+    mockLoger(consoleOutput);
 
     const commandsExecuted = [];
     mockery.registerMock('child_process', {
@@ -1681,19 +1603,17 @@ describe('e2e tests for init', () => {
     const {NightwatchInit} = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, {'generate-config': true});
 
-    nightwatchInit.askQuestions = () => {
+    nightwatchInit.askQuestions = function() {
       return answers;
     };
 
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestPath = () => {
+    nightwatchInit.getConfigDestPath = function() {
       return configPath;
     };
 
     await nightwatchInit.run();
 
     rmDirSync(rootDir);
-
-    done();
   });
 });

@@ -4,6 +4,22 @@ const assert = require('assert');
 const nock = require('nock');
 const {extend} = require('axios/lib/utils');
 
+function mockLoger(consoleOutput) {
+  mockery.registerMock(
+    './logger',
+    class {
+      static error(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+      static info(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+      static warn(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+    }
+  );
+}
 
 describe('test run function', () => {
   beforeEach(() => {
@@ -34,12 +50,7 @@ describe('test run function', () => {
   test('works with no argument and package.json present', async () => {
     process.argv = ['node', 'filename.js'];
 
-    mockery.registerMock(
-      './logger',
-      class {
-        static error() {}
-      }
-    );
+    mockLoger([]);
 
 
     mockery.registerMock('./utils', {
@@ -205,12 +216,7 @@ describe('test run function', () => {
     process.argv = ['node', 'filename.js', 'new-project', 'some', 'random', 'args'];
     const expectedRootDir = path.join(process.cwd(), 'new-project');
 
-    mockery.registerMock(
-      './logger',
-      class {
-        static error() {}
-      }
-    );
+    mockLoger([]);
 
     mockery.registerMock('node:fs', {
       existsSync() {
@@ -300,12 +306,7 @@ describe('test run function', () => {
     process.argv = ['node', 'filename.js', 'new-project', 'random', '--generate-config', 'args'];
     const expectedRootDir = path.join(process.cwd(), 'new-project');
 
-    mockery.registerMock(
-      './logger',
-      class {
-        static error() {}
-      }
-    );
+    mockLoger([]);
 
     mockery.registerMock('node:fs', {
       existsSync() {
@@ -401,12 +402,7 @@ describe('test run function', () => {
     process.argv = ['node', 'filename.js', 'new-project', 'random', '--browser=chrome', '--browser=safari', 'args'];
     const expectedRootDir = path.join(process.cwd(), 'new-project');
 
-    mockery.registerMock(
-      './logger',
-      class {
-        static error() {}
-      }
-    );
+    mockLoger([]);
 
     mockery.registerMock('node:fs', {
       existsSync() {
@@ -504,12 +500,7 @@ describe('test run function', () => {
     process.argv = ['node', 'filename.js', 'new-project', '-y', '--hello', '--there=hi', '-d', '--generate-config'];
     const expectedRootDir = path.join(process.cwd(), 'new-project');
 
-    mockery.registerMock(
-      './logger',
-      class {
-        static error() {}
-      }
-    );
+    mockLoger([]);
 
     mockery.registerMock('node:fs', {
       existsSync() {

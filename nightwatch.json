@@ -1,6 +1,6 @@
 {
   "src_folders": [
-    "tests"
+    "test"
   ],
   "unit_tests_mode": true
 }

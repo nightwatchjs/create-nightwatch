@@ -2,6 +2,23 @@ const path = require('path');
 const mockery = require('mockery');
 const assert = require('assert');
 
+function mockLoger(consoleOutput) {
+  mockery.registerMock(
+    './logger',
+    class {
+      static error(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+      static info(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+      static warn(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+    }
+  );
+}
+
 describe('test confirmRootDir', async () => {
   beforeEach(() => {
     mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
@@ -15,14 +32,7 @@ describe('test confirmRootDir', async () => {
 
   test('when given root dir is confirmed', async () => {
     const consoleOutput = [];
-    mockery.registerMock(
-      './logger',
-      class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
-        }
-      }
-    );
+    mockLoger(consoleOutput);
 
     mockery.registerMock('inquirer', {
       prompt() {
@@ -44,14 +54,7 @@ describe('test confirmRootDir', async () => {
 
   test('when given root dir is not confirmed and new path is provided', async () => {
     const consoleOutput = [];
-    mockery.registerMock(
-      './logger',
-      class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
-        }
-      }
-    );
+    mockLoger(consoleOutput);
 
     mockery.registerMock('inquirer', {
       prompt() {

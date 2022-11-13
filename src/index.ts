@@ -40,11 +40,10 @@ export const run = async () => {
       }
     }
 
-    Logger.error(NIGHTWATCH_TITLE);
-
-    await checkCreateNightwatchVersion();
-
     let rootDir = path.resolve(process.cwd(), args[0] || '');
+
+    Logger.info(NIGHTWATCH_TITLE);
+    await checkCreateNightwatchVersion();
 
     if (options?.['generate-config'] && !isNodeProject(rootDir)) {
       throw new Error(`package.json not found. Please run this command from your existing Nightwatch project.
@@ -70,7 +69,7 @@ export const run = async () => {
 };
 
 export const confirmRootDir = async (rootDir: string): Promise<string> => {
-  Logger.error(`${colors.yellow('Warning:')} Current working directory is not a node project and contains some files.`);
+  Logger.warn(`${colors.yellow('Warning:')} Current working directory is not a node project and already contains some files.`);
 
   const answers = await prompt([
     {
@@ -92,7 +91,7 @@ export const confirmRootDir = async (rootDir: string): Promise<string> => {
     }
   ]);
   // Insert a blank line after prompt.
-  Logger.error();
+  Logger.info();
 
   if (answers.confirm) {
     return rootDir;
@@ -106,7 +105,7 @@ export const initializeNodeProject = (rootDir: string) => {
     fs.mkdirSync(rootDir, {recursive: true});
   }
 
-  Logger.error(`${colors.yellow('package.json')} not found in the root directory. Initializing a new NPM project..\n`);
+  Logger.info(`${colors.yellow('package.json')} not found in the root directory. Initializing a new NPM project..\n`);
 
   execSync('npm init -y', {
     stdio: 'inherit',
@@ -128,8 +127,8 @@ export const checkCreateNightwatchVersion = async () => {
   const currentVersion = process.env.npm_package_version;
 
   if (latestVersion && currentVersion && latestVersion !== currentVersion) {
-    Logger.error(
-      `We've updated this onboarding tool. ${colors.red(currentVersion)} -> ${colors.green(
+    Logger.info(
+      `We've updated this onboarding tool: ${colors.red(currentVersion)} -> ${colors.green(
         latestVersion
       )}. To get the latest experience, run: ${colors.green('npm init nightwatch@latest')}\n\n`
     );
