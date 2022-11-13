@@ -17,7 +17,7 @@ export const CONFIG_INTRO = `===============================
 Nightwatch Configuration Wizard
 ===============================
 
-Initializing a new project in %s...
+Initializing project in %s...
 `;
 
 export const AVAILABLE_CONFIG_FLAGS = ['yes', 'generate-config', 'browser', 'y', 'b', 'mobile'];
@@ -99,7 +99,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     message: 'Select target browsers',
     choices: (answers) => {
       let browsers = BROWSER_CHOICES;
-      if (answers.backend === 'local' && process.platform !== 'darwin') {
+      if (process.platform !== 'darwin') {
         browsers = browsers.filter((browser) => browser.value !== 'safari');
       }
 

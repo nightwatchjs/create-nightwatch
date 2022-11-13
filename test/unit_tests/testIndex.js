@@ -5,7 +5,7 @@ const nock = require('nock');
 
 const VERSION = process.env.npm_package_version;
 
-function mockLoger(consoleOutput) {
+function mockLogger(consoleOutput) {
   mockery.registerMock(
     './logger',
     class {
@@ -36,7 +36,7 @@ describe('index tests',  function () {
           latest: VERSION
         }
       });
-    
+
   });
 
   afterEach( function () {
@@ -46,12 +46,12 @@ describe('index tests',  function () {
     nock.cleanAll();
     nock.restore();
   });
-  
+
   it('should not give suggestion when right args are passed ', async function () {
     process.argv = ['node', 'filename.js', '--browser=chrome', '--browser=safari', 'args'];
 
     const consoleOutput = [];
-    mockLoger(consoleOutput);
+    mockLogger(consoleOutput);
 
     mockery.registerMock('node:fs', {
       existsSync() {
@@ -97,7 +97,7 @@ describe('index tests',  function () {
     process.argv = ['node', 'filename.js', '--browsers=chrome', '--browsers=safari'];
 
     const consoleOutput = [];
-    mockLoger(consoleOutput);
+    mockLogger(consoleOutput);
 
     mockery.registerMock('node:fs', {
       existsSync() {
@@ -128,7 +128,7 @@ describe('index tests',  function () {
     process.argv = ['node', 'filename.js', '--browser=chrome', '--browser=safari', 'args'];
 
     const consoleOutput = [];
-    mockLoger(consoleOutput);
+    mockLogger(consoleOutput);
 
     mockery.registerMock('node:fs', {
       existsSync() {

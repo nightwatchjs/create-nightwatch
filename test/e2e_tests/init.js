@@ -8,7 +8,7 @@ const nock = require('nock');
 
 const rootDir = path.join(process.cwd(), 'test_output');
 
-function mockLoger(consoleOutput) {
+function mockLogger(consoleOutput) {
   mockery.registerMock(
     './logger',
     class {
@@ -62,7 +62,7 @@ describe('e2e tests for init', function () {
 
   it('with js-nightwatch-local', async function () {
     const consoleOutput = [];
-    mockLoger(consoleOutput);
+    mockLogger(consoleOutput);
 
     const commandsExecuted = [];
     mockery.registerMock('child_process', {
@@ -214,7 +214,7 @@ describe('e2e tests for init', function () {
 
   it('with js-cucumber-remote', async function () {
     const consoleOutput = [];
-    mockLoger(consoleOutput);
+    mockLogger(consoleOutput);
 
     const commandsExecuted = [];
     mockery.registerMock('child_process', {
@@ -358,7 +358,7 @@ describe('e2e tests for init', function () {
 
   it('with js-mocha-both', async function () {
     const consoleOutput = [];
-    mockLoger(consoleOutput);
+    mockLogger(consoleOutput);
 
     const commandsExecuted = [];
     mockery.registerMock('child_process', {
@@ -520,7 +520,7 @@ describe('e2e tests for init', function () {
 
   it('with ts-nightwatch-remote-mobile', async function () {
     const consoleOutput = [];
-    mockLoger(consoleOutput);
+    mockLogger(consoleOutput);
 
     const commandsExecuted = [];
     mockery.registerMock('child_process', {
@@ -673,7 +673,7 @@ describe('e2e tests for init', function () {
 
   it('with ts-mocha-both-browserstack-mobile and non-default config', async function () {
     const consoleOutput = [];
-    mockLoger(consoleOutput);
+    mockLogger(consoleOutput);
 
     const commandsExecuted = [];
     mockery.registerMock('child_process', {
@@ -917,7 +917,7 @@ describe('e2e tests for init', function () {
 
   it('with yes and browser flag', async function () {
     const consoleOutput = [];
-    mockLoger(consoleOutput);
+    mockLogger(consoleOutput);
 
     const commandsExecuted = [];
     mockery.registerMock('child_process', {
@@ -1057,7 +1057,7 @@ describe('e2e tests for init', function () {
 
   it('with yes, browser and mobile flag', async function () {
     const consoleOutput = [];
-    mockLoger(consoleOutput);
+    mockLogger(consoleOutput);
 
     const commandsExecuted = [];
     mockery.registerMock('child_process', {
@@ -1257,7 +1257,7 @@ describe('e2e tests for init', function () {
 
   it('generate-config with js-nightwatch-local and seleniumServer false', async function () {
     const consoleOutput = [];
-    mockLoger(consoleOutput);
+    mockLogger(consoleOutput);
 
     const commandsExecuted = [];
     mockery.registerMock('child_process', {
@@ -1382,7 +1382,7 @@ describe('e2e tests for init', function () {
 
   it('generate-config with ts-nightwatch-both', async function () {
     const consoleOutput = [];
-    mockLoger(consoleOutput);
+    mockLogger(consoleOutput);
 
     const commandsExecuted = [];
     mockery.registerMock('child_process', {
@@ -1504,7 +1504,7 @@ describe('e2e tests for init', function () {
 
   it('make sure we send analytics data if allowAnalytics is set to true', async function () {
     const consoleOutput = [];
-    mockLoger(consoleOutput);
+    mockLogger(consoleOutput);
 
     const commandsExecuted = [];
     mockery.registerMock('child_process', {
@@ -1548,7 +1548,7 @@ describe('e2e tests for init', function () {
           value: []
         };
       });
-    
+
     const {NightwatchInit} = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, {'generate-config': true});
 
@@ -1575,7 +1575,7 @@ describe('e2e tests for init', function () {
 
   it('make sure we do not send analytics data if allowAnalytics is set to false', async function () {
     const consoleOutput = [];
-    mockLoger(consoleOutput);
+    mockLogger(consoleOutput);
 
     const commandsExecuted = [];
     mockery.registerMock('child_process', {
@@ -1601,7 +1601,7 @@ describe('e2e tests for init', function () {
       .reply(204, (uri, requestBody) => {
         assert.fail();
       });
-    
+
     const {NightwatchInit} = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, {'generate-config': true});
 
