@@ -35,7 +35,7 @@ export const MOBILE_BROWSER_CHOICES = [
   {name: 'Safari (iOS)', value: 'safari'}
 ];
 
-export const MOBILE_BROWSER_QUES: inquirer.QuestionCollection = 
+export const MOBILE_BROWSER_QUES: inquirer.QuestionCollection =
 {
   type: 'checkbox',
   name: 'mobileBrowsers',
@@ -59,7 +59,7 @@ export const MOBILE_BROWSER_QUES: inquirer.QuestionCollection =
 
     const browsersHasMobileBrowsers = (answers.browsers as string[] | undefined)
       ?.some(((browser: string) => mobileBrowserValues.includes(browser)));
-    
+
     return answers.mobile && answers.backend !== 'remote' && !browsersHasMobileBrowsers;
   }
 };
@@ -97,7 +97,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     type: 'checkbox',
     name: 'browsers',
     message: 'Select target browsers',
-    choices: (answers) => {
+    choices: () => {
       let browsers = BROWSER_CHOICES;
       if (process.platform !== 'darwin') {
         browsers = browsers.filter((browser) => browser.value !== 'safari');
@@ -170,7 +170,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     message: 'Allow Nightwatch to collect completely anonymous usage metrics?',
     default: false
   },
-  
+
   // TEST ON MOBILE
   {
     type: 'list',
