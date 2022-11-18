@@ -4,9 +4,25 @@ const assert = require('assert');
 const nock = require('nock');
 const {extend} = require('axios/lib/utils');
 
+function mockLoger(consoleOutput) {
+  mockery.registerMock(
+    './logger',
+    class {
+      static error(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+      static info(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+      static warn(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+    }
+  );
+}
 
-describe('test run function', () => {
-  beforeEach(() => {
+describe('test run function', function () {
+  beforeEach(function () {
     this.originalProcessArgv = process.argv;
     mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
     if (!nock.isActive()) {
@@ -22,7 +38,7 @@ describe('test run function', () => {
     
   });
 
-  afterEach(() => {
+  afterEach(function () {
     process.argv = this.originalProcessArgv;
     mockery.deregisterAll();
     mockery.resetCache();
@@ -31,15 +47,10 @@ describe('test run function', () => {
     nock.restore();
   });
 
-  test('works with no argument and package.json present', async () => {
+  it('works with no argument and package.json present', async function () {
     process.argv = ['node', 'filename.js'];
 
-    mockery.registerMock(
-      './logger',
-      class {
-        static error() {}
-      }
-    );
+    mockLoger([]);
 
 
     mockery.registerMock('./utils', {
@@ -71,18 +82,11 @@ describe('test run function', () => {
     });
   });
 
-  test('works with no argument, package.json not present, and root dir empty', async () => {
+  it('works with no argument, package.json not present, and root dir empty', async function () {
     process.argv = ['node', 'filename.js'];
 
     const consoleOutput = [];
-    mockery.registerMock(
-      './logger',
-      class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
-        }
-      }
-    );
+    mockLoger(consoleOutput);
 
     mockery.registerMock('./utils', {
       isNodeProject() {
@@ -131,18 +135,11 @@ describe('test run function', () => {
     assert.strictEqual(newNodeProjectRootDir, process.cwd());
   });
 
-  test('works with no argument, package.json not present, and root dir not empty', async () => {
+  it('works with no argument, package.json not present, and root dir not empty', async function () {
     process.argv = ['node', 'filename.js'];
 
     const consoleOutput = [];
-    mockery.registerMock(
-      './logger',
-      class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
-        }
-      }
-    );
+    mockLoger(consoleOutput);
 
     mockery.registerMock('./utils', {
       isNodeProject() {
@@ -201,16 +198,11 @@ describe('test run function', () => {
     assert.strictEqual(newNodeProjectRootDir, process.cwd());
   });
 
-  test('works with many arguments, no options, and package.json present', async () => {
+  it('works with many arguments, no options, and package.json present', async function () {
     process.argv = ['node', 'filename.js', 'new-project', 'some', 'random', 'args'];
     const expectedRootDir = path.join(process.cwd(), 'new-project');
 
-    mockery.registerMock(
-      './logger',
-      class {
-        static error() {}
-      }
-    );
+    mockLoger([]);
 
     mockery.registerMock('node:fs', {
       existsSync() {
@@ -241,19 +233,12 @@ describe('test run function', () => {
     });
   });
 
-  test('works with many argument, no options, and package.json not present', async () => {
+  it('works with many argument, no options, and package.json not present', async function () {
     process.argv = ['node', 'filename.js', 'new-project', 'some', 'random', 'args'];
     const expectedRootDir = path.join(process.cwd(), 'new-project');
 
     const consoleOutput = [];
-    mockery.registerMock(
-      './logger',
-      class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
-        }
-      }
-    );
+    mockLoger(consoleOutput);
 
     let newDirCreatedRecursively = false;
     mockery.registerMock('node:fs', {
@@ -296,16 +281,11 @@ describe('test run function', () => {
     assert.strictEqual(newNodeProjectRootDir, expectedRootDir);
   });
 
-  test('works with many arguments, generate-config options, and package.json present', async () => {
+  it('works with many arguments, generate-config options, and package.json present', async function () {
     process.argv = ['node', 'filename.js', 'new-project', 'random', '--generate-config', 'args'];
     const expectedRootDir = path.join(process.cwd(), 'new-project');
 
-    mockery.registerMock(
-      './logger',
-      class {
-        static error() {}
-      }
-    );
+    mockLoger([]);
 
     mockery.registerMock('node:fs', {
       existsSync() {
@@ -335,7 +315,7 @@ describe('test run function', () => {
     });
   });
 
-  test('works with many arguments, generate-config options, and package.json not present', async () => {
+  it('works with many arguments, generate-config options, and package.json not present', async function () {
     process.argv = ['node', 'filename.js', 'new-project', 'random', '--generate-config', 'args'];
 
     const origProcessExit = process.exit;
@@ -346,14 +326,7 @@ describe('test run function', () => {
     };
 
     const consoleOutput = [];
-    mockery.registerMock(
-      './logger',
-      class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
-        }
-      }
-    );
+    mockLoger(consoleOutput);
 
     mockery.registerMock('node:fs', {
       existsSync() {
@@ -397,16 +370,11 @@ describe('test run function', () => {
     process.exit = origProcessExit;
   });
 
-  test('works with many arguments, browsers options, and package.json present', async () => {
+  it('works with many arguments, browsers options, and package.json present', async function () {
     process.argv = ['node', 'filename.js', 'new-project', 'random', '--browser=chrome', '--browser=safari', 'args'];
     const expectedRootDir = path.join(process.cwd(), 'new-project');
 
-    mockery.registerMock(
-      './logger',
-      class {
-        static error() {}
-      }
-    );
+    mockLoger([]);
 
     mockery.registerMock('node:fs', {
       existsSync() {
@@ -438,18 +406,11 @@ describe('test run function', () => {
     });
   });
 
-  test('works with no arguments, browser options without =, and package.json not present', async () => {
+  it('works with no arguments, browser options without =, and package.json not present', async function () {
     process.argv = ['node', 'filename.js', '--browser', 'chrome', '--browser', 'safari'];
 
     const consoleOutput = [];
-    mockery.registerMock(
-      './logger',
-      class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
-        }
-      }
-    );
+    mockLoger(consoleOutput);
 
     mockery.registerMock('./utils', {
       isNodeProject() {
@@ -500,16 +461,11 @@ describe('test run function', () => {
     assert.strictEqual(newNodeProjectRootDir, process.cwd());
   });
 
-  test('works with many arguments, many options, and package.json present', async () => {
+  it('works with many arguments, many options, and package.json present', async function () {
     process.argv = ['node', 'filename.js', 'new-project', '-y', '--hello', '--there=hi', '-d', '--generate-config'];
     const expectedRootDir = path.join(process.cwd(), 'new-project');
 
-    mockery.registerMock(
-      './logger',
-      class {
-        static error() {}
-      }
-    );
+    mockLoger([]);
 
     mockery.registerMock('node:fs', {
       existsSync() {

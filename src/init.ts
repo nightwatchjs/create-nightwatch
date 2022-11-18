@@ -16,6 +16,7 @@ import {ConfigGeneratorAnswers, ConfigDestination, OtherInfo, MobileResult} from
 import defaultAnswers from './defaults.json';
 import defaultMobileAnswers from './defaultsMobile.json';
 import {AndroidSetup, IosSetup} from '@nightwatch/mobile-helper';
+import { format } from 'node:util';
 
 
 const EXAMPLE_TEST_FOLDER = 'examples';
@@ -63,11 +64,11 @@ export class NightwatchInit {
         }
       }
     } else {
-      Logger.error(CONFIG_INTRO);
+      Logger.info(format(CONFIG_INTRO, this.rootDir));
 
       answers = await this.askQuestions();
       // Add a newline after questions.
-      Logger.error();
+      Logger.info();
     }
 
     this.refineAnswers(answers);
@@ -121,13 +122,13 @@ export class NightwatchInit {
       // answers.mobileDevice will be undefined in case of empty or non-matching mobileBrowsers
       // hence, no need to setup any device.
       if (['android', 'both'].includes(answers.mobileDevice)) {
-        Logger.error('Running Android Setup...\n');
+        Logger.info('Running Android Setup...\n');
         const androidSetup = new AndroidSetup({browsers: answers.mobileBrowsers || []}, this.rootDir);
         mobileResult.android = await androidSetup.run();
       }
 
       if (['ios', 'both'].includes(answers.mobileDevice)) {
-        Logger.error('Running iOS Setup...\n');
+        Logger.info('Running iOS Setup...\n');
         const iosSetup = new IosSetup({mode: ['simulator', 'real'], setup: true});
         mobileResult.ios = await iosSetup.run();
       }
@@ -314,21 +315,21 @@ export class NightwatchInit {
       return;
     }
 
-    Logger.error('Installing the following packages:');
+    Logger.info('Installing the following packages:');
     for (const pack of packagesToInstall) {
-      Logger.error(`- ${pack}`);
+      Logger.info(`- ${pack}`);
     }
-    Logger.error();
+    Logger.info();
 
     for (const pack of packagesToInstall) {
-      Logger.error(`Installing ${colors.green(pack)}`);
+      Logger.info(`Installing ${colors.green(pack)}`);
 
       try {
         execSync(`npm install ${pack} --save-dev`, {
           stdio: ['inherit', 'pipe', 'inherit'],
           cwd: this.rootDir
         });
-        Logger.error(colors.green('Done!'), '\n');
+        Logger.info(colors.green('Done!'), '\n');
       } catch (err) {
         Logger.error(`Failed to install ${pack}. Please run 'npm install ${pack} --save-dev' later.\n`);
       }
@@ -344,7 +345,7 @@ export class NightwatchInit {
         stdio: 'inherit',
         cwd: this.rootDir
       });
-      Logger.error();
+      Logger.info();
     }
 
     // Generate a new tsconfig.json file to be used by ts-node, if not already present.
@@ -380,9 +381,9 @@ export class NightwatchInit {
 
   async getConfigDestPath() {
     if (this.options?.yes) {
-      Logger.error('Auto-generating a configuration file...\n');
+      Logger.info('Auto-generating a configuration file...\n');
     } else {
-      Logger.error('Generting a configuration file based on your responses...\n');
+      Logger.info('Generating a configuration file based on your responses...\n');
     }
 
     // check for ESM project
@@ -395,11 +396,11 @@ export class NightwatchInit {
     const configDestPath = path.join(this.rootDir, `nightwatch${configExt}`);
 
     if (fs.existsSync(configDestPath)) {
-      Logger.error(colors.yellow(`There seems to be another config file located at "${configDestPath}".\n`));
+      Logger.info(colors.yellow(`There seems to be another config file located at "${configDestPath}".\n`));
 
       const answers: ConfigDestination = await prompt(CONFIG_DEST_QUES, {rootDir: this.rootDir, configExt});
       // Adding a newline after questions.
-      Logger.error();
+      Logger.info();
 
       if (!answers.overwrite) {
         const configFileName = `${answers.newFileName}${configExt}`;
@@ -475,13 +476,13 @@ export class NightwatchInit {
     try {
       fs.writeFileSync(configDestPath, rendered, {encoding: 'utf-8'});
 
-      Logger.error(`${colors.green(symbols().ok + ' Success!')} Configuration file generated at: "${configDestPath}".`);
+      Logger.info(`${colors.green(symbols().ok + ' Success!')} Configuration file generated at: "${configDestPath}".`);
 
       if (this.otherInfo.nonDefaultConfigName) {
-        Logger.error(`To use this configuration file, run the tests using ${colors.magenta('--config')} flag.`);
+        Logger.info(`To use this configuration file, run the tests using ${colors.magenta('--config')} flag.`);
       }
       // Add a newline
-      Logger.error();
+      Logger.info();
 
       return true;
     } catch (err) {
@@ -511,11 +512,11 @@ export class NightwatchInit {
   }
 
   async installWebdrivers(webdriversToInstall: string[]) {
-    Logger.error('Installing/updating the following webdrivers:');
+    Logger.info('Installing/updating the following webdrivers:');
     for (const webdriver of webdriversToInstall) {
-      Logger.error(`- ${webdriver}`);
+      Logger.info(`- ${webdriver}`);
     }
-    Logger.error();
+    Logger.info();
 
     const driversDownloadedFromNPM: { [key: string]: string } = {
       geckodriver: 'Firefox',
@@ -524,13 +525,13 @@ export class NightwatchInit {
 
     for (const webdriver of webdriversToInstall) {
       if (webdriver in driversDownloadedFromNPM) {
-        Logger.error(`Installing webdriver for ${driversDownloadedFromNPM[webdriver]} (${webdriver})...`);
+        Logger.info(`Installing webdriver for ${driversDownloadedFromNPM[webdriver]} (${webdriver})...`);
         try {
           execSync(`npm install ${webdriver} --save-dev`, {
             stdio: ['inherit', 'pipe', 'inherit'],
             cwd: this.rootDir
           });
-          Logger.error(colors.green('Done!'), '\n');
+          Logger.info(colors.green('Done!'), '\n');
         } catch (err) {
           Logger.error(`Failed to install ${webdriver}. Please run 'npm install ${webdriver} --save-dev' later.\n`);
         }
@@ -553,15 +554,15 @@ export class NightwatchInit {
         ]);
 
         if (answers.safaridriver) {
-          Logger.error();
-          Logger.error('Enabling safaridriver...');
+          Logger.info();
+          Logger.info('Enabling safaridriver...');
           execSync('sudo safaridriver --enable', {
             stdio: ['inherit', 'pipe', 'inherit'],
             cwd: this.rootDir
           });
-          Logger.error(colors.green('Done!'), '\n');
+          Logger.info(colors.green('Done!'), '\n');
         } else {
-          Logger.error('Please run \'sudo safaridriver --enable\' command to enable safaridriver later.\n');
+          Logger.info('Please run \'sudo safaridriver --enable\' command to enable safaridriver later.\n');
         }
       } catch (err) {
         Logger.error('Failed to enable safaridriver. Please run \'sudo safaridriver --enable\' later.\n');
@@ -584,12 +585,12 @@ export class NightwatchInit {
       return;
     }
 
-    Logger.error('Generating example for CucumberJS...');
+    Logger.info('Generating example for CucumberJS...');
     this.otherInfo.cucumberExamplesAdded = true;
 
     const exampleDestPath = path.join(this.rootDir, examplesLocation);
     if (fs.existsSync(exampleDestPath)) {
-      Logger.error(`Example already exists at '${examplesLocation}'. Skipping...`, '\n');
+      Logger.info(`Example already exists at '${examplesLocation}'. Skipping...`, '\n');
 
       return;
     }
@@ -599,13 +600,13 @@ export class NightwatchInit {
     const exampleSrcPath = path.join(nightwatchModulePath, 'examples', 'cucumber-js', 'features');
 
     copy(exampleSrcPath, exampleDestPath);
-    Logger.error(
+    Logger.info(
       `${colors.green(symbols().ok + ' Success!')} Generated an example for CucumberJS at "${examplesLocation}".\n`
     );
   }
 
   copyExamples(examplesLocation: string, typescript: boolean) {
-    Logger.error('Generating example files...');
+    Logger.info('Generating example files...');
 
     const examplesDestPath = path.join(this.rootDir, examplesLocation);  // this is different from this.otherInfo.examplesJsSrc
     try {
@@ -616,7 +617,7 @@ export class NightwatchInit {
     const examplesDestFiles = fs.readdirSync(examplesDestPath);
 
     if ((typescript && examplesDestFiles.length > 1) || (!typescript && examplesDestFiles.length > 0)) {
-      Logger.error(`Examples already exists at '${examplesLocation}'. Skipping...`, '\n');
+      Logger.info(`Examples already exists at '${examplesLocation}'. Skipping...`, '\n');
 
       return;
     }
@@ -630,14 +631,14 @@ export class NightwatchInit {
 
     copy(examplesSrcPath, examplesDestPath);
 
-    Logger.error(
+    Logger.info(
       `${colors.green(symbols().ok + ' Success!')} Generated some example files at '${examplesLocation}'.\n`
     );
   }
 
 
   copyTemplates(examplesLocation: string) {
-    Logger.error('Generating template files...');
+    Logger.info('Generating template files...');
 
     const templatesLocation = path.join(examplesLocation, 'templates');
 
@@ -649,7 +650,7 @@ export class NightwatchInit {
     } catch (err) {}
 
     if (fs.readdirSync(templatesDestPath).length) {
-      Logger.error(`Templates already exists at '${templatesLocation}'. Skipping...`, '\n');
+      Logger.info(`Templates already exists at '${templatesLocation}'. Skipping...`, '\n');
 
       return;
     }
@@ -658,63 +659,55 @@ export class NightwatchInit {
     
     copy(templatesSrcPath, templatesDestPath);
 
-    Logger.error(
+    Logger.info(
       `${colors.green(symbols().ok + ' Success!')} Generated some templates files at '${templatesLocation}'.\n`
     );
   }
 
   postSetupInstructions(answers: ConfigGeneratorAnswers, mobileResult: MobileResult) {
-    Logger.error('Nightwatch setup complete!!\n');
-
-    // Join Discord and GitHub
-    Logger.error('Join our Discord community and instantly find answers to your issues or queries. Or just join and say hi!');
-    Logger.error(colors.cyan('  https://discord.gg/SN8Da2X'), '\n');
-
-    Logger.error('Visit our GitHub page to report bugs or raise feature requests:');
-    Logger.error(colors.cyan('  https://github.com/nightwatchjs/nightwatch'), '\n');
 
     // Instructions for setting host, port, username and passowrd for remote.
     if (answers.backend && ['remote', 'both'].includes(answers.backend)) {
-      Logger.error(colors.red('IMPORTANT'));
+      Logger.info(colors.red('IMPORTANT'));
       if (answers.cloudProvider === 'other') {
         let configFileName = this.otherInfo.usingESM ? 'nightwatch.conf.cjs' : 'nightwatch.conf.js';
         if (this.otherInfo.nonDefaultConfigName) {
           configFileName = this.otherInfo.nonDefaultConfigName;
         }
-        Logger.error(
+        Logger.info(
           `To run tests on your remote device, please set the ${colors.magenta('host')} and ${colors.magenta('port')} property in your ${configFileName} file.` 
         );
-        Logger.error('These can be located at:');
-        Logger.error(
+        Logger.info('These can be located at:');
+        Logger.info(
           `{\n  ...\n  "test_settings": {\n    ...\n    "${answers.remoteName}": {\n      "selenium": {\n        ${colors.cyan(
             '"host":')}\n        ${colors.cyan('"port":')}\n      }\n    }\n  }\n}`,
           '\n'
         );
 
-        Logger.error(
+        Logger.info(
           'Please set the credentials (if any) required to run tests on your cloud provider or remote selenium-server, by setting the below env variables:'
         );
       } else {
-        Logger.error(
+        Logger.info(
           'Please set the credentials required to run tests on your cloud provider, by setting the below env variables:'
         );
       }
 
-      Logger.error(`- ${colors.cyan(answers.remoteEnv?.username as string)}`);
-      Logger.error(`- ${colors.cyan(answers.remoteEnv?.access_key as string)}`);
-      Logger.error('(.env files are also supported)', '\n');
+      Logger.info(`- ${colors.cyan(answers.remoteEnv?.username as string)}`);
+      Logger.info(`- ${colors.cyan(answers.remoteEnv?.access_key as string)}`);
+      Logger.info('(.env files are also supported)', '\n');
     }
-    Logger.error();
+    Logger.info();
 
     const relativeToRootDir = path.relative(process.cwd(), this.rootDir) || '.';
 
     // For now the templates added only for JS
     if (answers.runner !== Runner.Cucumber && answers.language !== 'ts') {
-      Logger.error(colors.green('TEMPLATE TESTS'), '\n');
-      Logger.error('To get started, checkout the following templates. Skip/delete them if you are an experienced user.');
-      Logger.error(colors.cyan(`  1. Title Assertion (${path.join(relativeToRootDir, answers.examplesLocation || '', 'templates', 'titleAssertion.js')})`));
-      Logger.error(colors.cyan(`  2. Login (${path.join(relativeToRootDir, answers.examplesLocation || '', 'templates', 'login.js')})`));
-      Logger.error();
+      Logger.info(colors.green('📃 TEMPLATE TESTS'), '\n');
+      Logger.info('To get started, checkout the following templates. Skip/delete them if you are an experienced user.');
+      Logger.info(colors.cyan(`  1. Title Assertion (${path.join(relativeToRootDir, answers.examplesLocation || '', 'templates', 'titleAssertion.js')})`));
+      Logger.info(colors.cyan(`  2. Login (${path.join(relativeToRootDir, answers.examplesLocation || '', 'templates', 'login.js')})`));
+      Logger.info();
     }
   
     let configFlag = '';
@@ -722,11 +715,21 @@ export class NightwatchInit {
       configFlag = ` --config ${this.otherInfo.nonDefaultConfigName}`;
     }
 
+    Logger.info(colors.green('✨ SETUP COMPLETE'));
+    execSync('npx nightwatch --version', {
+      stdio: 'inherit',
+      cwd: this.rootDir
+    });
+
+    // Join Discord and GitHub
+    Logger.info('💬 Join our Discord community to find answers to your issues or queries. Or just join and say hi.');
+    Logger.info(colors.cyan('   https://discord.gg/SN8Da2X'), '\n');
+
     if (!this.options?.mobile) {
-      Logger.error(colors.green('RUN NIGHTWATCH TESTS'), '\n');
+      Logger.info(colors.green('🚀 RUN EXAMPLE TESTS'), '\n');
       if (this.rootDir !== process.cwd()) {
-        Logger.error('First, change directory to the root dir of your project:');
-        Logger.error(colors.cyan(`  cd ${relativeToRootDir}`), '\n');
+        Logger.info('First, change directory to the root dir of your project:');
+        Logger.info(colors.cyan(`  cd ${relativeToRootDir}`), '\n');
       }
 
       let envFlag = '';
@@ -735,27 +738,27 @@ export class NightwatchInit {
       }
 
       if (answers.runner === Runner.Cucumber) {
-        Logger.error('To run your tests with CucumberJS, simply run:');
-        Logger.error(colors.cyan(`  npx nightwatch${envFlag}${configFlag}`), '\n');
+        Logger.info('To run your tests with CucumberJS, simply run:');
+        Logger.info(colors.cyan(`  npx nightwatch${envFlag}${configFlag}`), '\n');
 
         if (this.otherInfo.cucumberExamplesAdded) {
-          Logger.error('To run an example test with CucumberJS, run:');
-          Logger.error(colors.cyan(`  npx nightwatch ${answers.examplesLocation}${envFlag}${configFlag}`), '\n');
+          Logger.info('To run an example test with CucumberJS, run:');
+          Logger.info(colors.cyan(`  npx nightwatch ${answers.examplesLocation}${envFlag}${configFlag}`), '\n');
         }
 
-        Logger.error('For more details on using CucumberJS with Nightwatch, visit:');
-        Logger.error(
+        Logger.info('For more details on using CucumberJS with Nightwatch, visit:');
+        Logger.info(
           colors.cyan('  https://nightwatchjs.org/guide/third-party-runners/cucumberjs-nightwatch-integration.html')
         );
       } else if (answers.addExamples) {
         if (answers.language === 'ts') {
-          Logger.error('To run all examples, run:');
-          Logger.error(
+          Logger.info('To run all examples, run:');
+          Logger.info(
             colors.cyan(`  npx nightwatch .${path.sep}${this.otherInfo.examplesJsSrc}${envFlag}${configFlag}\n`)
           );
 
-          Logger.error('To run a single example (github.ts), run:');
-          Logger.error(
+          Logger.info('To run a single example (github.ts), run:');
+          Logger.info(
             colors.cyan(
               `  npx nightwatch .${path.sep}${path.join(
                 this.otherInfo.examplesJsSrc || '',
@@ -764,8 +767,8 @@ export class NightwatchInit {
             )
           );
         } else {
-          Logger.error('To run all examples, run:');
-          Logger.error(
+          Logger.info('To run all examples, run:');
+          Logger.info(
             colors.cyan(
               `  npx nightwatch .${path.sep}${path.join(
                 this.otherInfo.examplesJsSrc || '',
@@ -774,8 +777,8 @@ export class NightwatchInit {
             )
           );
 
-          Logger.error('To run a single example (ecosia.js), run:');
-          Logger.error(
+          Logger.info('To run a single example (ecosia.js), run:');
+          Logger.info(
             colors.cyan(
               `  npx nightwatch .${path.sep}${path.join(
                 this.otherInfo.examplesJsSrc || '',
@@ -787,10 +790,10 @@ export class NightwatchInit {
           );
         }
       } else {
-        Logger.error(`A few examples are available at '${path.join('node_modules', 'nightwatch', 'examples')}'.\n`);
+        Logger.info(`A few examples are available at '${path.join('node_modules', 'nightwatch', 'examples')}'.\n`);
 
-        Logger.error('To run a single example (ecosia.js), try:');
-        Logger.error(
+        Logger.info('To run a single example (ecosia.js), try:');
+        Logger.info(
           colors.cyan(
             `  npx nightwatch ${path.join(
               'node_modules',
@@ -803,8 +806,8 @@ export class NightwatchInit {
           '\n'
         );
 
-        Logger.error('To run all examples, try:');
-        Logger.error(
+        Logger.info('To run all examples, try:');
+        Logger.info(
           colors.cyan(`  npx nightwatch ${path.join('node_modules', 'nightwatch', 'examples')}${envFlag}${configFlag}`),
           '\n'
         );
@@ -812,24 +815,24 @@ export class NightwatchInit {
     }
 
     if (answers.seleniumServer) {
-      Logger.error('[Selenium Server]\n');
+      Logger.info('[Selenium Server]\n');
       if (this.otherInfo.javaNotInstalled) {
-        Logger.error(
+        Logger.info(
           'Java Development Kit (minimum v7) is required to run selenium-server locally. Download from here:'
         );
-        Logger.error(colors.cyan('  https://www.oracle.com/technetwork/java/javase/downloads/index.html'), '\n');
+        Logger.info(colors.cyan('  https://www.oracle.com/technetwork/java/javase/downloads/index.html'), '\n');
       }
 
-      Logger.error('To run tests on your local selenium-server, use command:');
-      Logger.error(colors.cyan(`  npx nightwatch --env selenium_server${configFlag}`), '\n');
+      Logger.info('To run tests on your local selenium-server, use command:');
+      Logger.info(colors.cyan(`  npx nightwatch --env selenium_server${configFlag}`), '\n');
     }
 
     if (answers.browsers?.includes('edge')) {
-      Logger.error(`${colors.red('Note:')} Microsoft Edge Webdriver is not installed automatically.`);
-      Logger.error(
+      Logger.info(`${colors.red('Note:')} Microsoft Edge Webdriver is not installed automatically.`);
+      Logger.info(
         'Please follow the below link ("Download" and "Standalone Usage" sections) to setup EdgeDriver manually:'
       );
-      Logger.error(colors.cyan('  https://nightwatchjs.org/guide/browser-drivers-setup/edgedriver.html'), '\n');
+      Logger.info(colors.cyan('  https://nightwatchjs.org/guide/browser-drivers-setup/edgedriver.html'), '\n');
     }
 
     // MOBILE TESTS
@@ -861,7 +864,7 @@ export class NightwatchInit {
     };
 
     if (answers.mobileDevice) {
-      Logger.error(colors.green('RUN NIGHTWATCH TESTS ON MOBILE'), '\n');
+      Logger.info(colors.green('RUN NIGHTWATCH TESTS ON MOBILE'), '\n');
 
       if (['android', 'both'].includes(answers.mobileDevice)) {
         const errorHelp = 'Please go through the setup logs above to know the actual cause of failure.\n\nOr, re-run the following commands:';
@@ -921,7 +924,7 @@ export class NightwatchInit {
               )}\n\n${errorHelp}\n${setupMsg}\n\n${testCommands}`, {padding: 1})
             );
           } else {
-            Logger.error(
+            Logger.info(
               boxen(`${colors.red(
                 'Android setup skipped...'
               )}\n\n${setupMsg}\n\n${testCommands}`, {padding: 1})
@@ -930,16 +933,16 @@ export class NightwatchInit {
         } else {
           // mobileResult.android.status is true.
           if (this.rootDir !== process.cwd()) {
-            Logger.error('First, change directory to the root dir of your project:');
-            Logger.error(colors.cyan(`  cd ${relativeToRootDir}`), '\n');
+            Logger.info('First, change directory to the root dir of your project:');
+            Logger.info(colors.cyan(`  cd ${relativeToRootDir}`), '\n');
           }
 
           if (['real', 'both'].includes(mobileResult.android.mode)) {
-            Logger.error(realAndroidTestCommand(), '\n');
+            Logger.info(realAndroidTestCommand(), '\n');
           }
 
           if (['emulator', 'both'].includes(mobileResult.android.mode)) {
-            Logger.error(emulatorAndroidTestCommand(), '\n');
+            Logger.info(emulatorAndroidTestCommand(), '\n');
           }
         }
       }
@@ -970,11 +973,11 @@ export class NightwatchInit {
           );
         } else if (typeof mobileResult.ios === 'object') {
           if (mobileResult.ios.real) {
-            Logger.error(realIosTestCommand, '\n');
+            Logger.info(realIosTestCommand, '\n');
           }
           
           if (mobileResult.ios.simulator) {
-            Logger.error(simulatorIosTestCommand, '\n');
+            Logger.info(simulatorIosTestCommand, '\n');
           }
   
           if (!mobileResult.ios.real || !mobileResult.ios.simulator) {
@@ -988,28 +991,28 @@ export class NightwatchInit {
       }
     } else if (this.options?.mobile && answers.mobileRemote && answers.cloudProvider === 'browserstack') {
       // no other test run commands are printed and remote mobile is selected.
-      Logger.error(colors.green('RUN NIGHTWATCH TESTS ON MOBILE'), '\n');
+      Logger.info(colors.green('RUN NIGHTWATCH TESTS ON MOBILE'), '\n');
       if (this.rootDir !== process.cwd()) {
-        Logger.error('First, change directory to the root dir of your project:');
-        Logger.error(colors.cyan(`  cd ${relativeToRootDir}`), '\n');
+        Logger.info('First, change directory to the root dir of your project:');
+        Logger.info(colors.cyan(`  cd ${relativeToRootDir}`), '\n');
       }
 
       const chromeEnvFlag = ' --env browserstack.android.chrome';
       const safariEnvFlag = ' --env browserstack.ios.safari';
 
       if (answers.runner === Runner.Cucumber) {
-        Logger.error('To run your tests with CucumberJS, simply run:');
-        Logger.error('  Chrome: ', colors.cyan(`${cucumberExample}${chromeEnvFlag}`), '\n');
-        Logger.error('  Safari: ', colors.cyan(`${cucumberExample}${safariEnvFlag}`), '\n');
+        Logger.info('To run your tests with CucumberJS, simply run:');
+        Logger.info('  Chrome: ', colors.cyan(`${cucumberExample}${chromeEnvFlag}`), '\n');
+        Logger.info('  Safari: ', colors.cyan(`${cucumberExample}${safariEnvFlag}`), '\n');
       } else if (answers.addExamples) {
         if (answers.language === 'ts') {
-          Logger.error('To run an example test (github.ts), run:');
-          Logger.error('  Chrome: ', colors.cyan(`${tsExample}${chromeEnvFlag}`), '\n');
-          Logger.error('  Safari: ', colors.cyan(`${tsExample}${safariEnvFlag}`), '\n');
+          Logger.info('To run an example test (github.ts), run:');
+          Logger.info('  Chrome: ', colors.cyan(`${tsExample}${chromeEnvFlag}`), '\n');
+          Logger.info('  Safari: ', colors.cyan(`${tsExample}${safariEnvFlag}`), '\n');
         } else {
-          Logger.error('To run an example test (ecosia.js), run:');
-          Logger.error('  Chrome: ', colors.cyan(`${jsExample}${chromeEnvFlag}`), '\n');
-          Logger.error('  Safari: ', colors.cyan(`${jsExample}${safariEnvFlag}`), '\n');
+          Logger.info('To run an example test (ecosia.js), run:');
+          Logger.info('  Chrome: ', colors.cyan(`${jsExample}${chromeEnvFlag}`), '\n');
+          Logger.info('  Safari: ', colors.cyan(`${jsExample}${safariEnvFlag}`), '\n');
         }
       }
     }
@@ -1017,11 +1020,11 @@ export class NightwatchInit {
 
   postConfigInstructions(answers: ConfigGeneratorAnswers) {
     if (answers.seleniumServer && this.otherInfo.javaNotInstalled) {
-      Logger.error('Java Development Kit (minimum v7) is required to run selenium-server locally. Download from here:');
-      Logger.error(colors.cyan('  https://www.oracle.com/technetwork/java/javase/downloads/index.html'), '\n');
+      Logger.info('Java Development Kit (minimum v7) is required to run selenium-server locally. Download from here:');
+      Logger.info(colors.cyan('  https://www.oracle.com/technetwork/java/javase/downloads/index.html'), '\n');
     }
 
-    Logger.error('Happy Testing!!!');
+    Logger.info('Happy Testing!');
   }
 
   pushAnonymousMetrics(answers: ConfigGeneratorAnswers) {

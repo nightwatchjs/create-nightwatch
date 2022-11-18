@@ -1,28 +1,37 @@
 const assert = require('assert');
 const mockery = require('mockery');
 
+function mockLoger(consoleOutput) {
+  mockery.registerMock(
+    './logger',
+    class {
+      static error(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+      static info(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+      static warn(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+    }
+  );
+}
 
-describe('test initializeNodeProject', () => {
-  beforeEach(() => {
+describe('test initializeNodeProject', function () {
+  beforeEach(function () {
     mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
   });
 
-  afterEach(() => {
+  afterEach(function () {
     mockery.deregisterAll();
     mockery.resetCache();
     mockery.disable();
   });
 
-  test('when rootDir exists', () => {
+  it('when rootDir exists', function () {
     const consoleOutput = [];
-    mockery.registerMock(
-      './logger',
-      class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
-        }
-      }
-    );
+    mockLoger(consoleOutput);
 
     let newDirCreated = false;
     mockery.registerMock('node:fs', {
@@ -62,18 +71,11 @@ describe('test initializeNodeProject', () => {
     assert.strictEqual(output.includes('Initializing a new NPM project'), true);
   });
 
-  test('when rootDir does not exists', () => {
+  it('when rootDir does not exists', function () {
     const rootDir = 'someDirPath';
 
     const consoleOutput = [];
-    mockery.registerMock(
-      './logger',
-      class {
-        static error(...msgs) {
-          consoleOutput.push(...msgs);
-        }
-      }
-    );
+    mockLoger(consoleOutput);
 
     let newDirCreatedRecursively = false;
     mockery.registerMock('node:fs', {

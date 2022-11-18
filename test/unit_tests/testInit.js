@@ -3,21 +3,37 @@ const mockery = require('mockery');
 const fs = require('node:fs');
 const path = require('path');
 
-const rootDir = path.join(process.cwd(), 'test_output');
+function mockLoger(consoleOutput) {
+  mockery.registerMock(
+    './logger',
+    class {
+      static error(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+      static info(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+      static warn(...msgs) {
+        consoleOutput.push(...msgs);
+      }
+    }
+  );
+}
 
-describe('init tests', () => {
-  describe('test askQuestions', () => {
-    beforeEach(() => {
+const rootDir = path.join(process.cwd(), 'test_output');
+describe('init tests', function() {
+  describe('test askQuestions', function() {
+    beforeEach(function() {
       mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
     });
 
-    afterEach(() => {
+    afterEach(function() {
       mockery.deregisterAll();
       mockery.resetCache();
       mockery.disable();
     });
 
-    test('if answers passed to inquirer contains rootDir and onlyConfig by default', async () => {
+    it('if answers passed to inquirer contains rootDir and onlyConfig by default', async function() {
       mockery.registerMock('inquirer', {
         async prompt(questions, answers) {
           return answers;
@@ -35,7 +51,7 @@ describe('init tests', () => {
       assert.strictEqual(answers['browsers'], undefined);
     });
 
-    test('if answers passed to inquirer also contains browsers and mobile when flags passed', async () => {
+    it('if answers passed to inquirer also contains browsers and mobile when flags passed', async function() {
       mockery.registerMock('inquirer', {
         async prompt(questions, answers) {
           return answers;
@@ -56,7 +72,7 @@ describe('init tests', () => {
       assert.strictEqual(answers['mobile'], true);
     });
 
-    test('if answers passed to inquirer contains correct property when mobile flag passed with wrong type', async () => {
+    it('if answers passed to inquirer contains correct property when mobile flag passed with wrong type', async function() {
       mockery.registerMock('inquirer', {
         async prompt(questions, answers) {
           return answers;
@@ -77,18 +93,18 @@ describe('init tests', () => {
     });
   });
 
-  describe('test refineAnswers', () => {
-    beforeEach(() => {
+  describe('test refineAnswers', function() {
+    beforeEach(function() {
       mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
     });
 
-    afterEach(() => {
+    afterEach(function() {
       mockery.deregisterAll();
       mockery.resetCache();
       mockery.disable();
     });
 
-    test('with just both in answers', () => {
+    it('with just both in answers', function() {
       mockery.registerMock('node:fs', {
         existsSync: () => false
       });
@@ -125,7 +141,7 @@ describe('init tests', () => {
       assert.strictEqual(answers['examplesLocation'], 'nightwatch');
     });
 
-    test('with local, seleniumServer and no mobile and testsLocation (non-existent) in answers', () => {
+    it('with local, seleniumServer and no mobile and testsLocation (non-existent) in answers', function() {
       mockery.registerMock('node:fs', {
         existsSync: () => false
       });
@@ -167,7 +183,7 @@ describe('init tests', () => {
       assert.strictEqual(answers['seleniumServer'], true);
     });
 
-    test('with local and mobile with no mobileBrowsers', () => {
+    it('with local and mobile with no mobileBrowsers', function() {
       mockery.registerMock('node:fs', {
         existsSync: () => false
       });
@@ -215,7 +231,7 @@ describe('init tests', () => {
       }
     });
 
-    test('with local and mobile with mobile flag', () => {
+    it('with local and mobile with mobile flag', function() {
       mockery.registerMock('node:fs', {
         existsSync: () => false
       });
@@ -259,7 +275,7 @@ describe('init tests', () => {
       }
     });
 
-    test('with remote (browserstack) and testsLocation (exist but empty) in answers', () => {
+    it('with remote (browserstack) and testsLocation (exist but empty) in answers', function() {
       mockery.registerMock('node:fs', {
         existsSync: () => true,
         readdirSync: () => []
@@ -302,7 +318,7 @@ describe('init tests', () => {
       assert.strictEqual(answers['examplesLocation'], 'nightwatch');
     });
 
-    test('with remote (saucelabs) and mobile and testsLocation (exist and non-empty) in answers', () => {
+    it('with remote (saucelabs) and mobile and testsLocation (exist and non-empty) in answers', function() {
       mockery.registerMock('node:fs', {
         existsSync: () => true,
         readdirSync: () => ['file.txt']
@@ -346,7 +362,7 @@ describe('init tests', () => {
       assert.strictEqual(answers['examplesLocation'], 'nightwatch');
     });
 
-    test('with remote (other) in answers and onlyConfig flag and mobile with mobile flag', () => {
+    it('with remote (other) in answers and onlyConfig flag and mobile with mobile flag', function() {
       mockery.registerMock('node:fs', {
         existsSync: () => false
       });
@@ -386,7 +402,7 @@ describe('init tests', () => {
       assert.strictEqual(answers['remoteEnv'].access_key, 'REMOTE_ACCESS_KEY');
     });
 
-    test('with both (remote - other) and cucumber runner and seleniumServer false', () => {
+    it('with both (remote - other) and cucumber runner and seleniumServer false', function() {
       const {NightwatchInit} = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
@@ -428,7 +444,7 @@ describe('init tests', () => {
       assert.strictEqual(answers['examplesLocation'], 'nightwatch');
     });
 
-    test('with both (remote - other) and mobile with mobile flag', () => {
+    it('with both (remote - other) and mobile with mobile flag', function() {
       const {NightwatchInit} = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
@@ -476,18 +492,18 @@ describe('init tests', () => {
     });
   });
 
-  describe('test identifyPackagesToInstall', () => {
-    beforeEach(() => {
+  describe('test identifyPackagesToInstall', function() {
+    beforeEach(function() {
       mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
     });
 
-    afterEach(() => {
+    afterEach(function() {
       mockery.deregisterAll();
       mockery.resetCache();
       mockery.disable();
     });
 
-    test('correct packages are installed with ts-mocha-seleniumServer-mobile', () => {
+    it('correct packages are installed with ts-mocha-seleniumServer-mobile', function() {
       mockery.registerMock('node:fs', {
         readFileSync(path, encoding) {
           return `{
@@ -518,7 +534,7 @@ describe('init tests', () => {
       assert.strictEqual(packagesToInstall.includes('@nightwatch/mobile-helper'), true);
     });
 
-    test('correct packages are installed with js-cucumber', () => {
+    it('correct packages are installed with js-cucumber', function() {
       mockery.registerMock('node:fs', {
         readFileSync(path, encoding) {
           return `{
@@ -547,7 +563,7 @@ describe('init tests', () => {
       assert.strictEqual(packagesToInstall.includes('@nightwatch/mobile-helper'), false);
     });
 
-    test('correct packages are installed with ts-cucumber-seleniumServer without initial packages', () => {
+    it('correct packages are installed with ts-cucumber-seleniumServer without initial packages', function() {
       mockery.registerMock('node:fs', {
         readFileSync(path, encoding) {
           return '{}';
@@ -573,27 +589,20 @@ describe('init tests', () => {
     });
   });
 
-  describe('test installPackages', () => {
-    beforeEach(() => {
+  describe('test installPackages', function() {
+    beforeEach(function() {
       mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
     });
 
-    afterEach(() => {
+    afterEach(function() {
       mockery.deregisterAll();
       mockery.resetCache();
       mockery.disable();
     });
 
-    test('packages are installed correctly with correct output', () => {
+    it('packages are installed correctly with correct output', function() {
       const consoleOutput = [];
-      mockery.registerMock(
-        './logger',
-        class {
-          static error(...msgs) {
-            consoleOutput.push(...msgs);
-          }
-        }
-      );
+      mockLoger(consoleOutput);
 
       const commandsExecuted = [];
       mockery.registerMock('child_process', {
@@ -628,18 +637,18 @@ describe('init tests', () => {
     });
   });
 
-  describe('test setupTypesript', () => {
-    beforeEach(() => {
+  describe('test setupTypesript', function() {
+    beforeEach(function() {
       mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
     });
 
-    afterEach(() => {
+    afterEach(function() {
       mockery.deregisterAll();
       mockery.resetCache();
       mockery.disable();
     });
 
-    test('with both tsconfig not present', () => {
+    it('with both tsconfig not present', function() {
       let nwTsconfigCopied = false;
 
       mockery.registerMock('node:fs', {
@@ -670,7 +679,7 @@ describe('init tests', () => {
       assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, '');
     });
 
-    test('with both tsconfig already present', () => {
+    it('with both tsconfig already present', function() {
       let nwTsconfigCopied = false;
 
       mockery.registerMock('node:fs', {
@@ -699,7 +708,7 @@ describe('init tests', () => {
       assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, '');
     });
 
-    test('with tsconfig.nightwatch.json already present', () => {
+    it('with tsconfig.nightwatch.json already present', function() {
       let nwTsconfigCopied = false;
 
       mockery.registerMock('node:fs', {
@@ -735,27 +744,20 @@ describe('init tests', () => {
     });
   });
 
-  describe('test getConfigDestPath', () => {
-    beforeEach(() => {
+  describe('test getConfigDestPath', function() {
+    beforeEach(function() {
       mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
     });
 
-    afterEach(() => {
+    afterEach(function() {
       mockery.deregisterAll();
       mockery.resetCache();
       mockery.disable();
     });
 
-    test('if config file is not already present', async () => {
+    it('if config file is not already present', async function() {
       const consoleOutput = [];
-      mockery.registerMock(
-        './logger',
-        class {
-          static error(...msgs) {
-            consoleOutput.push(...msgs);
-          }
-        }
-      );
+      mockLoger(consoleOutput);
 
       mockery.registerMock('node:fs', {
         existsSync(path) {
@@ -777,16 +779,9 @@ describe('init tests', () => {
       assert.strictEqual(nightwatchInit.otherInfo.usingESM, false);
     });
 
-    test('if config file is already present and overwrite in prompt', async () => {
+    it('if config file is already present and overwrite in prompt', async function() {
       const consoleOutput = [];
-      mockery.registerMock(
-        './logger',
-        class {
-          static error(...msgs) {
-            consoleOutput.push(...msgs);
-          }
-        }
-      );
+      mockLoger(consoleOutput);
 
       mockery.registerMock('node:fs', {
         existsSync(path) {
@@ -814,16 +809,9 @@ describe('init tests', () => {
       assert.strictEqual(nightwatchInit.otherInfo.usingESM, false);
     });
 
-    test('if config file is already present and new file in prompt', async () => {
+    it('if config file is already present and new file in prompt', async function() {
       const consoleOutput = [];
-      mockery.registerMock(
-        './logger',
-        class {
-          static error(...msgs) {
-            consoleOutput.push(...msgs);
-          }
-        }
-      );
+      mockLoger(consoleOutput);
 
       mockery.registerMock('node:fs', {
         existsSync(path) {
@@ -853,16 +841,9 @@ describe('init tests', () => {
       assert.strictEqual(nightwatchInit.otherInfo.usingESM, false);
     });
 
-    test('if config file is not already present (ESM)', async () => {
+    it('if config file is not already present (ESM)', async function() {
       const consoleOutput = [];
-      mockery.registerMock(
-        './logger',
-        class {
-          static error(...msgs) {
-            consoleOutput.push(...msgs);
-          }
-        }
-      );
+      mockLoger(consoleOutput);
 
       mockery.registerMock('node:fs', {
         existsSync(path) {
@@ -884,16 +865,9 @@ describe('init tests', () => {
       assert.strictEqual(nightwatchInit.otherInfo.usingESM, true);
     });
 
-    test('if config file is already present and new file in prompt (ESM)', async () => {
+    it('if config file is already present and new file in prompt (ESM)', async function() {
       const consoleOutput = [];
-      mockery.registerMock(
-        './logger',
-        class {
-          static error(...msgs) {
-            consoleOutput.push(...msgs);
-          }
-        }
-      );
+      mockLoger(consoleOutput);
 
       mockery.registerMock('node:fs', {
         existsSync(path) {
@@ -929,24 +903,19 @@ describe('init tests', () => {
     });
   });
 
-  describe('test generateConfig', () => {
-    beforeEach(() => {
+  describe('test generateConfig', function() {
+    beforeEach(function() {
       mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
     });
 
-    afterEach(() => {
+    afterEach(function() {
       mockery.deregisterAll();
       mockery.resetCache();
       mockery.disable();
     });
 
-    test('generateConfig with js and without testsLocation and examplesLocation', () => {
-      mockery.registerMock(
-        './logger',
-        class {
-          static error() {}
-        }
-      );
+    it('generateConfig with js and without testsLocation and examplesLocation', function() {
+      mockLoger([]);
 
       const answers = {
         language: 'js',
@@ -976,13 +945,8 @@ describe('init tests', () => {
       fs.unlinkSync('test_config.conf.js');
     });
 
-    test('generateConfig with js (local with mobile) and same testsLocation and examplesLocation', () => {
-      mockery.registerMock(
-        './logger',
-        class {
-          static error() {}
-        }
-      );
+    it('generateConfig with js (local with mobile) and same testsLocation and examplesLocation', function() {
+      mockLoger([]);
 
       const answers = {
         language: 'js',
@@ -1024,13 +988,8 @@ describe('init tests', () => {
       fs.unlinkSync('test_config.conf.js');
     });
 
-    test('generateConfig with js (local with mobile) with mobile flag', () => {
-      mockery.registerMock(
-        './logger',
-        class {
-          static error() {}
-        }
-      );
+    it('generateConfig with js (local with mobile) with mobile flag', function() {
+      mockLoger([]);
 
       const answers = {
         language: 'js',
@@ -1072,13 +1031,8 @@ describe('init tests', () => {
       fs.unlinkSync('test_config.conf.js');
     });
 
-    test('generateConfig with js with different testsLocation and examplesLocation', () => {
-      mockery.registerMock(
-        './logger',
-        class {
-          static error() {}
-        }
-      );
+    it('generateConfig with js with different testsLocation and examplesLocation', function() {
+      mockLoger([]);
 
       const answers = {
         language: 'js',
@@ -1131,13 +1085,8 @@ describe('init tests', () => {
       fs.unlinkSync('test_config.conf.js');
     });
 
-    test('generateConfig with js with cucumber and same testsLocation and examplesLocation', () => {
-      mockery.registerMock(
-        './logger',
-        class {
-          static error() {}
-        }
-      );
+    it('generateConfig with js with cucumber and same testsLocation and examplesLocation', function() {
+      mockLoger([]);
 
       const answers = {
         language: 'js',
@@ -1193,13 +1142,8 @@ describe('init tests', () => {
       fs.unlinkSync('test_config.conf.js');
     });
 
-    test('generateConfig with js with cucumber (both and mobile with mobile flag) and different testsLocation and examplesLocation', () => {
-      mockery.registerMock(
-        './logger',
-        class {
-          static error() {}
-        }
-      );
+    it('generateConfig with js with cucumber (both and mobile with mobile flag) and different testsLocation and examplesLocation', function() {
+      mockLoger([]);
 
       // can be converted to sauce once we have sauce mobile configs
       const answers = {
@@ -1260,13 +1204,8 @@ describe('init tests', () => {
       fs.unlinkSync('test_config.conf.js');
     });
 
-    test('generateConfig with ts (remote with mobile) with testsLocation and examplesLocation', () => {
-      mockery.registerMock(
-        './logger',
-        class {
-          static error() {}
-        }
-      );
+    it('generateConfig with ts (remote with mobile) with testsLocation and examplesLocation', function() {
+      mockLoger([]);
 
       const answers = {
         language: 'ts',
@@ -1322,13 +1261,8 @@ describe('init tests', () => {
       fs.unlinkSync('test_config.conf.js');
     });
 
-    test('generateConfig with js with allowAnonymousMetrics set to false', () => {
-      mockery.registerMock(
-        './logger',
-        class {
-          static error() {}
-        }
-      );
+    it('generateConfig with js with allowAnonymousMetrics set to false', function() {
+      mockLoger([]);
 
       mockery.registerMock(
         'uuid',
@@ -1358,20 +1292,13 @@ describe('init tests', () => {
       nightwatchInit.generateConfig(answers, 'test_config.conf.js');
       const config = require('../../test_config.conf.js');
 
-      assert.strictEqual(config.usage_analytics.enabled, false);
-      assert.strictEqual(config.usage_analytics.log_path, './logs/analytics');
-      assert.strictEqual(config.usage_analytics.client_id, '3141-5926-5358-9793');
+      assert.strictEqual(typeof config.usage_analytics, 'undefined');
 
       fs.unlinkSync('test_config.conf.js');
     });
 
-    test('generateConfig with js with allowAnonymousMetrics set to true', () => {
-      mockery.registerMock(
-        './logger',
-        class {
-          static error() {}
-        }
-      );
+    it('generateConfig with js with allowAnonymousMetrics set to true', function() {
+      mockLoger([]);
 
       const answers = {
         language: 'js',

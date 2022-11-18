@@ -2,13 +2,13 @@
  * To learn more about the describe interface, refer to the following link:
  * https://nightwatchjs.org/guide/writing-tests/test-syntax.html
  */
-describe('Title Assertion', () => {
+describe('Title Assertion', function() {
     
   /**
    * This section will always execute before the test suite
    * Read More : https://nightwatchjs.org/guide/writing-tests/using-test-hooks.html#before-beforeeach-after-aftereach
    */ 
-  before(browser => {
+  before(function (browser) {
     /**
      * Navigate to a URL :
      *   - We need to navigate before performing any actions on the page
@@ -38,7 +38,7 @@ describe('Title Assertion', () => {
 
 
   /* The following will always execute after the test suite */
-  after(browser => {
+  after(function (browser) {
     // This is used to close the browser's session
     browser.end();
   });

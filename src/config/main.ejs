@@ -631,10 +631,11 @@ module.exports = {
       }
     }<% }} %>
   },
-
+  <% if (answers.allowAnonymousMetrics) { %>
   usage_analytics: {
-    enabled: <%- answers.allowAnonymousMetrics %>,
+    enabled: true,
     log_path: './logs/analytics',
     client_id: '<%- client_id %>'
   }
+  <% } %>
 };

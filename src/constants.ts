@@ -17,9 +17,7 @@ export const CONFIG_INTRO = `===============================
 Nightwatch Configuration Wizard
 ===============================
 
-Just answer a few questions to get started with Nightwatch:
-
-We'll setup everything for you :-)
+Initializing project in %s...
 `;
 
 export const AVAILABLE_CONFIG_FLAGS = ['yes', 'generate-config', 'browser', 'y', 'b', 'mobile'];
@@ -37,7 +35,7 @@ export const MOBILE_BROWSER_CHOICES = [
   {name: 'Safari (iOS)', value: 'safari'}
 ];
 
-export const MOBILE_BROWSER_QUES: inquirer.QuestionCollection = 
+export const MOBILE_BROWSER_QUES: inquirer.QuestionCollection =
 {
   type: 'checkbox',
   name: 'mobileBrowsers',
@@ -61,7 +59,7 @@ export const MOBILE_BROWSER_QUES: inquirer.QuestionCollection =
 
     const browsersHasMobileBrowsers = (answers.browsers as string[] | undefined)
       ?.some(((browser: string) => mobileBrowserValues.includes(browser)));
-    
+
     return answers.mobile && answers.backend !== 'remote' && !browsersHasMobileBrowsers;
   }
 };
@@ -73,12 +71,13 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
   {
     type: 'list',
     name: 'languageRunnerSetup',
-    message: 'What is your Language - Test Runner setup?',
+    message: 'Select language + test runner variant',
     choices: [
-      {name: 'JavaScript - Nightwatch Test Runner', value: 'js-nightwatch'},
-      {name: 'JavaScript - Mocha Test Runner', value: 'js-mocha'},
-      {name: 'JavaScript - CucumberJS Test Runner', value: 'js-cucumber'},
-      {name: 'TypeScript - Nightwatch Test Runner', value: 'ts-nightwatch'}
+      {name: 'JavaScript / default', value: 'js-nightwatch'},
+      {name: 'TypeScript / default', value: 'ts-nightwatch'},
+      {name: 'JavaScript / Mocha', value: 'js-mocha'},
+      {name: 'JavaScript / CucumberJS', value: 'js-cucumber'},
+
       // {name: 'TypeScript - Mocha Test Runner', value: 'ts-mocha'}
       // {name: 'TypeScript - CucumberJS Test Runner', value: 'ts-cucumber'}
     ],
@@ -91,39 +90,16 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     }
   },
 
-  // TESTING BACKEND
-  {
-    type: 'list',
-    name: 'backend',
-    message: 'Where do you want to run your e2e tests?',
-    choices: [
-      {name: 'On my local machine', value: 'local'},
-      {name: 'On a remote machine (cloud)', value: 'remote'},
-      {name: 'Both', value: 'both'}
-    ],
-    default: 'local'
-  },
 
-  {
-    type: 'list',
-    name: 'cloudProvider',
-    message: '(Remote) Please select your cloud provider:',
-    choices: [
-      {name: 'BrowserStack', value: 'browserstack'},
-      {name: 'Sauce Labs', value: 'saucelabs'},
-      {name: 'Other providers or remote selenium-server', value: 'other'}
-    ],
-    when: (answers) => ['remote', 'both'].includes(answers.backend)
-  },
 
   // BROWSERS
   {
     type: 'checkbox',
     name: 'browsers',
-    message: 'Which browsers will you be testing on?',
-    choices: (answers) => {
+    message: 'Select target browsers',
+    choices: () => {
       let browsers = BROWSER_CHOICES;
-      if (answers.backend === 'local' && process.platform !== 'darwin') {
+      if (process.platform !== 'darwin') {
         browsers = browsers.filter((browser) => browser.value !== 'safari');
       }
 
@@ -142,14 +118,14 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
   {
     type: 'input',
     name: 'testsLocation',
-    message: 'Where do you plan to keep your end-to-end tests?',
-    default: 'tests'
+    message: 'Enter source folder where test files are stored',
+    default: 'test'
   },
 
   {
     type: 'input',
     name: 'featurePath',
-    message: 'Where do you plan to keep your CucumberJS feature files?',
+    message: 'Enter location of CucumberJS feature files',
     default: (answers: { testsLocation: string }) => path.join(answers.testsLocation, 'features'),
     when: (answers) => answers.runner === 'cucumber'
   },
@@ -158,23 +134,48 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
   {
     type: 'input',
     name: 'baseUrl',
-    message: 'What is the base_url of your project?',
+    message: 'Enter the base_url of the project',
     default: 'http://localhost'
+  },
+
+  // TESTING BACKEND
+  {
+    type: 'list',
+    name: 'backend',
+    message: 'Select where to run Nightwatch tests',
+    choices: [
+      {name: 'On localhost', value: 'local'},
+      {name: 'On a remote/cloud service', value: 'remote'},
+      {name: 'Both', value: 'both'}
+    ],
+    default: 'local'
+  },
+
+  {
+    type: 'list',
+    name: 'cloudProvider',
+    message: '(Remote) Select cloud provider:',
+    choices: [
+      {name: 'BrowserStack', value: 'browserstack'},
+      {name: 'Sauce Labs', value: 'saucelabs'},
+      {name: 'Other providers or remote selenium-server', value: 'other'}
+    ],
+    when: (answers) => ['remote', 'both'].includes(answers.backend)
   },
 
   // ANONYMOUS METRIC COLLECTION
   {
     type: 'confirm',
     name: 'allowAnonymousMetrics',
-    message: 'Allow Nightwatch to anonymously collect usage metrics?',
+    message: 'Allow Nightwatch to collect completely anonymous usage metrics?',
     default: false
   },
-  
+
   // TEST ON MOBILE
   {
     type: 'list',
     name: 'mobile',
-    message: 'Would you like to run your e2e tests on Mobile devices as well?',
+    message: 'Setup testing on Mobile devices as well?',
     choices: () => [
       {name: 'Yes', value: true},
       {name: 'No, skip for now', value: false}
@@ -189,17 +190,17 @@ export const CONFIG_DEST_QUES: inquirer.QuestionCollection = [
   {
     type: 'list',
     name: 'overwrite',
-    message: 'Do you want to overwrite the existing config file?',
+    message: 'Overwrite the existing config file?',
     default: false,
     choices: [
       {name: 'Yes', value: true},
-      {name: 'No, create a new one!', value: false}
+      {name: 'No, create a new one', value: false}
     ]
   },
   {
     type: 'input',
     name: 'newFileName',
-    message: 'What should your new config file be called?',
+    message: 'Enter new config file name:',
     validate: (value, answers) => {
       if (!value.length) {
         return 'File name cannot be empty.';
