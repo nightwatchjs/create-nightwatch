@@ -133,6 +133,37 @@ export class NightwatchInit {
         mobileResult.ios = await iosSetup.run();
       }
     }
+
+    // Setup component testing files 
+    if (answers.uiFramework === 'react' || answers.uiFramework === 'vue') {
+      const componentConfigPath = path.join(__dirname, '..', 'assets', 'component-config');
+      const nightwatchPath = path.join(this.rootDir, 'nightwatch');
+
+      try {
+        fs.mkdirSync(nightwatchPath);
+        // eslint-disable-next-line
+      } catch (err) {}
+
+      if (answers.language === 'js') {
+        const viteSrcPath = path.join(componentConfigPath, 'vite.config.js');
+        const viteDestPath = path.join(this.rootDir, 'vite.config.js');
+
+        fs.copyFileSync(viteSrcPath, viteDestPath);
+      } else if (answers.language === 'ts') {
+        const viteSrcPath = path.join(componentConfigPath, 'vite.config.ts');
+        const viteDestPath = path.join(this.rootDir, 'vite.config.ts');
+
+        fs.copyFileSync(viteSrcPath, viteDestPath);
+      }
+      
+      if ( answers.uiFramework === 'react') {
+        // Generate a new index.jsx file
+        const reactIndexSrcPath = path.join(componentConfigPath, 'index.jsx');
+        const reactIndexgDestPath = path.join(nightwatchPath, 'index.jsx');
+
+        fs.copyFileSync(reactIndexSrcPath, reactIndexgDestPath);
+      }
+    }
     
     if (!this.onlyConfig) {
       // Post instructions to run their first test
@@ -278,6 +309,20 @@ export class NightwatchInit {
         }
       }
     }
+    
+    answers.plugins = [];
+
+    if(answers.uiFramework === 'react') {
+      answers.plugins.push('@nightwatch/react');
+    }
+
+    if(answers.uiFramework === 'storybook') {
+      answers.plugins.push('@nightwatch/storybook');
+    }
+
+    if(answers.uiFramework === 'vue') {
+      answers.plugins.push('@nightwatch/vue');
+    }
   }
 
   identifyPackagesToInstall(answers: ConfigGeneratorAnswers): string[] {
@@ -299,6 +344,10 @@ export class NightwatchInit {
       packages.push('@nightwatch/mobile-helper');
     }
 
+    if(answers.plugins) {
+      packages.push(...answers.plugins);
+    }
+    
     // Identify packages already installed and don't install them again
     const packageJson = JSON.parse(fs.readFileSync(path.join(this.rootDir, 'package.json'), 'utf-8'));
 
@@ -461,7 +510,6 @@ export class NightwatchInit {
     const tplData = fs.readFileSync(templateFile).toString();
 
     let rendered = ejs.render(tplData, {
-      plugins: false,
       src_folders: JSON.stringify(src_folders).replace(/"/g, '\'').replace(/\\\\/g, '/'),
       page_objects_path: JSON.stringify(page_objects_path).replace(/"/g, '\'').replace(/\\\\/g, '/'),
       custom_commands_path: JSON.stringify(custom_commands_path).replace(/"/g, '\'').replace(/\\\\/g, '/'),

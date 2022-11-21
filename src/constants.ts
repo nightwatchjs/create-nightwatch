@@ -67,20 +67,44 @@ export const MOBILE_BROWSER_QUES: inquirer.QuestionCollection =
 export const QUESTIONAIRRE: inquirer.QuestionCollection = [
   // answers.rootDir is available to all the questions (passed in Inquirer.prompt()).
 
+  // TEST TYPE
+  {
+    type: 'checkbox',
+    name: 'testType',
+    message: 'Select testing type',
+    choices: [
+        {name: 'End-To-End Testing', value: 'e2e-test'},
+        {name: 'Component Testing', value: 'ct-test'},
+        // { name: 'mobile app testing', value: 'mobile-test' }
+    ],
+    default: ['e2e-test'],
+    validate: (value) => {
+      return !!value.length || 'Please select at least 1 testing type.';
+    },
+  },
+
   // JS OR TS
   {
     type: 'list',
     name: 'languageRunnerSetup',
     message: 'Select language + test runner variant',
-    choices: [
-      {name: 'JavaScript / default', value: 'js-nightwatch'},
-      {name: 'TypeScript / default', value: 'ts-nightwatch'},
-      {name: 'JavaScript / Mocha', value: 'js-mocha'},
-      {name: 'JavaScript / CucumberJS', value: 'js-cucumber'},
+    choices: (answers) => {
+      const languageRunners = [
+        {name: 'JavaScript / default', value: 'js-nightwatch'},
+        {name: 'TypeScript / default', value: 'ts-nightwatch'},
+        {name: 'JavaScript / Mocha', value: 'js-mocha'},
+        {name: 'JavaScript / CucumberJS', value: 'js-cucumber'},
+  
+        // {name: 'TypeScript - Mocha Test Runner', value: 'ts-mocha'}
+        // {name: 'TypeScript - CucumberJS Test Runner', value: 'ts-cucumber'}
+      ]
 
-      // {name: 'TypeScript - Mocha Test Runner', value: 'ts-mocha'}
-      // {name: 'TypeScript - CucumberJS Test Runner', value: 'ts-cucumber'}
-    ],
+      if (answers.testType.length === 1 && answers.testType.includes('ct-test')) {
+        return languageRunners.filter((languageRunner) => !['js-mocha', 'js-cucumber'].includes(languageRunner.value))
+      }
+
+      return languageRunners;
+    },
     filter: (value, answers) => {
       const [language, runner] = value.split('-');
       answers.language = language;
@@ -90,7 +114,18 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     }
   },
 
-
+  // UI Framework
+  {
+    type: 'list',
+    name: 'uiFramework',
+    message: 'Select UI framework',
+    choices: [
+        {name: 'React', value: 'react'},
+        {name: 'Vue.js', value: 'vue'},
+        {name: 'Storybook', value: 'storybook'}
+    ],
+    when: (answers) => answers.testType.includes('ct-test')
+  },
 
   // BROWSERS
   {
@@ -119,7 +154,13 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     type: 'input',
     name: 'testsLocation',
     message: 'Enter source folder where test files are stored',
-    default: 'test'
+    default: (answers: {uiFramework: string}) => {
+      if (answers.uiFramework === 'storybook') {
+        return 'stories/*.stories.jsx';
+      }
+
+      return 'test';
+    }
   },
 
   {
@@ -135,7 +176,15 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     type: 'input',
     name: 'baseUrl',
     message: 'Enter the base_url of the project',
-    default: 'http://localhost'
+    default: (answers: {uiFramework: string}) => {
+      if (['react', 'vue'].includes(answers.uiFramework)) {
+        return 'localhost:5173';
+      } else if (answers.uiFramework === 'storybook') {
+        return 'http://localhost:6006';
+      }
+
+      return 'http://localhost';
+    }
   },
 
   // TESTING BACKEND

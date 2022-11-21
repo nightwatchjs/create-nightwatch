@@ -26,7 +26,9 @@ export interface ConfigGeneratorAnswers {
   defaultBrowser?: string;
   remoteBrowsers?: string[];
   allowAnonymousMetrics?: boolean;
-  mobileRemote?: boolean
+  mobileRemote?: boolean;
+  uiFramework?: 'react' | 'vue' | 'storybook';
+  plugins?: string[];
 }
 
 export interface ConfigDestination {
