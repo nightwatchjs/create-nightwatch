@@ -510,6 +510,7 @@ export class NightwatchInit {
     const tplData = fs.readFileSync(templateFile).toString();
 
     let rendered = ejs.render(tplData, {
+      plugins: JSON.stringify(answers.plugins).replace(/"/g, '\'').replace(/\\\\/g, '/'),
       src_folders: JSON.stringify(src_folders).replace(/"/g, '\'').replace(/\\\\/g, '/'),
       page_objects_path: JSON.stringify(page_objects_path).replace(/"/g, '\'').replace(/\\\\/g, '/'),
       custom_commands_path: JSON.stringify(custom_commands_path).replace(/"/g, '\'').replace(/\\\\/g, '/'),
