@@ -178,7 +178,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     message: 'Enter the base_url of the project',
     default: (answers: {uiFramework: string}) => {
       if (['react', 'vue'].includes(answers.uiFramework)) {
-        return 'localhost:5173';
+        return 'http://localhost:5173';
       } else if (answers.uiFramework === 'storybook') {
         return 'http://localhost:6006';
       }
