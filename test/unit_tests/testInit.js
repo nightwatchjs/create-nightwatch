@@ -959,7 +959,8 @@ describe('init tests', function() {
         addExamples: true,
         examplesLocation: 'tests',
         allowAnonymousMetrics: false,
-        mobile: true
+        mobile: true,
+        plugins: []
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1002,7 +1003,8 @@ describe('init tests', function() {
         addExamples: true,
         examplesLocation: 'tests',
         allowAnonymousMetrics: false,
-        mobile: true
+        mobile: true,
+        plugins: []
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1052,7 +1054,8 @@ describe('init tests', function() {
         testsLocation: 'tests',
         addExamples: true,
         examplesLocation: path.join('tests', 'nightwatch-examples'),
-        allowAnonymousMetrics: false
+        allowAnonymousMetrics: false,
+        plugins: []
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1107,7 +1110,8 @@ describe('init tests', function() {
         testsLocation: 'tests',
         addExamples: true,
         examplesLocation: 'tests',
-        allowAnonymousMetrics: false
+        allowAnonymousMetrics: false,
+        plugins: []
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1167,7 +1171,8 @@ describe('init tests', function() {
         addExamples: true,
         examplesLocation: path.join('tests', 'features', 'nightwatch-examples'),
         allowAnonymousMetrics: false,
-        mobile: true
+        mobile: true,
+        plugins: []
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1225,7 +1230,8 @@ describe('init tests', function() {
         addExamples: true,
         examplesLocation: 'nightwatch-examples',
         allowAnonymousMetrics: false,
-        mobile: true
+        mobile: true,
+        plugins: []
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1281,7 +1287,8 @@ describe('init tests', function() {
         browsers: ['chrome', 'firefox'],
         mobileBrowsers: [],
         defaultBrowser: 'firefox',
-        allowAnonymousMetrics: false
+        allowAnonymousMetrics: false,
+        plugins: []
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1307,7 +1314,8 @@ describe('init tests', function() {
         browsers: ['chrome', 'firefox'],
         mobileBrowsers: [],
         defaultBrowser: 'firefox',
-        allowAnonymousMetrics: true
+        allowAnonymousMetrics: true,
+        plugins: []
       };
 
       const {NightwatchInit} = require('../../lib/init');
