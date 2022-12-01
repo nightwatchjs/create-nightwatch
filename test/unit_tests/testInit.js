@@ -923,7 +923,8 @@ describe('init tests', function() {
         browsers: ['chrome', 'firefox'],
         mobileBrowsers: [],
         defaultBrowser: 'firefox',
-        allowAnonymousMetrics: false
+        allowAnonymousMetrics: false,
+        plugins: []
       };
 
       const {NightwatchInit} = require('../../lib/init');
