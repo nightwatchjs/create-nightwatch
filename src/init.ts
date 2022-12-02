@@ -143,18 +143,6 @@ export class NightwatchInit {
         fs.mkdirSync(nightwatchPath);
         // eslint-disable-next-line
       } catch (err) {}
-
-      if (answers.language === 'js') {
-        const viteSrcPath = path.join(componentConfigPath, 'vite.config.js');
-        const viteDestPath = path.join(this.rootDir, 'vite.config.js');
-
-        fs.copyFileSync(viteSrcPath, viteDestPath);
-      } else if (answers.language === 'ts') {
-        const viteSrcPath = path.join(componentConfigPath, 'vite.config.ts');
-        const viteDestPath = path.join(this.rootDir, 'vite.config.ts');
-
-        fs.copyFileSync(viteSrcPath, viteDestPath);
-      }
       
       if ( answers.uiFramework === 'react') {
         // Generate a new index.jsx file
