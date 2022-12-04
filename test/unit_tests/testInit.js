@@ -656,6 +656,26 @@ describe('init tests', function() {
       assert.strictEqual(packagesToInstall.includes('@cucumber/cucumber'), true);
       assert.strictEqual(packagesToInstall.includes('@nightwatch/selenium-server'), true);
     });
+
+    it('when react is selected as uiFramework for component testing', function() {
+      mockery.registerMock('node:fs', {
+        readFileSync(path, encoding) {
+          return '{}';
+        }
+      });
+
+      const answers = {
+        uiFramework: 'react'
+      };
+
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, []);
+      nightwatchInit.refineAnswers(answers);
+      const packagesToInstall = nightwatchInit.identifyPackagesToInstall(answers);
+
+      assert.strictEqual(packagesToInstall.includes('nightwatch'), true);
+      assert.strictEqual(packagesToInstall.includes('@nightwatch/react'), true);
+    });
   });
 
   describe('test installPackages', function() {
