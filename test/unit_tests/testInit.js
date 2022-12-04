@@ -490,6 +490,75 @@ describe('init tests', function() {
       assert.strictEqual(answers['addExamples'], true);
       assert.strictEqual(answers['examplesLocation'], 'nightwatch');
     });
+
+    it('when component testing is not selected', function() {
+      mockery.registerMock('node:fs', {
+        existsSync: () => false
+      });
+
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, []);
+
+      let answers = {};
+      nightwatchInit.refineAnswers(answers);
+      assert.strictEqual('plugins' in answers, true);
+      assert.strictEqual('uiFramework' in answers, false);
+      assert.deepEqual(answers['plugins'], []);
+    });
+
+    it('when react is selected as uiFramework', function() {
+      mockery.registerMock('node:fs', {
+        existsSync: () => false
+      });
+
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, []);
+
+      let answers = {
+        uiFramework: 'react'
+      };
+      nightwatchInit.refineAnswers(answers);
+      assert.strictEqual('plugins' in answers, true);
+      assert.strictEqual('uiFramework' in answers, true);
+      assert.deepEqual(answers['plugins'], ['@nightwatch/react']);
+      assert.strictEqual(answers['uiFramework'], 'react');
+    });
+
+    it('when vue is selected as uiFramework', function() {
+      mockery.registerMock('node:fs', {
+        existsSync: () => false
+      });
+
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, []);
+
+      let answers = {
+        uiFramework: 'vue'
+      };
+      nightwatchInit.refineAnswers(answers);
+      assert.strictEqual('plugins' in answers, true);
+      assert.strictEqual('uiFramework' in answers, true);
+      assert.deepEqual(answers['plugins'], ['@nightwatch/vue']);
+      assert.strictEqual(answers['uiFramework'], 'vue');
+    });
+
+    it('when storybook is selected as uiFramework', function() {
+      mockery.registerMock('node:fs', {
+        existsSync: () => false
+      });
+
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, []);
+
+      let answers = {
+        uiFramework: 'storybook'
+      };
+      nightwatchInit.refineAnswers(answers);
+      assert.strictEqual('plugins' in answers, true);
+      assert.strictEqual('uiFramework' in answers, true);
+      assert.deepEqual(answers['plugins'], ['@nightwatch/storybook']);
+      assert.strictEqual(answers['uiFramework'], 'storybook');
+    });
   });
 
   describe('test identifyPackagesToInstall', function() {
