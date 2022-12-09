@@ -17,7 +17,7 @@ export const CONFIG_INTRO = `===============================
 Nightwatch Configuration Wizard
 ===============================
 
-Initializing project in %s...
+Setting up Nightwatch in %s...
 `;
 
 export const AVAILABLE_CONFIG_FLAGS = ['yes', 'generate-config', 'browser', 'y', 'b', 'mobile'];
@@ -71,10 +71,10 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
   {
     type: 'checkbox',
     name: 'testType',
-    message: 'Select testing type',
+    message: 'Select testing type to setup for your project',
     choices: [
-        {name: 'End-To-End Testing', value: 'e2e-test'},
-        {name: 'Component Testing', value: 'ct-test'},
+        {name: 'End-to-End testing', value: 'e2e-test'},
+        {name: 'Component testing', value: 'ct-test'},
         // { name: 'mobile app testing', value: 'mobile-test' }
     ],
     default: ['e2e-test'],

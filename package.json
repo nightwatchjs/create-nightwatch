@@ -22,6 +22,7 @@
     "url": "git+https://github.com/nightwatchjs/create-nightwatch"
   },
   "devDependencies": {
+    "@nightwatch/vue": "^0.3.2",
     "@npm/types": "^1.0.2",
     "@types/ejs": "^3.1.1",
     "@types/inquirer": "^8.2.1",
@@ -32,10 +33,11 @@
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.27.1",
     "@typescript-eslint/parser": "^5.27.1",
+    "chromedriver": "^108.0.0",
     "eslint": "^8.27.0",
     "mocha": "^10.1.0",
     "mockery": "^2.1.0",
-    "nightwatch": "^2.5.0",
+    "nightwatch": "^2.5.4",
     "nock": "^13.2.9",
     "typescript": "^4.7.3"
   },
