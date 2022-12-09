@@ -31,6 +31,19 @@ module.exports = {
   <% } %>
   // See https://nightwatchjs.org/guide/concepts/test-globals.html
   globals_path: '',
+  <% if (answers.uiFramework === 'storybook') { %>
+  '@nightwatch/storybook': {
+    start_storybook: true,
+    storybook_config_dir: '.storybook',
+    hide_csf_errors: true,
+    show_browser_console: true,
+    storybook_url: '<%- answers.baseUrl %>'
+  },
+  <% } else if (answers.uiFramework === 'react' || answers.uiFramework === 'vue') { %>
+  vite_dev_server: {
+    start_vite: true,
+    port: 5173
+  }, <% } %>
 
   webdriver: {},
 

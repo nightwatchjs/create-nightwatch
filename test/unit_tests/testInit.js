@@ -490,6 +490,75 @@ describe('init tests', function() {
       assert.strictEqual(answers['addExamples'], true);
       assert.strictEqual(answers['examplesLocation'], 'nightwatch');
     });
+
+    it('when component testing is not selected', function() {
+      mockery.registerMock('node:fs', {
+        existsSync: () => false
+      });
+
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, []);
+
+      let answers = {};
+      nightwatchInit.refineAnswers(answers);
+      assert.strictEqual('plugins' in answers, true);
+      assert.strictEqual('uiFramework' in answers, false);
+      assert.deepEqual(answers['plugins'], []);
+    });
+
+    it('when react is selected as uiFramework', function() {
+      mockery.registerMock('node:fs', {
+        existsSync: () => false
+      });
+
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, []);
+
+      let answers = {
+        uiFramework: 'react'
+      };
+      nightwatchInit.refineAnswers(answers);
+      assert.strictEqual('plugins' in answers, true);
+      assert.strictEqual('uiFramework' in answers, true);
+      assert.deepEqual(answers['plugins'], ['@nightwatch/react']);
+      assert.strictEqual(answers['uiFramework'], 'react');
+    });
+
+    it('when vue is selected as uiFramework', function() {
+      mockery.registerMock('node:fs', {
+        existsSync: () => false
+      });
+
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, []);
+
+      let answers = {
+        uiFramework: 'vue'
+      };
+      nightwatchInit.refineAnswers(answers);
+      assert.strictEqual('plugins' in answers, true);
+      assert.strictEqual('uiFramework' in answers, true);
+      assert.deepEqual(answers['plugins'], ['@nightwatch/vue']);
+      assert.strictEqual(answers['uiFramework'], 'vue');
+    });
+
+    it('when storybook is selected as uiFramework', function() {
+      mockery.registerMock('node:fs', {
+        existsSync: () => false
+      });
+
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, []);
+
+      let answers = {
+        uiFramework: 'storybook'
+      };
+      nightwatchInit.refineAnswers(answers);
+      assert.strictEqual('plugins' in answers, true);
+      assert.strictEqual('uiFramework' in answers, true);
+      assert.deepEqual(answers['plugins'], ['@nightwatch/storybook']);
+      assert.strictEqual(answers['uiFramework'], 'storybook');
+    });
   });
 
   describe('test identifyPackagesToInstall', function() {
@@ -586,6 +655,26 @@ describe('init tests', function() {
       assert.strictEqual(packagesToInstall.includes('@types/nightwatch'), true);
       assert.strictEqual(packagesToInstall.includes('@cucumber/cucumber'), true);
       assert.strictEqual(packagesToInstall.includes('@nightwatch/selenium-server'), true);
+    });
+
+    it('when react is selected as uiFramework for component testing', function() {
+      mockery.registerMock('node:fs', {
+        readFileSync(path, encoding) {
+          return '{}';
+        }
+      });
+
+      const answers = {
+        uiFramework: 'react'
+      };
+
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, []);
+      nightwatchInit.refineAnswers(answers);
+      const packagesToInstall = nightwatchInit.identifyPackagesToInstall(answers);
+
+      assert.strictEqual(packagesToInstall.includes('nightwatch'), true);
+      assert.strictEqual(packagesToInstall.includes('@nightwatch/react'), true);
     });
   });
 
@@ -923,7 +1012,8 @@ describe('init tests', function() {
         browsers: ['chrome', 'firefox'],
         mobileBrowsers: [],
         defaultBrowser: 'firefox',
-        allowAnonymousMetrics: false
+        allowAnonymousMetrics: false,
+        plugins: []
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -958,7 +1048,8 @@ describe('init tests', function() {
         addExamples: true,
         examplesLocation: 'tests',
         allowAnonymousMetrics: false,
-        mobile: true
+        mobile: true,
+        plugins: []
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1001,7 +1092,8 @@ describe('init tests', function() {
         addExamples: true,
         examplesLocation: 'tests',
         allowAnonymousMetrics: false,
-        mobile: true
+        mobile: true,
+        plugins: []
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1051,7 +1143,8 @@ describe('init tests', function() {
         testsLocation: 'tests',
         addExamples: true,
         examplesLocation: path.join('tests', 'nightwatch-examples'),
-        allowAnonymousMetrics: false
+        allowAnonymousMetrics: false,
+        plugins: []
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1106,7 +1199,8 @@ describe('init tests', function() {
         testsLocation: 'tests',
         addExamples: true,
         examplesLocation: 'tests',
-        allowAnonymousMetrics: false
+        allowAnonymousMetrics: false,
+        plugins: []
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1166,7 +1260,8 @@ describe('init tests', function() {
         addExamples: true,
         examplesLocation: path.join('tests', 'features', 'nightwatch-examples'),
         allowAnonymousMetrics: false,
-        mobile: true
+        mobile: true,
+        plugins: []
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1224,7 +1319,8 @@ describe('init tests', function() {
         addExamples: true,
         examplesLocation: 'nightwatch-examples',
         allowAnonymousMetrics: false,
-        mobile: true
+        mobile: true,
+        plugins: []
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1280,7 +1376,8 @@ describe('init tests', function() {
         browsers: ['chrome', 'firefox'],
         mobileBrowsers: [],
         defaultBrowser: 'firefox',
-        allowAnonymousMetrics: false
+        allowAnonymousMetrics: false,
+        plugins: []
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1306,7 +1403,8 @@ describe('init tests', function() {
         browsers: ['chrome', 'firefox'],
         mobileBrowsers: [],
         defaultBrowser: 'firefox',
-        allowAnonymousMetrics: true
+        allowAnonymousMetrics: true,
+        plugins: []
       };
 
       const {NightwatchInit} = require('../../lib/init');
