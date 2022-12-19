@@ -501,9 +501,8 @@ describe('init tests', function() {
 
       let answers = {};
       nightwatchInit.refineAnswers(answers);
-      assert.strictEqual('plugins' in answers, true);
+      assert.strictEqual('plugins' in answers, false);
       assert.strictEqual('uiFramework' in answers, false);
-      assert.deepEqual(answers['plugins'], []);
     });
 
     it('when react is selected as uiFramework', function() {
