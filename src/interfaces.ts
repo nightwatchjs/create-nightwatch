@@ -20,13 +20,13 @@ export interface ConfigGeneratorAnswers {
   addExamples?: boolean;
   examplesLocation?: string;
   browsers?: string[];
-  mobile?: boolean;
-  mobileDevice?: 'ios' | 'android' | 'both';
-  mobileBrowsers?: string[];
   defaultBrowser?: string;
   remoteBrowsers?: string[];
   allowAnonymousMetrics?: boolean;
-  mobileRemote?: boolean
+  mobile?: boolean;
+  mobileRemote?: boolean;
+  mobileBrowsers?: string[];
+  mobilePlatform?: 'android' | 'ios' | 'both';
 }
 
 export interface ConfigDestination {

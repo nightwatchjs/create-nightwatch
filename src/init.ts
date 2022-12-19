@@ -16,7 +16,7 @@ import {ConfigGeneratorAnswers, ConfigDestination, OtherInfo, MobileResult} from
 import defaultAnswers from './defaults.json';
 import defaultMobileAnswers from './defaultsMobile.json';
 import {AndroidSetup, IosSetup} from '@nightwatch/mobile-helper';
-import { format } from 'node:util';
+import {format} from 'node:util';
 
 
 const EXAMPLE_TEST_FOLDER = 'examples';
@@ -118,16 +118,16 @@ export class NightwatchInit {
 
     // Setup mobile
     const mobileResult: MobileResult = {};
-    if (answers.mobile && answers.mobileDevice) {
-      // answers.mobileDevice will be undefined in case of empty or non-matching mobileBrowsers
+    if (answers.mobile && answers.mobilePlatform) {
+      // answers.mobilePlatform will be undefined in case of empty or non-matching mobileBrowsers
       // hence, no need to setup any device.
-      if (['android', 'both'].includes(answers.mobileDevice)) {
+      if (['android', 'both'].includes(answers.mobilePlatform)) {
         Logger.info('Running Android Setup...\n');
         const androidSetup = new AndroidSetup({browsers: answers.mobileBrowsers || []}, this.rootDir);
         mobileResult.android = await androidSetup.run();
       }
 
-      if (['ios', 'both'].includes(answers.mobileDevice)) {
+      if (['ios', 'both'].includes(answers.mobilePlatform)) {
         Logger.info('Running iOS Setup...\n');
         const iosSetup = new IosSetup({mode: ['simulator', 'real'], setup: true});
         mobileResult.ios = await iosSetup.run();
@@ -265,16 +265,16 @@ export class NightwatchInit {
       }
     }
 
-    if (answers.mobile && !answers.mobileDevice) {
+    if (answers.mobile && !answers.mobilePlatform) {
       if (answers.mobileBrowsers?.includes('safari')) {
-        answers.mobileDevice = 'ios';
+        answers.mobilePlatform = 'ios';
       }
 
       if (answers.mobileBrowsers?.some(browser => ['chrome', 'firefox'].includes(browser))) {
-        if (answers.mobileDevice === 'ios') {
-          answers.mobileDevice = 'both';
+        if (answers.mobilePlatform === 'ios') {
+          answers.mobilePlatform = 'both';
         } else {
-          answers.mobileDevice = 'android';
+          answers.mobilePlatform = 'android';
         }
       }
     }
@@ -863,10 +863,10 @@ export class NightwatchInit {
       }
     };
 
-    if (answers.mobileDevice) {
+    if (answers.mobilePlatform) {
       Logger.info(colors.green('RUN NIGHTWATCH TESTS ON MOBILE'), '\n');
 
-      if (['android', 'both'].includes(answers.mobileDevice)) {
+      if (['android', 'both'].includes(answers.mobilePlatform)) {
         const errorHelp = 'Please go through the setup logs above to know the actual cause of failure.\n\nOr, re-run the following commands:';
 
         const setupMsg = `  To setup Android, run: ${colors.gray.italic('npx @nightwatch/mobile-helper android --setup')}\n` +
@@ -947,7 +947,7 @@ export class NightwatchInit {
         }
       }
     
-      if (['ios', 'both'].includes(answers.mobileDevice)) {
+      if (['ios', 'both'].includes(answers.mobilePlatform)) {
         const setupHelp = 'Please follow the guide above to complete the setup.\n\nOr, re-run the following commands:';
 
         const setupCommand = `  For iOS setup, run: ${colors.gray.italic('npx @nightwatch/mobile-helper ios --setup')}\n` +

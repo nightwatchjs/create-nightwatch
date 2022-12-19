@@ -122,7 +122,7 @@ describe('e2e tests for init', function () {
     assert.strictEqual(answers.remoteBrowsers, undefined);
     assert.deepStrictEqual(answers.mobileBrowsers, []);
     assert.strictEqual(answers.mobileRemote, undefined);
-    assert.strictEqual(answers.mobileDevice, undefined);
+    assert.strictEqual(answers.mobilePlatform, undefined);
     assert.strictEqual(answers.cloudProvider, undefined);
     assert.strictEqual(answers.remoteName, undefined);
     assert.strictEqual(answers.remoteEnv, undefined);
@@ -274,7 +274,7 @@ describe('e2e tests for init', function () {
     assert.deepEqual(answers.remoteBrowsers, ['chrome', 'edge']);
     assert.deepStrictEqual(answers.mobileBrowsers, undefined);
     assert.strictEqual(answers.mobileRemote, undefined);
-    assert.strictEqual(answers.mobileDevice, undefined);
+    assert.strictEqual(answers.mobilePlatform, undefined);
     assert.strictEqual(answers.cloudProvider, 'other');
     assert.strictEqual(answers.remoteName, 'remote');
     assert.strictEqual(answers.remoteEnv.username, 'REMOTE_USERNAME');
@@ -422,7 +422,7 @@ describe('e2e tests for init', function () {
     assert.deepEqual(answers.remoteBrowsers, ['chrome', 'safari']);
     assert.deepStrictEqual(answers.mobileBrowsers, []);
     assert.strictEqual(answers.mobileRemote, undefined);
-    assert.strictEqual(answers.mobileDevice, undefined);
+    assert.strictEqual(answers.mobilePlatform, undefined);
     assert.strictEqual(answers.cloudProvider, 'browserstack');
     assert.strictEqual(answers.remoteName, 'browserstack');
     assert.strictEqual(answers.remoteEnv.username, 'BROWSERSTACK_USERNAME');
@@ -582,7 +582,7 @@ describe('e2e tests for init', function () {
     assert.deepEqual(answers.remoteBrowsers, ['chrome', 'edge', 'safari']);
     assert.deepStrictEqual(answers.mobileBrowsers, undefined);
     assert.strictEqual(answers.mobileRemote, true);
-    assert.strictEqual(answers.mobileDevice, undefined);
+    assert.strictEqual(answers.mobilePlatform, undefined);
     assert.strictEqual(answers.cloudProvider, 'saucelabs');
     assert.strictEqual(answers.remoteName, 'saucelabs');
     assert.strictEqual(answers.remoteEnv.username, 'SAUCE_USERNAME');
@@ -769,10 +769,10 @@ describe('e2e tests for init', function () {
     let browsers;
     if (process.platform === 'darwin') {
       browsers = ['firefox', 'safari'];
-      assert.strictEqual(answers.mobileDevice, 'both');
+      assert.strictEqual(answers.mobilePlatform, 'both');
     } else {
       browsers = ['firefox'];
-      assert.strictEqual(answers.mobileDevice, 'android');
+      assert.strictEqual(answers.mobilePlatform, 'android');
     }
     assert.deepStrictEqual(answers.browsers, browsers);
     assert.deepStrictEqual(answers.mobileBrowsers, browsers);
@@ -967,7 +967,7 @@ describe('e2e tests for init', function () {
     assert.deepEqual(answers.remoteBrowsers, ['firefox', 'chrome']);
     assert.deepStrictEqual(answers.mobileBrowsers, []);
     assert.strictEqual(answers.mobileRemote, undefined);
-    assert.strictEqual(answers.mobileDevice, undefined);
+    assert.strictEqual(answers.mobilePlatform, undefined);
     assert.strictEqual(answers.cloudProvider, 'browserstack');
     assert.strictEqual(answers.remoteName, 'browserstack');
     assert.strictEqual(answers.remoteEnv.username, 'BROWSERSTACK_USERNAME');
@@ -1131,10 +1131,10 @@ describe('e2e tests for init', function () {
     let mobileBrowsers;
     if (process.platform === 'darwin') {
       mobileBrowsers = ['firefox', 'chrome', 'safari'];
-      assert.strictEqual(answers.mobileDevice, 'both');
+      assert.strictEqual(answers.mobilePlatform, 'both');
     } else {
       mobileBrowsers = ['firefox', 'chrome'];
-      assert.strictEqual(answers.mobileDevice, 'android');
+      assert.strictEqual(answers.mobilePlatform, 'android');
     }
     assert.deepStrictEqual(answers.browsers, []);
     assert.deepStrictEqual(answers.mobileBrowsers, mobileBrowsers);
@@ -1320,7 +1320,7 @@ describe('e2e tests for init', function () {
     assert.strictEqual(answers.remoteBrowsers, undefined);
     assert.deepStrictEqual(answers.mobileBrowsers, []);
     assert.strictEqual(answers.mobileRemote, undefined);
-    assert.strictEqual(answers.mobileDevice, undefined);
+    assert.strictEqual(answers.mobilePlatform, undefined);
     assert.strictEqual(answers.cloudProvider, undefined);
     assert.strictEqual(answers.remoteName, undefined);
     assert.strictEqual(answers.remoteEnv, undefined);
@@ -1442,7 +1442,7 @@ describe('e2e tests for init', function () {
     assert.deepEqual(answers.remoteBrowsers, ['chrome', 'edge', 'safari']);
     assert.deepStrictEqual(answers.mobileBrowsers, []);
     assert.strictEqual(answers.mobileRemote, undefined);
-    assert.strictEqual(answers.mobileDevice, undefined);
+    assert.strictEqual(answers.mobilePlatform, undefined);
     assert.strictEqual(answers.cloudProvider, 'other');
     assert.strictEqual(answers.remoteName, 'remote');
     assert.strictEqual(answers.remoteEnv.username, 'REMOTE_USERNAME');
