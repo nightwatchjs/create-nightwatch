@@ -11,6 +11,5 @@
   "testsLocation": "nightwatch-e2e",
   "baseUrl": "http://localhost",
   "allowAnonymousMetrics": false,
-  "mobile": false,
-  "plugins": []
+  "mobile": false
 }
