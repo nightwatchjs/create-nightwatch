@@ -119,7 +119,7 @@ describe('init tests', function() {
       assert.strictEqual('mobile' in answers, false);
       assert.strictEqual('mobileBrowsers' in answers, true);
       assert.strictEqual('mobileRemote' in answers, false);
-      assert.strictEqual('mobileDevice' in answers, false);
+      assert.strictEqual('mobilePlatform' in answers, false);
       assert.strictEqual('defaultBrowser' in answers, true);
       assert.strictEqual('cloudProvider' in answers, false);
       assert.strictEqual('remoteName' in answers, true);
@@ -161,7 +161,7 @@ describe('init tests', function() {
       assert.strictEqual('mobile' in answers, false);
       assert.strictEqual('mobileBrowsers' in answers, true);
       assert.strictEqual('mobileRemote' in answers, false);
-      assert.strictEqual('mobileDevice' in answers, false);
+      assert.strictEqual('mobilePlatform' in answers, false);
       assert.strictEqual('defaultBrowser' in answers, true);
       assert.strictEqual('cloudProvider' in answers, false);
       assert.strictEqual('remoteName' in answers, false);
@@ -202,7 +202,7 @@ describe('init tests', function() {
       assert.strictEqual('mobile' in answers, true);
       assert.strictEqual('mobileBrowsers' in answers, true);
       assert.strictEqual('mobileRemote' in answers, false);
-      assert.strictEqual('mobileDevice' in answers, true);
+      assert.strictEqual('mobilePlatform' in answers, true);
       assert.strictEqual('defaultBrowser' in answers, true);
       assert.strictEqual('cloudProvider' in answers, false);
       assert.strictEqual('remoteName' in answers, false);
@@ -225,9 +225,9 @@ describe('init tests', function() {
       assert.strictEqual(answers['addExamples'], true);
       assert.strictEqual(answers['examplesLocation'], 'nightwatch');
       if (process.platform === 'darwin') {
-        assert.strictEqual(answers['mobileDevice'], 'both');
+        assert.strictEqual(answers['mobilePlatform'], 'both');
       } else {
-        assert.strictEqual(answers['mobileDevice'], 'android');
+        assert.strictEqual(answers['mobilePlatform'], 'android');
       }
     });
 
@@ -266,12 +266,12 @@ describe('init tests', function() {
       if (process.platform === 'darwin') {
         assert.deepEqual(answers['mobileBrowsers'], ['safari']);
         assert.strictEqual(answers['defaultBrowser'], 'safari');
-        assert.strictEqual('mobileDevice' in answers, true);
-        assert.strictEqual(answers['mobileDevice'], 'ios');
+        assert.strictEqual('mobilePlatform' in answers, true);
+        assert.strictEqual(answers['mobilePlatform'], 'ios');
       } else {
         assert.deepEqual(answers['mobileBrowsers'], []);
         assert.strictEqual(answers['defaultBrowser'], 'chrome');
-        assert.strictEqual('mobileDevice' in answers, false);
+        assert.strictEqual('mobilePlatform' in answers, false);
       }
     });
 
@@ -296,7 +296,7 @@ describe('init tests', function() {
       assert.strictEqual('mobile' in answers, false);
       assert.strictEqual('mobileBrowsers' in answers, false);
       assert.strictEqual('mobileRemote' in answers, false);
-      assert.strictEqual('mobileDevice' in answers, false);
+      assert.strictEqual('mobilePlatform' in answers, false);
       assert.strictEqual('defaultBrowser' in answers, true);
       assert.strictEqual('defaultBrowser' in answers, true);
       assert.strictEqual('cloudProvider' in answers, true);
@@ -340,7 +340,7 @@ describe('init tests', function() {
       assert.strictEqual('mobile' in answers, true);
       assert.strictEqual('mobileBrowsers' in answers, false);
       assert.strictEqual('mobileRemote' in answers, true);
-      assert.strictEqual('mobileDevice' in answers, false);
+      assert.strictEqual('mobilePlatform' in answers, false);
       assert.strictEqual('defaultBrowser' in answers, true);
       assert.strictEqual('cloudProvider' in answers, true);
       assert.strictEqual('remoteName' in answers, true);
@@ -384,7 +384,7 @@ describe('init tests', function() {
       assert.strictEqual('mobile' in answers, true);
       assert.strictEqual('mobileBrowsers' in answers, false);
       assert.strictEqual('mobileRemote' in answers, true);
-      assert.strictEqual('mobileDevice' in answers, false);
+      assert.strictEqual('mobilePlatform' in answers, false);
       assert.strictEqual('defaultBrowser' in answers, true);
       assert.strictEqual('cloudProvider' in answers, true);
       assert.strictEqual('remoteName' in answers, true);
@@ -420,7 +420,7 @@ describe('init tests', function() {
       assert.strictEqual('mobile' in answers, false);
       assert.strictEqual('mobileBrowsers' in answers, true);
       assert.strictEqual('mobileRemote' in answers, false);
-      assert.strictEqual('mobileDevice' in answers, false);
+      assert.strictEqual('mobilePlatform' in answers, false);
       assert.strictEqual('defaultBrowser' in answers, true);
       assert.strictEqual('cloudProvider' in answers, true);
       assert.strictEqual('remoteName' in answers, true);
@@ -461,7 +461,7 @@ describe('init tests', function() {
       assert.strictEqual('mobile' in answers, true);
       assert.strictEqual('mobileBrowsers' in answers, true);
       assert.strictEqual('mobileRemote' in answers, true);
-      assert.strictEqual('mobileDevice' in answers, true);
+      assert.strictEqual('mobilePlatform' in answers, true);
       assert.strictEqual('defaultBrowser' in answers, true);
       assert.strictEqual('cloudProvider' in answers, true);
       assert.strictEqual('remoteName' in answers, true);
@@ -475,10 +475,10 @@ describe('init tests', function() {
       assert.deepStrictEqual(answers['remoteBrowsers'], []);
       if (process.platform === 'darwin') {
         assert.deepStrictEqual(answers['mobileBrowsers'], ['firefox', 'chrome', 'safari']);
-        assert.strictEqual(answers['mobileDevice'], 'both');
+        assert.strictEqual(answers['mobilePlatform'], 'both');
       } else {
         assert.deepStrictEqual(answers['mobileBrowsers'], ['firefox', 'chrome']);
-        assert.strictEqual(answers['mobileDevice'], 'android');
+        assert.strictEqual(answers['mobilePlatform'], 'android');
       }
       assert.strictEqual(answers['mobileRemote'], true);
       assert.strictEqual(answers['defaultBrowser'], 'firefox');

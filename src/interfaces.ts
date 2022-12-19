@@ -5,6 +5,7 @@ export interface ConfigGeneratorAnswers {
   onlyConfig?: boolean;
   languageRunnerSetup?: string;
   language?: 'js' | 'ts';
+  runner?: 'nightwatch' | 'mocha' | 'cucumber';
   backend?: 'local' | 'remote' | 'both';
   seleniumServer?: boolean;
   cloudProvider?: 'browserstack' | 'saucelabs' | 'other';
@@ -14,19 +15,18 @@ export interface ConfigGeneratorAnswers {
     access_key: string;
   };
   baseUrl?: string;
-  runner?: 'nightwatch' | 'mocha' | 'cucumber';
   testsLocation?: string;
   featurePath?: string;
   addExamples?: boolean;
   examplesLocation?: string;
   browsers?: string[];
-  mobile?: boolean;
-  mobileDevice?: 'ios' | 'android' | 'both';
-  mobileBrowsers?: string[];
   defaultBrowser?: string;
   remoteBrowsers?: string[];
   allowAnonymousMetrics?: boolean;
+  mobile?: boolean;
   mobileRemote?: boolean;
+  mobileBrowsers?: string[];
+  mobilePlatform?: 'android' | 'ios' | 'both';
   uiFramework?: 'react' | 'vue' | 'storybook';
   plugins?: string[];
 }
