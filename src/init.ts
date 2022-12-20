@@ -386,7 +386,7 @@ export class NightwatchInit {
   }
 
   setupComponentTesting(answers: ConfigGeneratorAnswers) {
-    if (answers.uiFramework === 'react' || answers.uiFramework === 'vue') {
+    if (answers.uiFramework === 'react') {
       const componentConfigPath = path.join(__dirname, '..', 'assets', 'component-config');
       const nightwatchPath = path.join(this.rootDir, DEFAULT_FOLDER);
 
@@ -395,13 +395,11 @@ export class NightwatchInit {
         // eslint-disable-next-line
       } catch (err) {}
       
-      if (answers.uiFramework === 'react') {
-        // Generate a new index.jsx file
-        const reactIndexSrcPath = path.join(componentConfigPath, 'index.jsx');
-        const reactIndexDestPath = path.join(nightwatchPath, 'index.jsx');
+      // Generate a new index.jsx file
+      const reactIndexSrcPath = path.join(componentConfigPath, 'index.jsx');
+      const reactIndexDestPath = path.join(nightwatchPath, 'index.jsx');
 
-        fs.copyFileSync(reactIndexSrcPath, reactIndexDestPath);
-      }
+      fs.copyFileSync(reactIndexSrcPath, reactIndexDestPath);
     }
   }
 
