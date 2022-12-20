@@ -2,6 +2,9 @@ import fs from 'node:fs';
 import inquirer from 'inquirer';
 import path from 'path';
 
+import {ConfigGeneratorAnswers} from './interfaces';
+
+
 export const NIGHTWATCH_TITLE = `
  _   _  _         _      _                     _          _
 | \\ | |(_)       | |    | |                   | |        | |
@@ -88,7 +91,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     type: 'list',
     name: 'languageRunnerSetup',
     message: 'Select language + test runner variant',
-    choices: (answers) => {
+    choices: (answers: ConfigGeneratorAnswers) => {
       let languageRunners = [
         {name: 'JavaScript / default', value: 'js-nightwatch'},
         {name: 'TypeScript / default', value: 'ts-nightwatch'},
@@ -99,7 +102,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
         // {name: 'TypeScript - CucumberJS Test Runner', value: 'ts-cucumber'}
       ];
 
-      if (answers.testingType.includes('ct-test')) {
+      if (answers.testingType?.includes('ct-test')) {
         // component tests only work with default test runner.
         languageRunners = languageRunners.filter((languageRunner) => languageRunner.value.includes('nightwatch'));
       }
@@ -125,7 +128,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
       {name: 'Vue.js', value: 'vue'},
       {name: 'Storybook', value: 'storybook'}
     ],
-    when: (answers) => answers.testingType.includes('ct-test')
+    when: (answers: ConfigGeneratorAnswers) => answers.testingType?.includes('ct-test')
   },
 
   // BROWSERS
@@ -177,13 +180,13 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     type: 'input',
     name: 'baseUrl',
     message: 'Enter the base_url of the project',
-    default: (answers: {uiFramework: string}) => {
-      if (['react', 'vue'].includes(answers.uiFramework)) {
+    default: (answers: ConfigGeneratorAnswers) => {
+      if (answers.uiFramework) {
+        if (answers.uiFramework === 'storybook') {
+          return 'http://localhost:6006';
+        }
+
         return 'http://localhost:5173';
-      }
-      
-      if (answers.uiFramework === 'storybook') {
-        return 'http://localhost:6006';
       }
 
       return 'http://localhost';
