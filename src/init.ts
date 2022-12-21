@@ -139,9 +139,6 @@ export class NightwatchInit {
       }
     }
 
-    // Setup component testing files 
-    
-    
     if (!this.onlyConfig) {
       // Post instructions to run their first test
       this.postSetupInstructions(answers, mobileResult);
