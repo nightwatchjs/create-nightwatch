@@ -501,9 +501,8 @@ describe('init tests', function() {
 
       let answers = {};
       nightwatchInit.refineAnswers(answers);
-      assert.strictEqual('plugins' in answers, true);
+      assert.strictEqual('plugins' in answers, false);
       assert.strictEqual('uiFramework' in answers, false);
-      assert.deepEqual(answers['plugins'], []);
     });
 
     it('when react is selected as uiFramework', function() {
@@ -595,15 +594,15 @@ describe('init tests', function() {
 
       const packagesToInstall = nightwatchInit.identifyPackagesToInstall(answers);
 
+      assert.strictEqual(packagesToInstall.length, 5);
       assert.strictEqual(packagesToInstall.includes('nightwatch'), true);
-      assert.strictEqual(packagesToInstall.includes('typescript'), false);
       assert.strictEqual(packagesToInstall.includes('@types/nightwatch'), true);
-      assert.strictEqual(packagesToInstall.includes('@cucumber/cucumber'), false);
+      assert.strictEqual(packagesToInstall.includes('ts-node'), true);
       assert.strictEqual(packagesToInstall.includes('@nightwatch/selenium-server'), true);
       assert.strictEqual(packagesToInstall.includes('@nightwatch/mobile-helper'), true);
     });
 
-    it('correct packages are installed with js-cucumber', function() {
+    it('correct packages are installed with js-cucumber-plugins', function() {
       mockery.registerMock('node:fs', {
         readFileSync(path, encoding) {
           return `{
@@ -616,7 +615,8 @@ describe('init tests', function() {
 
       const answers = {
         language: 'js',
-        runner: 'cucumber'
+        runner: 'cucumber',
+        plugins: ['@nightwatch/react', '@nightwatch/storybook']
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -624,12 +624,10 @@ describe('init tests', function() {
 
       const packagesToInstall = nightwatchInit.identifyPackagesToInstall(answers);
 
-      assert.strictEqual(packagesToInstall.includes('nightwatch'), false);
-      assert.strictEqual(packagesToInstall.includes('typescript'), false);
-      assert.strictEqual(packagesToInstall.includes('@types/nightwatch'), false);
+      assert.strictEqual(packagesToInstall.length, 3);
       assert.strictEqual(packagesToInstall.includes('@cucumber/cucumber'), true);
-      assert.strictEqual(packagesToInstall.includes('@nightwatch/selenium-server'), false);
-      assert.strictEqual(packagesToInstall.includes('@nightwatch/mobile-helper'), false);
+      assert.strictEqual(packagesToInstall.includes('@nightwatch/react'), true);
+      assert.strictEqual(packagesToInstall.includes('@nightwatch/storybook'), true);
     });
 
     it('correct packages are installed with ts-cucumber-seleniumServer without initial packages', function() {
@@ -650,31 +648,13 @@ describe('init tests', function() {
 
       const packagesToInstall = nightwatchInit.identifyPackagesToInstall(answers);
 
+      assert.strictEqual(packagesToInstall.length, 6);
       assert.strictEqual(packagesToInstall.includes('nightwatch'), true);
       assert.strictEqual(packagesToInstall.includes('typescript'), true);
       assert.strictEqual(packagesToInstall.includes('@types/nightwatch'), true);
+      assert.strictEqual(packagesToInstall.includes('ts-node'), true);
       assert.strictEqual(packagesToInstall.includes('@cucumber/cucumber'), true);
       assert.strictEqual(packagesToInstall.includes('@nightwatch/selenium-server'), true);
-    });
-
-    it('when react is selected as uiFramework for component testing', function() {
-      mockery.registerMock('node:fs', {
-        readFileSync(path, encoding) {
-          return '{}';
-        }
-      });
-
-      const answers = {
-        uiFramework: 'react'
-      };
-
-      const {NightwatchInit} = require('../../lib/init');
-      const nightwatchInit = new NightwatchInit(rootDir, []);
-      nightwatchInit.refineAnswers(answers);
-      const packagesToInstall = nightwatchInit.identifyPackagesToInstall(answers);
-
-      assert.strictEqual(packagesToInstall.includes('nightwatch'), true);
-      assert.strictEqual(packagesToInstall.includes('@nightwatch/react'), true);
     });
   });
 
@@ -830,6 +810,47 @@ describe('init tests', function() {
 
       assert.strictEqual(nwTsconfigCopied, false);
       assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, '');
+    });
+  });
+
+  describe('test setupComponentTesting', function() {
+    beforeEach(function() {
+      mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
+    });
+
+    afterEach(function() {
+      mockery.deregisterAll();
+      mockery.resetCache();
+      mockery.disable();
+    });
+
+    it('generates index file for react', function() {
+      let newFolderPath = '';
+      let reactIndexCopied = false;
+      let reactIndexDestPath = '';
+
+      mockery.registerMock('node:fs', {
+        mkdirSync(path) {
+          newFolderPath = path;
+        },
+        copyFileSync(src, dest) {
+          reactIndexCopied = true;
+          reactIndexDestPath = dest;
+        }
+      });
+
+      const answers = {
+        uiFramework: 'react'
+      };
+
+      const {NightwatchInit} = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, []);
+
+      nightwatchInit.setupComponentTesting(answers);
+
+      assert.strictEqual(newFolderPath, path.join(rootDir, 'nightwatch'));
+      assert.strictEqual(reactIndexCopied, true);
+      assert.strictEqual(reactIndexDestPath, path.join(newFolderPath, 'index.jsx'));
     });
   });
 
@@ -1013,7 +1034,7 @@ describe('init tests', function() {
         mobileBrowsers: [],
         defaultBrowser: 'firefox',
         allowAnonymousMetrics: false,
-        plugins: []
+        plugins: ['@nightwatch/react']
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1029,6 +1050,7 @@ describe('init tests', function() {
       assert.deepEqual(config.page_objects_path, []);
       assert.deepEqual(config.custom_commands_path, []);
       assert.deepEqual(config.custom_assertions_path, []);
+      assert.deepEqual(config.plugins, ['@nightwatch/react']);
       assert.deepEqual(Object.keys(config.test_settings), ['default', 'firefox', 'chrome']);
       assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox');
 
@@ -1048,8 +1070,7 @@ describe('init tests', function() {
         addExamples: true,
         examplesLocation: 'tests',
         allowAnonymousMetrics: false,
-        mobile: true,
-        plugins: []
+        mobile: true
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1065,6 +1086,7 @@ describe('init tests', function() {
       assert.deepEqual(config.page_objects_path, ['tests/page-objects']);
       assert.deepEqual(config.custom_commands_path, ['tests/custom-commands']);
       assert.deepEqual(config.custom_assertions_path, ['tests/custom-assertions']);
+      assert.deepEqual(config.plugins, []);
       assert.deepEqual(Object.keys(config.test_settings), [
         'default',
         'firefox',
@@ -1092,8 +1114,7 @@ describe('init tests', function() {
         addExamples: true,
         examplesLocation: 'tests',
         allowAnonymousMetrics: false,
-        mobile: true,
-        plugins: []
+        mobile: true
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1109,6 +1130,7 @@ describe('init tests', function() {
       assert.deepEqual(config.page_objects_path, ['tests/page-objects']);
       assert.deepEqual(config.custom_commands_path, ['tests/custom-commands']);
       assert.deepEqual(config.custom_assertions_path, ['tests/custom-assertions']);
+      assert.deepEqual(config.plugins, []);
       assert.deepEqual(Object.keys(config.test_settings), [
         'default',
         'android.real.firefox',
@@ -1143,8 +1165,7 @@ describe('init tests', function() {
         testsLocation: 'tests',
         addExamples: true,
         examplesLocation: path.join('tests', 'nightwatch-examples'),
-        allowAnonymousMetrics: false,
-        plugins: []
+        allowAnonymousMetrics: false
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1160,6 +1181,7 @@ describe('init tests', function() {
       assert.deepEqual(config.page_objects_path, ['tests/nightwatch-examples/page-objects']);
       assert.deepEqual(config.custom_commands_path, ['tests/nightwatch-examples/custom-commands']);
       assert.deepEqual(config.custom_assertions_path, ['tests/nightwatch-examples/custom-assertions']);
+      assert.deepEqual(config.plugins, []);
       assert.deepEqual(Object.keys(config.test_settings), [
         'default',
         'chrome',
@@ -1199,8 +1221,7 @@ describe('init tests', function() {
         testsLocation: 'tests',
         addExamples: true,
         examplesLocation: 'tests',
-        allowAnonymousMetrics: false,
-        plugins: []
+        allowAnonymousMetrics: false
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1216,6 +1237,7 @@ describe('init tests', function() {
       assert.deepEqual(config.page_objects_path, []);
       assert.deepEqual(config.custom_commands_path, []);
       assert.deepEqual(config.custom_assertions_path, []);
+      assert.deepEqual(config.plugins, []);
       assert.deepEqual(Object.keys(config.test_settings), [
         'default',
         'chrome',
@@ -1260,8 +1282,7 @@ describe('init tests', function() {
         addExamples: true,
         examplesLocation: path.join('tests', 'features', 'nightwatch-examples'),
         allowAnonymousMetrics: false,
-        mobile: true,
-        plugins: []
+        mobile: true
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1277,6 +1298,7 @@ describe('init tests', function() {
       assert.deepEqual(config.page_objects_path, []);
       assert.deepEqual(config.custom_commands_path, []);
       assert.deepEqual(config.custom_assertions_path, []);
+      assert.deepEqual(config.plugins, []);
       assert.deepEqual(Object.keys(config.test_settings), [
         'default',
         'android.real.firefox',
@@ -1319,8 +1341,7 @@ describe('init tests', function() {
         addExamples: true,
         examplesLocation: 'nightwatch-examples',
         allowAnonymousMetrics: false,
-        mobile: true,
-        plugins: []
+        mobile: true
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1337,6 +1358,7 @@ describe('init tests', function() {
       assert.deepEqual(config.page_objects_path, []);
       assert.deepEqual(config.custom_commands_path, []);
       assert.deepEqual(config.custom_assertions_path, []);
+      assert.deepEqual(config.plugins, []);
       assert.deepEqual(Object.keys(config.test_settings), [
         'default',
         'browserstack',
@@ -1376,8 +1398,7 @@ describe('init tests', function() {
         browsers: ['chrome', 'firefox'],
         mobileBrowsers: [],
         defaultBrowser: 'firefox',
-        allowAnonymousMetrics: false,
-        plugins: []
+        allowAnonymousMetrics: false
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -1403,8 +1424,7 @@ describe('init tests', function() {
         browsers: ['chrome', 'firefox'],
         mobileBrowsers: [],
         defaultBrowser: 'firefox',
-        allowAnonymousMetrics: true,
-        plugins: []
+        allowAnonymousMetrics: true
       };
 
       const {NightwatchInit} = require('../../lib/init');

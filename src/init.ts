@@ -16,7 +16,7 @@ import {ConfigGeneratorAnswers, ConfigDestination, OtherInfo, MobileResult} from
 import defaultAnswers from './defaults.json';
 import defaultMobileAnswers from './defaultsMobile.json';
 import {AndroidSetup, IosSetup} from '@nightwatch/mobile-helper';
-import { format } from 'node:util';
+import {format} from 'node:util';
 
 
 const EXAMPLE_TEST_FOLDER = 'examples';
@@ -82,6 +82,11 @@ export class NightwatchInit {
       this.setupTypescript();
     }
 
+    // Setup component testing
+    if (answers.testingType?.includes('ct-test')) {
+      this.setupComponentTesting(answers);
+    }
+
     // Check if Java is installed on the system
     if (answers.seleniumServer) {
       this.checkJavaInstallation();
@@ -134,25 +139,6 @@ export class NightwatchInit {
       }
     }
 
-    // Setup component testing files 
-    if (answers.uiFramework === 'react' || answers.uiFramework === 'vue') {
-      const componentConfigPath = path.join(__dirname, '..', 'assets', 'component-config');
-      const nightwatchPath = path.join(this.rootDir, 'nightwatch');
-
-      try {
-        fs.mkdirSync(nightwatchPath);
-        // eslint-disable-next-line
-      } catch (err) {}
-      
-      if ( answers.uiFramework === 'react') {
-        // Generate a new index.jsx file
-        const reactIndexSrcPath = path.join(componentConfigPath, 'index.jsx');
-        const reactIndexgDestPath = path.join(nightwatchPath, 'index.jsx');
-
-        fs.copyFileSync(reactIndexSrcPath, reactIndexgDestPath);
-      }
-    }
-    
     if (!this.onlyConfig) {
       // Post instructions to run their first test
       this.postSetupInstructions(answers, mobileResult);
@@ -297,19 +283,10 @@ export class NightwatchInit {
         }
       }
     }
-    
-    answers.plugins = [];
 
-    if(answers.uiFramework === 'react') {
-      answers.plugins.push('@nightwatch/react');
-    }
-
-    if(answers.uiFramework === 'storybook') {
-      answers.plugins.push('@nightwatch/storybook');
-    }
-
-    if(answers.uiFramework === 'vue') {
-      answers.plugins.push('@nightwatch/vue');
+    if (answers.uiFramework) {
+      answers.plugins = answers.plugins || [];
+      answers.plugins.push(`@nightwatch/${answers.uiFramework}`);
     }
   }
 
@@ -332,7 +309,7 @@ export class NightwatchInit {
       packages.push('@nightwatch/mobile-helper');
     }
 
-    if(answers.plugins) {
+    if (answers.plugins) {
       packages.push(...answers.plugins);
     }
     
@@ -405,6 +382,24 @@ export class NightwatchInit {
     this.otherInfo.tsOutDir = '';
   }
 
+  setupComponentTesting(answers: ConfigGeneratorAnswers) {
+    if (answers.uiFramework === 'react') {
+      const componentConfigPath = path.join(__dirname, '..', 'assets', 'component-config');
+      const nightwatchPath = path.join(this.rootDir, DEFAULT_FOLDER);
+
+      try {
+        fs.mkdirSync(nightwatchPath);
+        // eslint-disable-next-line
+      } catch (err) {}
+      
+      // Generate a new index.jsx file
+      const reactIndexSrcPath = path.join(componentConfigPath, 'index.jsx');
+      const reactIndexDestPath = path.join(nightwatchPath, 'index.jsx');
+
+      fs.copyFileSync(reactIndexSrcPath, reactIndexDestPath);
+    }
+  }
+
   checkJavaInstallation() {
     try {
       execSync('java -version', {
@@ -459,6 +454,7 @@ export class NightwatchInit {
     const custom_commands_path: string[] = []; // to go as the value of custom_commands_path property.
     const custom_assertions_path: string[] = []; // to go as the value of custom_assertions_path property.
     const feature_path = answers.featurePath || ''; // to be used in cucumber feature_path property.
+    const plugins = answers.plugins || []; // to go as the value of plugins property.
 
     const testsJsSrc: string = path.join(this.otherInfo.tsOutDir || '', answers.testsLocation || '');
     if (testsJsSrc !== '.') {
@@ -498,7 +494,7 @@ export class NightwatchInit {
     const tplData = fs.readFileSync(templateFile).toString();
 
     let rendered = ejs.render(tplData, {
-      plugins: JSON.stringify(answers.plugins).replace(/"/g, '\'').replace(/\\\\/g, '/'),
+      plugins: JSON.stringify(plugins).replace(/"/g, '\'').replace(/\\\\/g, '/'),
       src_folders: JSON.stringify(src_folders).replace(/"/g, '\'').replace(/\\\\/g, '/'),
       page_objects_path: JSON.stringify(page_objects_path).replace(/"/g, '\'').replace(/\\\\/g, '/'),
       custom_commands_path: JSON.stringify(custom_commands_path).replace(/"/g, '\'').replace(/\\\\/g, '/'),

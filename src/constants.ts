@@ -2,6 +2,9 @@ import fs from 'node:fs';
 import inquirer from 'inquirer';
 import path from 'path';
 
+import {ConfigGeneratorAnswers} from './interfaces';
+
+
 export const NIGHTWATCH_TITLE = `
  _   _  _         _      _                     _          _
 | \\ | |(_)       | |    | |                   | |        | |
@@ -39,7 +42,7 @@ export const MOBILE_BROWSER_QUES: inquirer.QuestionCollection =
 {
   type: 'checkbox',
   name: 'mobileBrowsers',
-  message: 'Which mobile browsers would you like to test on?',
+  message: 'Select target mobile-browsers',
   choices: () => {
     let devices = MOBILE_BROWSER_CHOICES;
 
@@ -70,17 +73,17 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
   // TEST TYPE
   {
     type: 'checkbox',
-    name: 'testType',
+    name: 'testingType',
     message: 'Select testing type to setup for your project',
     choices: [
-        {name: 'End-to-End testing', value: 'e2e-test'},
-        {name: 'Component testing', value: 'ct-test'},
-        // { name: 'mobile app testing', value: 'mobile-test' }
+      {name: 'End-to-End testing', value: 'e2e-test'},
+      {name: 'Component testing', value: 'ct-test'}
+      // { name: 'mobile app testing', value: 'mobile-test' }
     ],
     default: ['e2e-test'],
     validate: (value) => {
       return !!value.length || 'Please select at least 1 testing type.';
-    },
+    }
   },
 
   // JS OR TS
@@ -88,19 +91,20 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     type: 'list',
     name: 'languageRunnerSetup',
     message: 'Select language + test runner variant',
-    choices: (answers) => {
-      const languageRunners = [
+    choices: (answers: ConfigGeneratorAnswers) => {
+      let languageRunners = [
         {name: 'JavaScript / default', value: 'js-nightwatch'},
         {name: 'TypeScript / default', value: 'ts-nightwatch'},
         {name: 'JavaScript / Mocha', value: 'js-mocha'},
-        {name: 'JavaScript / CucumberJS', value: 'js-cucumber'},
+        {name: 'JavaScript / CucumberJS', value: 'js-cucumber'}
   
         // {name: 'TypeScript - Mocha Test Runner', value: 'ts-mocha'}
         // {name: 'TypeScript - CucumberJS Test Runner', value: 'ts-cucumber'}
-      ]
+      ];
 
-      if (answers.testType.length === 1 && answers.testType.includes('ct-test')) {
-        return languageRunners.filter((languageRunner) => !['js-mocha', 'js-cucumber'].includes(languageRunner.value))
+      if (answers.testingType?.includes('ct-test')) {
+        // component tests only work with default test runner.
+        languageRunners = languageRunners.filter((languageRunner) => languageRunner.value.includes('nightwatch'));
       }
 
       return languageRunners;
@@ -120,11 +124,11 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     name: 'uiFramework',
     message: 'Select UI framework',
     choices: [
-        {name: 'React', value: 'react'},
-        {name: 'Vue.js', value: 'vue'},
-        {name: 'Storybook', value: 'storybook'}
+      {name: 'React', value: 'react'},
+      {name: 'Vue.js', value: 'vue'},
+      {name: 'Storybook', value: 'storybook'}
     ],
-    when: (answers) => answers.testType.includes('ct-test')
+    when: (answers: ConfigGeneratorAnswers) => answers.testingType?.includes('ct-test')
   },
 
   // BROWSERS
@@ -176,13 +180,13 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     type: 'input',
     name: 'baseUrl',
     message: 'Enter the base_url of the project',
-    default: (answers: {uiFramework: string}) => {
-      if (['react', 'vue'].includes(answers.uiFramework)) {
+    default: (answers: ConfigGeneratorAnswers) => {
+      if (answers.uiFramework) {
+        if (answers.uiFramework === 'storybook') {
+          return 'http://localhost:6006';
+        }
+
         return 'http://localhost:5173';
-      }
-      
-      if (answers.uiFramework === 'storybook') {
-        return 'http://localhost:6006';
       }
 
       return 'http://localhost';
