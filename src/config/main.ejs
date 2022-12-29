@@ -265,7 +265,7 @@ module.exports = {
     
       webdriver: {
         start_process: true,
-        server_path: 'chromedriver-mobile/chromedriver',
+        server_path: '',
         cli_args: [
           // --verbose
         ]
@@ -297,7 +297,9 @@ module.exports = {
     
       webdriver: {
         start_process: true,
-        server_path: 'chromedriver-mobile/chromedriver',
+        // path to chromedriver executable which can work with the factory
+        // version of Chrome mobile browser on the emulator (version 83).
+        server_path: 'chromedriver-mobile/chromedriver<%- dotExe %>',
         cli_args: [
           // --verbose
         ]
@@ -382,7 +384,7 @@ module.exports = {
           appActivity: 'org.wikipedia.main.MainActivity',
           appWaitActivity: 'org.wikipedia.onboarding.InitialOnboardingActivity',
           // chromedriver executable to use for testing web-views in hybrid apps
-          chromedriverExecutable: `${__dirname}/chromedriver-mobile/chromedriver`,
+          chromedriverExecutable: `${__dirname}/chromedriver-mobile/chromedriver<%- dotExe %>`,
           newCommandTimeout: 0
         }
       }

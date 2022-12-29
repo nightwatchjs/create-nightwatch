@@ -520,6 +520,7 @@ export class NightwatchInit {
       custom_assertions_path: JSON.stringify(custom_assertions_path).replace(/"/g, '\'').replace(/\\\\/g, '/'),
       feature_path: feature_path.replace(/\\/g, '/'),
       client_id: this.client_id,
+      dotExe: process.platform === 'win32' ? '.exe' : '',
       answers
     });
 
