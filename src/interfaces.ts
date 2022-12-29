@@ -3,7 +3,7 @@ import {AndroidSetup, IosSetup} from '@nightwatch/mobile-helper';
 export interface ConfigGeneratorAnswers {
   rootDir?: string;
   onlyConfig?: boolean;
-  testingType?: Array<'e2e-test' | 'ct-test'>
+  testingType?: Array<'e2e-test' | 'ct-test' | 'native-test'>
   languageRunnerSetup?: string;
   language?: 'js' | 'ts';
   runner?: 'nightwatch' | 'mocha' | 'cucumber';
@@ -48,7 +48,7 @@ export interface OtherInfo {
   usingESM?: boolean;
 }
 
-export interface MobileResult {
+export interface MobileHelperResult {
   android?: Awaited<ReturnType<AndroidSetup['run']>>;
   ios?: Awaited<ReturnType<IosSetup['run']>>;
 }

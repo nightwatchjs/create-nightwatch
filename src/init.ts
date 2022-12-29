@@ -11,8 +11,10 @@ import {copy, stripControlChars, symbols} from './utils';
 import Logger from './logger';
 import boxen from 'boxen';
 
-import {CONFIG_INTRO, QUESTIONAIRRE, CONFIG_DEST_QUES, MOBILE_BROWSER_CHOICES} from './constants';
-import {ConfigGeneratorAnswers, ConfigDestination, OtherInfo, MobileResult} from './interfaces';
+import {
+  CONFIG_INTRO, QUESTIONAIRRE, CONFIG_DEST_QUES, MOBILE_BROWSER_CHOICES, isAppTestingSetup
+} from './constants';
+import {ConfigGeneratorAnswers, ConfigDestination, OtherInfo, MobileHelperResult} from './interfaces';
 import defaultAnswers from './defaults.json';
 import defaultMobileAnswers from './defaultsMobile.json';
 import {AndroidSetup, IosSetup} from '@nightwatch/mobile-helper';
@@ -122,26 +124,30 @@ export class NightwatchInit {
     this.generateConfig(answers, configDestPath);
 
     // Setup mobile
-    const mobileResult: MobileResult = {};
-    if (answers.mobile && answers.mobilePlatform) {
+    const mobileHelperResult: MobileHelperResult = {};
+
+    if ((answers.mobile || isAppTestingSetup(answers)) && answers.mobilePlatform) {
       // answers.mobilePlatform will be undefined in case of empty or non-matching mobileBrowsers
       // hence, no need to setup any device.
       if (['android', 'both'].includes(answers.mobilePlatform)) {
         Logger.info('Running Android Setup...\n');
-        const androidSetup = new AndroidSetup({browsers: answers.mobileBrowsers || []}, this.rootDir);
-        mobileResult.android = await androidSetup.run();
+        const androidSetup = new AndroidSetup({
+          browsers: answers.mobileBrowsers || [],
+          ...(isAppTestingSetup(answers) && {appium: true})
+        }, this.rootDir);
+        mobileHelperResult.android = await androidSetup.run();
       }
 
       if (['ios', 'both'].includes(answers.mobilePlatform)) {
         Logger.info('Running iOS Setup...\n');
         const iosSetup = new IosSetup({mode: ['simulator', 'real'], setup: true});
-        mobileResult.ios = await iosSetup.run();
+        mobileHelperResult.ios = await iosSetup.run();
       }
     }
 
     if (!this.onlyConfig) {
       // Post instructions to run their first test
-      this.postSetupInstructions(answers, mobileResult);
+      this.postSetupInstructions(answers, mobileHelperResult);
     } else {
       // Post config instructions
       this.postConfigInstructions(answers);
@@ -164,6 +170,7 @@ export class NightwatchInit {
   }
 
   refineAnswers(answers: ConfigGeneratorAnswers) {
+    const onlyAppTestingSetup = answers.testingType && answers.testingType.length === 1 && answers.testingType[0] === 'native-test';
     const backendHasLocal = answers.backend && ['local', 'both'].includes(answers.backend);
     const backendHasRemote = answers.backend && ['remote', 'both'].includes(answers.backend);
 
@@ -208,7 +215,7 @@ export class NightwatchInit {
         if (answers.browsers) {
           delete answers.browsers;
         }
-        answers.defaultBrowser = answers.remoteBrowsers[0] || 'chrome';
+        answers.defaultBrowser = answers.remoteBrowsers[0] || (onlyAppTestingSetup ? '' : 'chrome');
       }
     }
 
@@ -248,9 +255,12 @@ export class NightwatchInit {
 
       // Set defaultBrowser
       if (!answers.defaultBrowser) {
-        answers.defaultBrowser = answers.browsers[0] || answers.mobileBrowsers[0] || 'chrome';
+        answers.defaultBrowser = answers.browsers[0] || answers.mobileBrowsers[0] || (onlyAppTestingSetup ? '' : 'chrome');
       }
     }
+
+    // Make sure baseUrl is not undefined
+    answers.baseUrl = answers.baseUrl || '';
 
     // Always generate examples (for now)
     if (!this.onlyConfig) {
@@ -284,6 +294,10 @@ export class NightwatchInit {
       }
     }
 
+    if (isAppTestingSetup(answers) && !answers.mobilePlatform) {
+      answers.mobilePlatform = 'android';
+    }
+
     if (answers.uiFramework) {
       answers.plugins = answers.plugins || [];
       answers.plugins.push(`@nightwatch/${answers.uiFramework}`);
@@ -305,8 +319,8 @@ export class NightwatchInit {
       packages.push('@nightwatch/selenium-server');
     }
 
-    if (answers.mobile) {
-      packages.push('@nightwatch/mobile-helper');
+    if (answers.testingType?.includes('native-test')) {
+      packages.push('appium');
     }
 
     if (answers.plugins) {
@@ -320,6 +334,11 @@ export class NightwatchInit {
       // eslint-disable-next-line
       return !packageJson.devDependencies?.hasOwnProperty(pack) && !packageJson.dependencies?.hasOwnProperty(pack);
     });
+
+    // Packages to always upgrade
+    if (answers.mobile || answers.testingType?.includes('native-test')) {
+      packagesToInstall.push('@nightwatch/mobile-helper');
+    }
 
     return packagesToInstall;
   }
@@ -534,10 +553,16 @@ export class NightwatchInit {
     if (answers.browsers?.includes('firefox') || answers.mobileBrowsers?.includes('firefox')) {
       webdrivers.push('geckodriver');
     }
-    if (answers.browsers?.includes('chrome') || answers.mobileBrowsers?.includes('chrome')) {
+
+    const webTestingOnChrome = answers.browsers?.includes('chrome') || answers.mobileBrowsers?.includes('chrome');
+    const appTestingOnAndroid = isAppTestingSetup(answers) && answers.mobilePlatform && ['android, both'].includes(answers.mobilePlatform);
+    if (webTestingOnChrome || appTestingOnAndroid) {
       webdrivers.push('chromedriver');
     }
-    if (answers.browsers?.includes('safari') || answers.mobileBrowsers?.includes('safari')) {
+
+    const webTestingOnSafari = answers.browsers?.includes('safari') || answers.mobileBrowsers?.includes('safari');
+    const appTestingOnIos = isAppTestingSetup(answers) && answers.mobilePlatform && ['ios, both'].includes(answers.mobilePlatform);
+    if (webTestingOnSafari || appTestingOnIos) {
       webdrivers.push('safaridriver');
     }
 
@@ -577,10 +602,10 @@ export class NightwatchInit {
           {
             type: 'list',
             name: 'safaridriver',
-            message: 'Enable safaridriver (requires sudo password)?',
+            message: 'Enable safaridriver (requires sudo password, skip if already enabled)?',
             choices: [
               {name: 'Yes', value: true},
-              {name: 'No, I\'ll do that later.', value: false}
+              {name: 'No, skip for now', value: false}
             ],
             default: 1
           }
@@ -697,7 +722,7 @@ export class NightwatchInit {
     );
   }
 
-  postSetupInstructions(answers: ConfigGeneratorAnswers, mobileResult: MobileResult) {
+  postSetupInstructions(answers: ConfigGeneratorAnswers, mobileHelperResult: MobileHelperResult) {
 
     // Instructions for setting host, port, username and passowrd for remote.
     if (answers.backend && ['remote', 'both'].includes(answers.backend)) {
@@ -902,7 +927,8 @@ export class NightwatchInit {
       if (['android', 'both'].includes(answers.mobilePlatform)) {
         const errorHelp = 'Please go through the setup logs above to know the actual cause of failure.\n\nOr, re-run the following commands:';
 
-        const setupMsg = `  To setup Android, run: ${colors.gray.italic('npx @nightwatch/mobile-helper android --setup')}\n` +
+        const appiumFlag = isAppTestingSetup(answers) ? ' --appium' : '';
+        const setupMsg = `  To setup Android, run: ${colors.gray.italic('npx @nightwatch/mobile-helper android' + appiumFlag)}\n` +
           `  For Android help, run: ${colors.gray.italic('npx @nightwatch/mobile-helper android --help')}`;
 
         const browsers = answers.mobileBrowsers?.filter((browser) => ['chrome', 'firefox'].includes(browser)) || [];
@@ -939,18 +965,18 @@ export class NightwatchInit {
 
         const testCommands = `Once setup is complete...\n\n${realAndroidTestCommand()}\n\n${emulatorAndroidTestCommand()}`;
         
-        if (!mobileResult.android) {
-          // mobileResult.android is undefined or false
+        if (!mobileHelperResult.android) {
+          // mobileHelperResult.android is undefined or false
           Logger.error(
             boxen(`${colors.red(
               'Android setup failed...'
             )}\n\n${errorHelp}\n${setupMsg}\n\n${testCommands}`, {padding: 1})
           );
-        } else if (mobileResult.android === true) {
+        } else if (mobileHelperResult.android === true) {
           // do nothing (command passed but verification/setup not initiated)
           // true is returned in cases of --help command.
-        } else if (mobileResult.android.status === false) {
-          if (mobileResult.android.setup) {
+        } else if (mobileHelperResult.android.status === false) {
+          if (mobileHelperResult.android.setup) {
             Logger.error(
               boxen(`${colors.red(
                 'Android setup failed...'
@@ -964,17 +990,17 @@ export class NightwatchInit {
             );
           }
         } else {
-          // mobileResult.android.status is true.
+          // mobileHelperResult.android.status is true.
           if (this.rootDir !== process.cwd()) {
             Logger.info('First, change directory to the root dir of your project:');
             Logger.info(colors.cyan(`  cd ${relativeToRootDir}`), '\n');
           }
 
-          if (['real', 'both'].includes(mobileResult.android.mode)) {
+          if (['real', 'both'].includes(mobileHelperResult.android.mode)) {
             Logger.info(realAndroidTestCommand(), '\n');
           }
 
-          if (['emulator', 'both'].includes(mobileResult.android.mode)) {
+          if (['emulator', 'both'].includes(mobileHelperResult.android.mode)) {
             Logger.info(emulatorAndroidTestCommand(), '\n');
           }
         }
@@ -998,22 +1024,22 @@ export class NightwatchInit {
 
         const testCommand = `After completing the setup...\n\n${realIosTestCommand}\n\n${simulatorIosTestCommand}`;
 
-        if (!mobileResult.ios) {
+        if (!mobileHelperResult.ios) {
           Logger.error(
             boxen(`${colors.red(
               'iOS setup failed...'
             )}\n\n${setupCommand}\n\n${testCommand}`, {padding: 1})
           );
-        } else if (typeof mobileResult.ios === 'object') {
-          if (mobileResult.ios.real) {
+        } else if (typeof mobileHelperResult.ios === 'object') {
+          if (mobileHelperResult.ios.real) {
             Logger.info(realIosTestCommand, '\n');
           }
           
-          if (mobileResult.ios.simulator) {
+          if (mobileHelperResult.ios.simulator) {
             Logger.info(simulatorIosTestCommand, '\n');
           }
   
-          if (!mobileResult.ios.real || !mobileResult.ios.simulator) {
+          if (!mobileHelperResult.ios.real || !mobileHelperResult.ios.simulator) {
             Logger.error(
               boxen(`${colors.yellow(
                 'iOS setup incomplete...'
