@@ -85,7 +85,7 @@ export class NightwatchInit {
     }
 
     // Setup component testing
-    if (answers.testingType?.includes('ct-test')) {
+    if (answers.testingType?.includes('component')) {
       this.setupComponentTesting(answers);
     }
 
@@ -170,7 +170,7 @@ export class NightwatchInit {
   }
 
   refineAnswers(answers: ConfigGeneratorAnswers) {
-    const onlyAppTestingSetup = answers.testingType && answers.testingType.length === 1 && answers.testingType[0] === 'native-test';
+    const onlyAppTestingSetup = answers.testingType && answers.testingType.length === 1 && answers.testingType[0] === 'app';
     const backendHasLocal = answers.backend && ['local', 'both'].includes(answers.backend);
     const backendHasRemote = answers.backend && ['remote', 'both'].includes(answers.backend);
 
@@ -319,7 +319,7 @@ export class NightwatchInit {
       packages.push('@nightwatch/selenium-server');
     }
 
-    if (answers.testingType?.includes('native-test')) {
+    if (answers.testingType?.includes('app')) {
       packages.push('appium');
     }
 
@@ -336,7 +336,7 @@ export class NightwatchInit {
     });
 
     // Packages to always upgrade
-    if (answers.mobile || answers.testingType?.includes('native-test')) {
+    if (answers.mobile || answers.testingType?.includes('app')) {
       packagesToInstall.push('@nightwatch/mobile-helper');
     }
 

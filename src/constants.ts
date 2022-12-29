@@ -26,9 +26,9 @@ Setting up Nightwatch in %s...
 export const AVAILABLE_CONFIG_FLAGS = ['yes', 'generate-config', 'browser', 'y', 'b', 'mobile'];
 
 const TESTING_TYPE_CHOICES = [
-  {name: 'End-to-End testing', value: 'e2e-test'},
-  {name: 'Component testing', value: 'ct-test'},
-  {name: 'Mobile-app testing', value: 'native-test'}
+  {name: 'End-to-End testing', value: 'e2e'},
+  {name: 'Component testing', value: 'component'},
+  {name: 'Mobile-app testing', value: 'app'}
 ];
 
 export const BROWSER_CHOICES = [
@@ -52,12 +52,12 @@ export const MOBILE_PLATFORM_CHOICES = [
 
 export const isWebTestingSetup = (answers: ConfigGeneratorAnswers) => {
   return answers.testingType?.some(
-    (type) => ['e2e-test', 'ct-test'].includes(type)
+    (type) => ['e2e', 'component'].includes(type)
   );
 };
 
 export const isAppTestingSetup = (answers: ConfigGeneratorAnswers) => {
-  return answers.testingType?.includes('native-test');
+  return answers.testingType?.includes('app');
 };
 
 export const MOBILE_BROWSER_QUES: inquirer.QuestionCollection =
@@ -106,12 +106,12 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
 
       if (answers.mobile) {
         // if --mobile flag is used
-        testingTypes = testingTypes.filter((type) => ['e2e-test', 'ct-test'].includes(type.value));
+        testingTypes = testingTypes.filter((type) => ['e2e', 'component'].includes(type.value));
       }
 
       return testingTypes;
     },
-    default: ['e2e-test'],
+    default: ['e2e'],
     validate: (value) => {
       return !!value.length || 'Please select at least 1 testing type.';
     }
@@ -133,7 +133,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
         // {name: 'TypeScript - CucumberJS Test Runner', value: 'ts-cucumber'}
       ];
 
-      if (answers.testingType?.includes('ct-test')) {
+      if (answers.testingType?.includes('component')) {
         // component tests only work with default test runner.
         languageRunners = languageRunners.filter((languageRunner) => languageRunner.value.includes('nightwatch'));
       }
@@ -159,7 +159,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
       {name: 'Vue.js', value: 'vue'},
       {name: 'Storybook', value: 'storybook'}
     ],
-    when: (answers: ConfigGeneratorAnswers) => answers.testingType?.includes('ct-test')
+    when: (answers: ConfigGeneratorAnswers) => answers.testingType?.includes('component')
   },
 
   // BROWSERS
