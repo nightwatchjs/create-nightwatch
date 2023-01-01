@@ -43,6 +43,7 @@ export interface OtherInfo {
   testsJsSrc?: string;
   examplesJsSrc?: string;
   cucumberExamplesAdded?: boolean;
+  templatesGenerated?: boolean;
   javaNotInstalled?: boolean;
   nonDefaultConfigName?: string;
   usingESM?: boolean;
