@@ -1,4 +1,5 @@
 {
+  "testingType": ["e2e"],
   "language": "js",
   "runner": "nightwatch",
   "backend": "both",

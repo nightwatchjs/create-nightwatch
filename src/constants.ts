@@ -23,7 +23,7 @@ Nightwatch Configuration Wizard
 Setting up Nightwatch in %s...
 `;
 
-export const AVAILABLE_CONFIG_FLAGS = ['yes', 'generate-config', 'browser', 'y', 'b', 'mobile'];
+export const AVAILABLE_CONFIG_FLAGS = ['yes', 'generate-config', 'browser', 'y', 'b', 'mobile', 'app', 'native'];
 
 const TESTING_TYPE_CHOICES = [
   {name: 'End-to-End testing', value: 'e2e'},
