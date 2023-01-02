@@ -13,7 +13,7 @@ import boxen from 'boxen';
 
 import {
   CONFIG_INTRO, QUESTIONAIRRE, CONFIG_DEST_QUES, MOBILE_BROWSER_CHOICES,
-  isAppTestingSetup, isWebTestingSetup
+  isAppTestingSetup, isLocalMobileTestingSetup, isRemoteMobileTestingSetup, isWebTestingSetup
 } from './constants';
 import DOWNLOADS from './downloads.json';
 import {ConfigGeneratorAnswers, ConfigDestination, OtherInfo, MobileHelperResult} from './interfaces';
@@ -136,7 +136,7 @@ export class NightwatchInit {
     // Setup mobile
     const mobileHelperResult: MobileHelperResult = {};
 
-    if ((answers.mobile || isAppTestingSetup(answers)) && answers.mobilePlatform) {
+    if (isLocalMobileTestingSetup(answers) && answers.mobilePlatform) {
       // answers.mobilePlatform will be undefined in case of empty or non-matching mobileBrowsers
       // hence, no need to setup any device.
       if (['android', 'both'].includes(answers.mobilePlatform)) {
@@ -779,7 +779,7 @@ export class NightwatchInit {
   }
 
   postSetupInstructions(answers: ConfigGeneratorAnswers, mobileHelperResult: MobileHelperResult) {
-    // Instructions for setting host, port, username and passowrd for remote.
+    // Instructions for setting host, port, username and password for remote.
     if (answers.backend && ['remote', 'both'].includes(answers.backend)) {
       Logger.info(colors.red('IMPORTANT'));
       if (answers.cloudProvider === 'other') {
@@ -822,11 +822,6 @@ export class NightwatchInit {
       Logger.info(colors.cyan(`  2. Login (${path.join(relativeToRootDir, answers.examplesLocation || '', 'templates', 'login.js')})`));
       Logger.info();
     }
-  
-    let configFlag = '';
-    if (this.otherInfo.nonDefaultConfigName) {
-      configFlag = ` --config ${this.otherInfo.nonDefaultConfigName}`;
-    }
 
     Logger.info(colors.green('✨ SETUP COMPLETE'));
     execSync('npx nightwatch --version', {
@@ -837,9 +832,18 @@ export class NightwatchInit {
     // Join Discord and GitHub
     Logger.info('💬 Join our Discord community to find answers to your issues or queries. Or just join and say hi.');
     Logger.info(colors.cyan('   https://discord.gg/SN8Da2X'), '\n');
+  
+    let exampleCommandsShared = false;
+
+    let configFlag = '';
+    if (this.otherInfo.nonDefaultConfigName) {
+      configFlag = ` --config ${this.otherInfo.nonDefaultConfigName}`;
+    }
 
     if (isWebTestingSetup(answers) && !this.options?.mobile) {
       // web-testing setup and --mobile flag is not used (testing on desktop browsers).
+      exampleCommandsShared = true;
+
       Logger.info(colors.green('🚀 RUN EXAMPLE TESTS'), '\n');
       if (this.rootDir !== process.cwd()) {
         Logger.info('First, change directory to the root dir of your project:');
@@ -1000,7 +1004,9 @@ export class NightwatchInit {
       return `${appJsExample}${envFlag}`;
     };
 
-    if ((answers.mobile || isAppTestingSetup(answers)) && answers.mobilePlatform) {
+    if (isLocalMobileTestingSetup(answers) && answers.mobilePlatform) {
+      exampleCommandsShared = true;
+
       Logger.info(colors.green('🚀 RUN MOBILE EXAMPLE TESTS'), '\n');
 
       if (['android', 'both'].includes(answers.mobilePlatform)) {
@@ -1168,9 +1174,17 @@ export class NightwatchInit {
           }
         }
       }
-    } else if (this.options?.mobile && answers.mobileRemote && answers.cloudProvider === 'browserstack') {
-      // no other test run commands are printed and remote mobile is selected.
-      Logger.info(colors.green('🚀 RUN MOBILE WEB EXAMPLE TESTS'), '\n');
+    }
+    
+    if (!exampleCommandsShared && isRemoteMobileTestingSetup(answers) && answers.cloudProvider === 'browserstack') {
+      // no other test run commands are printed and remote with mobile (web/app) is selected.
+
+      // TODO: Add support for testing native apps on BrowserStack and then remove the below code.
+      if (!answers.mobile) {
+        return;
+      }
+
+      Logger.info(colors.green('🚀 RUN MOBILE EXAMPLE TESTS ON CLOUD'), '\n');
       if (this.rootDir !== process.cwd()) {
         Logger.info('First, change directory to the root dir of your project:');
         Logger.info(colors.cyan(`  cd ${relativeToRootDir}`), '\n');

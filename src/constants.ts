@@ -60,6 +60,22 @@ export const isAppTestingSetup = (answers: ConfigGeneratorAnswers) => {
   return answers.testingType?.includes('app');
 };
 
+export const isLocalMobileTestingSetup = (answers: ConfigGeneratorAnswers) => {
+  if (answers.backend === 'remote') {
+    return false;
+  }
+
+  return (answers.mobile || isAppTestingSetup(answers));
+};
+
+export const isRemoteMobileTestingSetup = (answers: ConfigGeneratorAnswers) => {
+  if (answers.backend === 'local') {
+    return false;
+  }
+
+  return (answers.mobile || isAppTestingSetup(answers));
+};
+
 export const MOBILE_BROWSER_QUES: inquirer.QuestionCollection =
 {
   type: 'checkbox',
