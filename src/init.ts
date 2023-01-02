@@ -727,7 +727,7 @@ export class NightwatchInit {
       lang === 'js' ? EXAMPLE_TEST_FOLDER : '',
       'mobile-app-tests'
     );
-    const appDestPath = path.join(this.rootDir, examplesLocation, 'sample-app');
+    const appDestPath = path.join(this.rootDir, examplesLocation, 'sample-apps');
 
     try {
       fs.mkdirSync(examplesDestPath, {recursive: true});

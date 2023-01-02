@@ -379,7 +379,7 @@ module.exports = {
           avd: 'nightwatch-android-11',
           // While Appium v1 supports relative paths, it's more safe to use absolute paths instead.
           // Appium v2 does not support relative paths.
-          app: `${__dirname}/nightwatch/sample-app/wikipedia.apk`,
+          app: `${__dirname}/nightwatch/sample-apps/wikipedia.apk`,
           appPackage: 'org.wikipedia',
           appActivity: 'org.wikipedia.main.MainActivity',
           appWaitActivity: 'org.wikipedia.onboarding.InitialOnboardingActivity',
@@ -403,7 +403,7 @@ module.exports = {
           automationName: 'UiAutomator2',
           // While Appium v1 supports relative paths, it's more safe to use absolute paths instead.
           // Appium v2 does not support relative paths.
-          app: `${__dirname}/nightwatch/sample-app/wikipedia.apk`,
+          app: `${__dirname}/nightwatch/sample-apps/wikipedia.apk`,
           appPackage: 'org.wikipedia',
           appActivity: 'org.wikipedia.main.MainActivity',
           appWaitActivity: 'org.wikipedia.onboarding.InitialOnboardingActivity',
@@ -437,7 +437,7 @@ module.exports = {
           platformVersion: '15.5',
           // While Appium v1 supports relative paths, it's more safe to use absolute paths instead.
           // Appium v2 does not support relative paths.
-          app: `${__dirname}/nightwatch/sample-app/wikipedia.zip`,
+          app: `${__dirname}/nightwatch/sample-apps/wikipedia.zip`,
           bundleId: 'org.wikimedia.wikipedia',
           newCommandTimeout: 0
         }
@@ -457,7 +457,7 @@ module.exports = {
           automationName: 'XCUITest',
           // While Appium v1 supports relative paths, it's more safe to use absolute paths instead.
           // Appium v2 does not support relative paths.
-          app: `${__dirname}/nightwatch/sample-app/wikipedia.zip`,
+          app: `${__dirname}/nightwatch/sample-apps/wikipedia.zip`,
           bundleId: 'org.wikimedia.wikipedia',
           newCommandTimeout: 0,
           // add udid of the device to run tests on. Or, pass the id to `--deviceId` flag when running tests.
