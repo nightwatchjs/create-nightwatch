@@ -27,6 +27,7 @@ export interface ConfigGeneratorAnswers {
   mobile?: boolean;
   mobileRemote?: boolean;
   mobileBrowsers?: string[];
+  native?: boolean;
   mobilePlatform?: 'android' | 'ios' | 'both';
   uiFramework?: 'react' | 'vue' | 'storybook';
   plugins?: string[];

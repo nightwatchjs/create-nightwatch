@@ -114,6 +114,15 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     default: ['e2e'],
     validate: (value) => {
       return !!value.length || 'Please select at least 1 testing type.';
+    },
+    when: (answers: ConfigGeneratorAnswers) => {
+      if (answers.native) {
+        answers.testingType = ['app'];
+
+        return false;
+      }
+
+      return true;
     }
   },
 
