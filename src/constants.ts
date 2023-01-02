@@ -279,11 +279,20 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     type: 'list',
     name: 'backend',
     message: 'Select where to run Nightwatch tests',
-    choices: [
-      {name: 'On localhost', value: 'local'},
-      {name: 'On a remote/cloud service', value: 'remote'},
-      {name: 'Both', value: 'both'}
-    ],
+    choices: (answers: ConfigGeneratorAnswers) => {
+      // temporary change till app-testing is supported on BrowserStack
+      const choices = [
+        {name: 'On localhost', value: 'local'},
+        {name: 'On a remote/cloud service', value: 'remote'},
+        {name: 'Both', value: 'both'}
+      ];
+
+      if (answers.testingType && answers.testingType.length === 1 && answers.testingType[0] === 'app') {
+        return [choices[0]];
+      }
+
+      return choices;
+    },
     default: 'local'
   },
 
