@@ -22,9 +22,8 @@ function mockLogger(consoleOutput) {
   );
 }
 
-describe('index tests',  function () {
-
-  beforeEach( function () {
+describe('index tests', function() {
+  beforeEach(function() {
     mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
     if (!nock.isActive()) {
       nock.activate();
@@ -36,10 +35,9 @@ describe('index tests',  function () {
           latest: VERSION
         }
       });
-
   });
 
-  afterEach( function () {
+  afterEach(function() {
     mockery.deregisterAll();
     mockery.resetCache();
     mockery.disable();
@@ -47,8 +45,8 @@ describe('index tests',  function () {
     nock.restore();
   });
 
-  it('should not give suggestion when right args are passed ', async function () {
-    process.argv = ['node', 'filename.js', '--browser=chrome', '--browser=safari', 'args'];
+  it('should not give suggestion when right args are passed ', async function() {
+    process.argv = ['node', 'filename.js', '--browser=chrome', '--browser=safari', '--app', 'args'];
 
     const consoleOutput = [];
     mockLogger(consoleOutput);
@@ -71,14 +69,13 @@ describe('index tests',  function () {
 
     mockery.registerMock('./init', {
       NightwatchInit: class {
-        constructor(rootDir, options) {
-        }
+        constructor() {}
         run() {}
       }
     });
 
     mockery.registerMock(child_process, {
-      execSync:  function () {
+      execSync: function() {
         return true;
       }
     });
@@ -87,13 +84,15 @@ describe('index tests',  function () {
     await index.run();
 
     const output = consoleOutput.toString();
+    // new Nightwatch project initialized
     assert.strictEqual(
       output.includes('package.json not found in the root directory. Initializing a new NPM project..'),
       true
     );
+    assert.strictEqual(output.includes('error: unknown option'), false);
   });
 
-  it('should give suggestion when wrong args are passed ', async function () {
+  it('should give suggestion when wrong args are passed ', async function() {
     process.argv = ['node', 'filename.js', '--browsers=chrome', '--browsers=safari'];
 
     const consoleOutput = [];
@@ -109,7 +108,7 @@ describe('index tests',  function () {
     });
 
     mockery.registerMock(child_process, {
-      execSync:  function () {
+      execSync: function() {
         return true;
       }
     });
@@ -124,8 +123,8 @@ describe('index tests',  function () {
     );
   });
 
-  it('should give warning to run with latest package when using older version', async function () {
-    process.argv = ['node', 'filename.js', '--browser=chrome', '--browser=safari', 'args'];
+  it('should give warning to run with latest package when using older version', async function() {
+    process.argv = ['node', 'filename.js', '--browser=safari', 'args'];
 
     const consoleOutput = [];
     mockLogger(consoleOutput);
@@ -148,14 +147,13 @@ describe('index tests',  function () {
 
     mockery.registerMock('./init', {
       NightwatchInit: class {
-        constructor(rootDir, options) {
-        }
+        constructor() {}
         run() {}
       }
     });
 
     mockery.registerMock(child_process, {
-      execSync:  function () {
+      execSync: function() {
         return true;
       }
     });
@@ -171,10 +169,10 @@ describe('index tests',  function () {
 
     const index = require('../../lib/index');
     await index.run();
-    const output = consoleOutput.toString();
 
+    const output = consoleOutput.toString();
     assert.strictEqual(
-      output.includes(`We\'ve updated this onboarding tool: ${VERSION} -> 1.0.2. To get the latest experience, run: npm init nightwatch@latest`),
+      output.includes(`We've updated this onboarding tool: ${VERSION} -> 1.0.2. To get the latest experience, run: npm init nightwatch@latest`),
       true
     );
   });

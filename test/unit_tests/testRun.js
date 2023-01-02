@@ -4,7 +4,7 @@ const assert = require('assert');
 const nock = require('nock');
 const {extend} = require('axios/lib/utils');
 
-function mockLoger(consoleOutput) {
+function mockLogger(consoleOutput) {
   mockery.registerMock(
     './logger',
     class {
@@ -50,7 +50,7 @@ describe('test run function', function () {
   it('works with no argument and package.json present', async function () {
     process.argv = ['node', 'filename.js'];
 
-    mockLoger([]);
+    mockLogger([]);
 
 
     mockery.registerMock('./utils', {
@@ -78,7 +78,9 @@ describe('test run function', function () {
     // Check the arguments passed to NightwatchInit
     assert.strictEqual(rootDirPassed, process.cwd());
     assert.deepEqual(optionsPassed, {
-      'generate-config': false
+      'generate-config': false,
+      native: false,
+      app: false
     });
   });
 
@@ -86,7 +88,7 @@ describe('test run function', function () {
     process.argv = ['node', 'filename.js'];
 
     const consoleOutput = [];
-    mockLoger(consoleOutput);
+    mockLogger(consoleOutput);
 
     mockery.registerMock('./utils', {
       isNodeProject() {
@@ -127,7 +129,9 @@ describe('test run function', function () {
     // Check the arguments passed to NightwatchInit
     assert.strictEqual(rootDirPassed, process.cwd());
     assert.deepEqual(optionsPassed, {
-      'generate-config': false
+      'generate-config': false,
+      native: false,
+      app: false
     });
 
     // Check if new node project initialized in correct dir
@@ -139,7 +143,7 @@ describe('test run function', function () {
     process.argv = ['node', 'filename.js'];
 
     const consoleOutput = [];
-    mockLoger(consoleOutput);
+    mockLogger(consoleOutput);
 
     mockery.registerMock('./utils', {
       isNodeProject() {
@@ -187,7 +191,9 @@ describe('test run function', function () {
     // Check the arguments passed to NightwatchInit
     assert.strictEqual(rootDirPassed, process.cwd());
     assert.deepEqual(optionsPassed, {
-      'generate-config': false
+      'generate-config': false,
+      native: false,
+      app: false
     });
 
     // Check if root dir confirmation prompted
@@ -202,7 +208,7 @@ describe('test run function', function () {
     process.argv = ['node', 'filename.js', 'new-project', 'some', 'random', 'args'];
     const expectedRootDir = path.join(process.cwd(), 'new-project');
 
-    mockLoger([]);
+    mockLogger([]);
 
     mockery.registerMock('node:fs', {
       existsSync() {
@@ -229,7 +235,9 @@ describe('test run function', function () {
     // Check the arguments passed to NightwatchInit
     assert.strictEqual(rootDirPassed, expectedRootDir);
     assert.deepEqual(optionsPassed, {
-      'generate-config': false
+      'generate-config': false,
+      native: false,
+      app: false
     });
   });
 
@@ -238,7 +246,7 @@ describe('test run function', function () {
     const expectedRootDir = path.join(process.cwd(), 'new-project');
 
     const consoleOutput = [];
-    mockLoger(consoleOutput);
+    mockLogger(consoleOutput);
 
     let newDirCreatedRecursively = false;
     mockery.registerMock('node:fs', {
@@ -273,7 +281,9 @@ describe('test run function', function () {
     // Check the arguments passed to NightwatchInit
     assert.strictEqual(rootDirPassed, expectedRootDir);
     assert.deepEqual(optionsPassed, {
-      'generate-config': false
+      'generate-config': false,
+      native: false,
+      app: false
     });
 
     // Check if new node project initialized in correct dir
@@ -285,7 +295,7 @@ describe('test run function', function () {
     process.argv = ['node', 'filename.js', 'new-project', 'random', '--generate-config', 'args'];
     const expectedRootDir = path.join(process.cwd(), 'new-project');
 
-    mockLoger([]);
+    mockLogger([]);
 
     mockery.registerMock('node:fs', {
       existsSync() {
@@ -311,7 +321,9 @@ describe('test run function', function () {
     // Check the arguments passed to NightwatchInit
     assert.strictEqual(rootDirPassed, expectedRootDir);
     assert.deepEqual(optionsPassed, {
-      'generate-config': true
+      'generate-config': true,
+      native: false,
+      app: false
     });
   });
 
@@ -326,7 +338,7 @@ describe('test run function', function () {
     };
 
     const consoleOutput = [];
-    mockLoger(consoleOutput);
+    mockLogger(consoleOutput);
 
     mockery.registerMock('node:fs', {
       existsSync() {
@@ -370,11 +382,11 @@ describe('test run function', function () {
     process.exit = origProcessExit;
   });
 
-  it('works with many arguments, browsers options, and package.json present', async function () {
-    process.argv = ['node', 'filename.js', 'new-project', 'random', '--browser=chrome', '--browser=safari', 'args'];
+  it('works with many arguments, browsers and native options, and package.json present', async function() {
+    process.argv = ['node', 'filename.js', 'new-project', 'random', '--browser=chrome', '--browser=safari', '--native', 'args'];
     const expectedRootDir = path.join(process.cwd(), 'new-project');
 
-    mockLoger([]);
+    mockLogger([]);
 
     mockery.registerMock('node:fs', {
       existsSync() {
@@ -401,6 +413,8 @@ describe('test run function', function () {
     assert.strictEqual(rootDirPassed, expectedRootDir);
     assert.deepEqual(optionsPassed, {
       'generate-config': false,
+      native: true,
+      app: true,
       b: ['chrome', 'safari'],
       browser: ['chrome', 'safari']
     });
@@ -410,7 +424,7 @@ describe('test run function', function () {
     process.argv = ['node', 'filename.js', '--browser', 'chrome', '--browser', 'safari'];
 
     const consoleOutput = [];
-    mockLoger(consoleOutput);
+    mockLogger(consoleOutput);
 
     mockery.registerMock('./utils', {
       isNodeProject() {
@@ -452,6 +466,8 @@ describe('test run function', function () {
     assert.strictEqual(rootDirPassed, process.cwd());
     assert.deepEqual(optionsPassed, {
       'generate-config': false,
+      native: false,
+      app: false,
       b: ['chrome', 'safari'],
       browser: ['chrome', 'safari']
     });
@@ -465,7 +481,7 @@ describe('test run function', function () {
     process.argv = ['node', 'filename.js', 'new-project', '-y', '--hello', '--there=hi', '-d', '--generate-config'];
     const expectedRootDir = path.join(process.cwd(), 'new-project');
 
-    mockLoger([]);
+    mockLogger([]);
 
     mockery.registerMock('node:fs', {
       existsSync() {
@@ -492,6 +508,8 @@ describe('test run function', function () {
     assert.strictEqual(rootDirPassed, expectedRootDir);
     assert.deepEqual(optionsPassed, {
       'generate-config': true,
+      native: false,
+      app: false,
       d: true,
       hello: true,
       there: 'hi',
@@ -500,4 +518,41 @@ describe('test run function', function () {
     });
   });
 
+  it('works with many arguments, single browser and app option', async function() {
+    process.argv = ['node', 'filename.js', 'new-project', 'random', '--browser=safari', '--app', 'args'];
+    const expectedRootDir = path.join(process.cwd(), 'new-project');
+
+    mockLogger([]);
+
+    mockery.registerMock('node:fs', {
+      existsSync() {
+        return true;
+      }
+    });
+
+    let rootDirPassed;
+    let optionsPassed;
+    mockery.registerMock('./init', {
+      NightwatchInit: class {
+        constructor(rootDir, options) {
+          rootDirPassed = rootDir;
+          optionsPassed = options;
+        }
+        run() {}
+      }
+    });
+
+    const index = require('../../lib/index');
+    await index.run();
+
+    // Check the arguments passed to NightwatchInit
+    assert.strictEqual(rootDirPassed, expectedRootDir);
+    assert.deepEqual(optionsPassed, {
+      'generate-config': false,
+      native: true,
+      app: true,
+      b: 'safari',
+      browser: ['safari']
+    });
+  });
 });
