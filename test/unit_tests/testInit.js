@@ -696,8 +696,10 @@ describe('init tests', function() {
       });
 
       const answers = {
+        testingType: ['e2e'],
         language: 'ts',
         runner: 'mocha',
+        backend: 'local',
         seleniumServer: true,
         mobile: true
       };
@@ -715,7 +717,7 @@ describe('init tests', function() {
       assert.strictEqual(packagesToInstall.includes('@nightwatch/mobile-helper'), true);
     });
 
-    it('correct packages are installed with js-cucumber-plugins', function() {
+    it('correct packages are installed with js-cucumber-plugins-mobile-app with backend remote', function() {
       mockery.registerMock('node:fs', {
         readFileSync(path, encoding) {
           return `{
@@ -727,9 +729,12 @@ describe('init tests', function() {
       });
 
       const answers = {
+        testingType: ['component', 'app'],
         language: 'js',
         runner: 'cucumber',
-        plugins: ['@nightwatch/react', '@nightwatch/storybook']
+        backend: 'remote',
+        plugins: ['@nightwatch/react', '@nightwatch/storybook'],
+        mobile: true
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -738,12 +743,13 @@ describe('init tests', function() {
       const packagesToInstall = nightwatchInit.identifyPackagesToInstall(answers);
 
       assert.strictEqual(packagesToInstall.length, 3);
+      // App and mobile related packages not installed
       assert.strictEqual(packagesToInstall.includes('@cucumber/cucumber'), true);
       assert.strictEqual(packagesToInstall.includes('@nightwatch/react'), true);
       assert.strictEqual(packagesToInstall.includes('@nightwatch/storybook'), true);
     });
 
-    it('correct packages are installed with js,app-testing and @nightwatch/mobile-helper always updated', function() {
+    it('correct packages are installed with js,app-testing in backend both and @nightwatch/mobile-helper always updated', function() {
       mockery.registerMock('node:fs', {
         readFileSync() {
           return `{
@@ -757,7 +763,8 @@ describe('init tests', function() {
       const answers = {
         testingType: ['e2e', 'app'],
         language: 'js',
-        runner: 'nightwatch'
+        runner: 'nightwatch',
+        backend: 'both'
       };
 
       const {NightwatchInit} = require('../../lib/init');
@@ -779,8 +786,10 @@ describe('init tests', function() {
       });
 
       const answers = {
+        testingType: ['e2e'],
         language: 'ts',
         runner: 'cucumber',
+        backend: 'local',
         seleniumServer: true
       };
 

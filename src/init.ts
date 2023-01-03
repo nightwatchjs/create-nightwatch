@@ -330,7 +330,7 @@ export class NightwatchInit {
       packages.push('@nightwatch/selenium-server');
     }
 
-    if (answers.testingType?.includes('app')) {
+    if (isAppTestingSetup(answers) && answers.backend !== 'remote') {
       packages.push('appium');
     }
 
@@ -347,7 +347,7 @@ export class NightwatchInit {
     });
 
     // Packages to always upgrade
-    if (answers.mobile || answers.testingType?.includes('app')) {
+    if (isLocalMobileTestingSetup(answers)) {
       packagesToInstall.push('@nightwatch/mobile-helper');
     }
 
