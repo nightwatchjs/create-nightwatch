@@ -351,6 +351,11 @@ module.exports = {
         host: 'localhost',
         port: 4723,
         server_path: '',
+        // args to pass when starting the server
+        cli_args: [
+          // automatically download the required chromedriver
+          '--allow-insecure=chromedriver_autodownload'
+        ]
         // Uncomment below line if using Appium v2
         // default_path_prefix: ''
       },
