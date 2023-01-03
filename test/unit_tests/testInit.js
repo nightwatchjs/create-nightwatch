@@ -591,9 +591,13 @@ describe('init tests', function() {
       assert.strictEqual('seleniumServer' in answers, false);
       assert.strictEqual('baseUrl' in answers, true);
 
+      if (process.platform === 'darwin') {
+        assert.strictEqual(answers['mobilePlatform'], 'both');
+      } else {
+        assert.strictEqual(answers['mobilePlatform'], 'android');
+      }
       assert.deepEqual(answers['remoteBrowsers'], []);
       assert.strictEqual(answers['defaultBrowser'], '');
-      assert.strictEqual(answers['mobilePlatform'], 'both');
       assert.strictEqual(answers['cloudProvider'], 'browserstack');
       assert.strictEqual(answers['remoteName'], 'browserstack');
       assert.strictEqual(answers['remoteEnv'].username, 'BROWSERSTACK_USERNAME');
@@ -1742,5 +1746,22 @@ describe('test identifyWebdriversToInstall', function() {
 
     assert.strictEqual(webdriversToInstall.length, 1);
     assert.strictEqual(webdriversToInstall.includes('safaridriver'), true);
+  });
+  
+  it('selects correct webdrivers with firefox browser and app testing on both and backend remote', function() {
+    const answers = {
+      backend: 'remote',
+      browsers: ['firefox'],
+      testingType: ['e2e', 'app'],
+      mobilePlatform: 'both'
+    };
+
+    const {NightwatchInit} = require('../../lib/init');
+    const nightwatchInit = new NightwatchInit(rootDir, []);
+
+    const webdriversToInstall = nightwatchInit.identifyWebdriversToInstall(answers);
+
+    assert.strictEqual(webdriversToInstall.length, 1);
+    assert.strictEqual(webdriversToInstall.includes('geckodriver'), true);
   });
 });
