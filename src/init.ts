@@ -1035,9 +1035,6 @@ export class NightwatchInit {
           `  For Android help, run: ${colors.gray.italic('npx @nightwatch/mobile-helper android --help')}`;
 
         const browsers = answers.mobileBrowsers?.filter((browser) => ['chrome', 'firefox'].includes(browser)) || [];
-        if (answers.mobile && browsers.length === 0) {
-          browsers.push('chrome');
-        }
 
         const realAndroidTestCommand = (newline = '') => {
           const commands: string[] = [];
@@ -1045,7 +1042,7 @@ export class NightwatchInit {
           commands.push('  * Make sure your device is connected with USB Debugging turned on.');
           commands.push('  * Make sure required browsers are installed.');
 
-          if (answers.mobile) {
+          if (answers.mobile && browsers.length) {
             commands.push('  For mobile web tests, run:');
             for (const browser of browsers) {
               const envFlag = ` --env android.real.${browser}`;
@@ -1066,7 +1063,7 @@ export class NightwatchInit {
           const commands: string[] = [];
           commands.push('▶ To run an example test on Android Emulator');
 
-          if (answers.mobile) {
+          if (answers.mobile && browsers.length) {
             commands.push('  For mobile web tests, run:');
             for (const browser of browsers) {
               const envFlag = ` --env android.emulator.${browser}`;
@@ -1132,11 +1129,13 @@ export class NightwatchInit {
         const setupCommand = `  For iOS setup, run: ${colors.gray.italic('npx @nightwatch/mobile-helper ios --setup')}\n` +
           `  For iOS help, run: ${colors.gray.italic('npx @nightwatch/mobile-helper ios --help')}`;
 
+        const safariBrowserPresent = answers.mobileBrowsers?.includes('safari');
+
         const realIosTestCommand = () => {
           const commands: string[] = [];
           commands.push('▶ To run an example test on real iOS device');
 
-          if (answers.mobile) {
+          if (answers.mobile && safariBrowserPresent) {
             commands.push('  For mobile web tests, run:');
             commands.push(`    ${colors.cyan(mobileExampleCommand(' --env ios.real.safari'))}`);
           }
@@ -1153,7 +1152,7 @@ export class NightwatchInit {
           const commands: string[] = [];
           commands.push('▶ To run an example test on iOS simulator');
 
-          if (answers.mobile) {
+          if (answers.mobile && safariBrowserPresent) {
             commands.push('  For mobile web tests, run:');
             commands.push(`    ${colors.cyan(mobileExampleCommand(' --env ios.simulator.safari'))}`);
           }
