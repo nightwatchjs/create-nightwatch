@@ -28,7 +28,7 @@ export const AVAILABLE_CONFIG_FLAGS = ['yes', 'generate-config', 'browser', 'y',
 const TESTING_TYPE_CHOICES = [
   {name: 'End-to-End testing', value: 'e2e'},
   {name: 'Component testing', value: 'component'},
-  {name: 'Mobile-app testing', value: 'app'}
+  {name: 'Mobile app testing', value: 'app'}
 ];
 
 export const BROWSER_CHOICES = [

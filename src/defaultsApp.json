@@ -1,0 +1,10 @@
+{
+  "testingType": ["app"],
+  "language": "js",
+  "runner": "nightwatch",
+  "backend": "local",
+  "mobilePlatform": "android",
+  "testsLocation": "nightwatch",
+  "mobile": false,
+  "allowAnonymousMetrics": false
+}

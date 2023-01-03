@@ -19,6 +19,7 @@ import DOWNLOADS from './downloads.json';
 import {ConfigGeneratorAnswers, ConfigDestination, OtherInfo, MobileHelperResult} from './interfaces';
 import defaultAnswers from './defaults.json';
 import defaultMobileAnswers from './defaultsMobile.json';
+import defaultAppAnswers from './defaultsApp.json';
 import {AndroidSetup, IosSetup} from '@nightwatch/mobile-helper';
 import {format} from 'node:util';
 
@@ -60,6 +61,8 @@ export class NightwatchInit {
         if (this.options?.browser) {
           answers.mobileBrowsers = this.options.browser;
         }
+      } else if (this.options?.native) {
+        answers = defaultAppAnswers as ConfigGeneratorAnswers;
       } else {
         answers = defaultAnswers as ConfigGeneratorAnswers;
 
@@ -84,11 +87,6 @@ export class NightwatchInit {
     // Setup TypeScript
     if (!this.onlyConfig && answers.language === 'ts') {
       this.setupTypescript();
-    }
-
-    // Setup component testing
-    if (answers.testingType?.includes('component')) {
-      this.setupComponentTesting(answers);
     }
 
     // Check if Java is installed on the system
@@ -127,6 +125,11 @@ export class NightwatchInit {
           this.copyTemplates(path.join(answers.examplesLocation || ''));
         }
       }
+    }
+
+    // Setup component testing
+    if (answers.testingType?.includes('component')) {
+      this.setupComponentTesting(answers);
     }
 
     // Generate configuration file
@@ -307,6 +310,16 @@ export class NightwatchInit {
 
     if (isAppTestingSetup(answers) && !answers.mobilePlatform) {
       answers.mobilePlatform = 'android';
+    }
+
+    // Remove ios from mobilePlatform on non-mac systems (if present)
+    if (process.platform !== 'darwin' && answers.mobilePlatform) {
+      if (answers.mobilePlatform === 'both') {
+        answers.mobilePlatform = 'android';
+      } else if (answers.mobilePlatform === 'ios') {
+        Logger.error(`${colors.red('Error: Testing on iOS devices is not supported on non-mac systems.')}`);
+        answers.mobilePlatform = undefined;
+      }
     }
 
     if (answers.uiFramework) {
@@ -562,19 +575,24 @@ export class NightwatchInit {
   identifyWebdriversToInstall(answers: ConfigGeneratorAnswers): string[] {
     const webdrivers: string[] = [];
 
-    if (answers.browsers?.includes('firefox') || answers.mobileBrowsers?.includes('firefox')) {
+    const localWebTestingOnFirefox = answers.browsers?.includes('firefox') || answers.mobileBrowsers?.includes('firefox');
+    if (localWebTestingOnFirefox) {
       webdrivers.push('geckodriver');
     }
 
-    const webTestingOnChrome = answers.browsers?.includes('chrome') || answers.mobileBrowsers?.includes('chrome');
-    const appTestingOnAndroid = isAppTestingSetup(answers) && answers.mobilePlatform && ['android', 'both'].includes(answers.mobilePlatform);
-    if (webTestingOnChrome || appTestingOnAndroid) {
+    const localWebTestingOnChrome = answers.browsers?.includes('chrome') || answers.mobileBrowsers?.includes('chrome');
+    const localAppTestingOnAndroid = (isAppTestingSetup(answers) && answers.backend !== 'remote' &&
+      answers.mobilePlatform && ['android', 'both'].includes(answers.mobilePlatform));
+
+    if (localWebTestingOnChrome || localAppTestingOnAndroid) {
       webdrivers.push('chromedriver');
     }
 
-    const webTestingOnSafari = answers.browsers?.includes('safari') || answers.mobileBrowsers?.includes('safari');
-    const appTestingOnIos = isAppTestingSetup(answers) && answers.mobilePlatform && ['ios', 'both'].includes(answers.mobilePlatform);
-    if (webTestingOnSafari || appTestingOnIos) {
+    const localWebTestingOnSafari = answers.browsers?.includes('safari') || answers.mobileBrowsers?.includes('safari');
+    const localAppTestingOnIos = (isAppTestingSetup(answers) && answers.backend !== 'remote' &&
+      answers.mobilePlatform && ['ios', 'both'].includes(answers.mobilePlatform));
+
+    if (localWebTestingOnSafari || localAppTestingOnIos) {
       webdrivers.push('safaridriver');
     }
 

@@ -26,7 +26,7 @@ function mockLogger(consoleOutput) {
 }
 
 
-describe('e2e tests for init', function () {
+describe('e2e tests for init', function() {
   before(function()  {
     if (!nock.isActive()) {
       nock.activate();
@@ -60,7 +60,7 @@ describe('e2e tests for init', function () {
     mockery.disable();
   });
 
-  it('with js-nightwatch-local', async function () {
+  it('with js-nightwatch-local', async function() {
     const consoleOutput = [];
     mockLogger(consoleOutput);
 
@@ -91,6 +91,7 @@ describe('e2e tests for init', function () {
     });
 
     const answers = {
+      testingType: ['e2e'],
       language: 'js',
       runner: 'nightwatch',
       backend: 'local',
@@ -138,6 +139,7 @@ describe('e2e tests for init', function () {
     assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'nightwatch');
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, undefined);
+    assert.strictEqual(nightwatchInit.otherInfo.templatesGenerated, true);
 
     // Test generated config
     assert.strictEqual(fs.existsSync(configPath), true);
@@ -146,6 +148,7 @@ describe('e2e tests for init', function () {
     assert.deepEqual(config.page_objects_path, ['nightwatch/page-objects']);
     assert.deepEqual(config.custom_commands_path, ['nightwatch/custom-commands']);
     assert.deepEqual(config.custom_assertions_path, ['nightwatch/custom-assertions']);
+    assert.deepEqual(config.plugins, []);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
     if (process.platform === 'darwin') {
@@ -191,6 +194,7 @@ describe('e2e tests for init', function () {
     if (process.platform === 'darwin') {assert.strictEqual(output.includes('Enabling safaridriver...'), true)}
     assert.strictEqual(output.includes('Generating example files...'), true);
     assert.strictEqual(output.includes('Success! Generated some example files at \'nightwatch\'.'), true);
+    assert.strictEqual(output.includes('TEMPLATE TESTS'), true);
     assert.strictEqual(output.includes('Generating template files...'), true);
     assert.strictEqual(output.includes(`Success! Generated some templates files at '${path.join('nightwatch', 'templates')}'.`), true);
     assert.strictEqual(output.includes('✨ SETUP COMPLETE'), true);
@@ -212,7 +216,7 @@ describe('e2e tests for init', function () {
 
   });
 
-  it('with js-cucumber-remote', async function () {
+  it('with js-cucumber-remote', async function() {
     const consoleOutput = [];
     mockLogger(consoleOutput);
 
@@ -243,6 +247,7 @@ describe('e2e tests for init', function () {
     });
 
     const answers = {
+      testingType: ['e2e'],
       language: 'js',
       runner: 'cucumber',
       backend: 'remote',
@@ -290,6 +295,7 @@ describe('e2e tests for init', function () {
     assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, true);
     assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, undefined);
+    assert.strictEqual(nightwatchInit.otherInfo.templatesGenerated, undefined);
 
     // Test generated config
     assert.strictEqual(fs.existsSync(configPath), true);
@@ -298,6 +304,7 @@ describe('e2e tests for init', function () {
     assert.deepEqual(config.page_objects_path, []);
     assert.deepEqual(config.custom_commands_path, []);
     assert.deepEqual(config.custom_assertions_path, []);
+    assert.deepEqual(config.plugins, []);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.test_runner.type, 'cucumber');
     assert.strictEqual(config.test_settings.default.test_runner.options.feature_path, 'tests/features');
@@ -351,12 +358,13 @@ describe('e2e tests for init', function () {
     );
     assert.strictEqual(output.includes('For more details on using CucumberJS with Nightwatch, visit:'), true);
     assert.strictEqual(output.includes('Note: Microsoft Edge Webdriver is not installed automatically.'), false);
+    assert.strictEqual(output.includes('TEMPLATE TESTS'), false);
 
     rmDirSync(rootDir);
 
   });
 
-  it('with js-mocha-both', async function () {
+  it('with js-mocha-both-app', async function() {
     const consoleOutput = [];
     mockLogger(consoleOutput);
 
@@ -370,12 +378,18 @@ describe('e2e tests for init', function () {
     mockery.registerMock('inquirer', {
       prompt(questions) {
         if (questions[0].name === 'safaridriver') {
-          return {safaridriver: false};
+          return {safaridriver: true};
         } else {
           return {};
         }
       }
     });
+
+    let appDownloaderCalled = false;
+    const origUtils = require('../../lib/utils.js');
+    origUtils.downloadWithProgressBar = () => {
+      return appDownloaderCalled = true;
+    };
 
     const colorFn = (arg) => arg;
     mockery.registerMock('ansi-colors', {
@@ -383,18 +397,48 @@ describe('e2e tests for init', function () {
       yellow: colorFn,
       magenta: colorFn,
       cyan: colorFn,
-      red: colorFn
+      red: colorFn,
+      gray: {
+        italic: colorFn
+      }
+    });
+
+    let androidSetupOptions;
+    mockery.registerMock('@nightwatch/mobile-helper', {
+      AndroidSetup: class {
+        constructor(options) {
+          androidSetupOptions = options;
+        }
+        run() {
+          return {
+            status: true,
+            mode: 'real'
+          };
+        }
+      },
+      IosSetup: class {
+        constructor() {}
+        run() {
+          return {
+            real: false,
+            simulator: true
+          };
+        }
+      }
     });
 
     // Create a folder in the 'tests' folder, to make it non-empty.
     fs.mkdirSync(path.join(rootDir, 'tests', 'sample'), {recursive: true});
 
     const answers = {
+      testingType: ['component', 'app'],
       language: 'js',
       runner: 'mocha',
       backend: 'both',
       cloudProvider: 'browserstack',
-      browsers: ['chrome', 'safari'],
+      browsers: ['firefox', 'safari'],
+      mobilePlatform: 'both',
+      uiFramework: 'react',
       testsLocation: 'tests',
       baseUrl: 'https://nightwatchjs.org',
       allowAnonymousMetrics: false
@@ -415,22 +459,24 @@ describe('e2e tests for init', function () {
 
     // Test answers
     if (process.platform === 'darwin') {
-      assert.deepEqual(answers.browsers, ['chrome', 'safari']);
+      assert.deepEqual(answers.browsers, ['firefox', 'safari']);
+      assert.strictEqual(answers.mobilePlatform, 'both');
     } else {
-      assert.deepEqual(answers.browsers, ['chrome']);
+      assert.deepEqual(answers.browsers, ['firefox']);
+      assert.strictEqual(answers.mobilePlatform, 'android');
     }
-    assert.deepEqual(answers.remoteBrowsers, ['chrome', 'safari']);
+    assert.deepEqual(answers.remoteBrowsers, ['firefox', 'safari']);
     assert.deepStrictEqual(answers.mobileBrowsers, []);
     assert.strictEqual(answers.mobileRemote, undefined);
-    assert.strictEqual(answers.mobilePlatform, undefined);
     assert.strictEqual(answers.cloudProvider, 'browserstack');
     assert.strictEqual(answers.remoteName, 'browserstack');
     assert.strictEqual(answers.remoteEnv.username, 'BROWSERSTACK_USERNAME');
     assert.strictEqual(answers.remoteEnv.access_key, 'BROWSERSTACK_ACCESS_KEY');
     assert.strictEqual(answers.seleniumServer, undefined);
-    assert.strictEqual(answers.defaultBrowser, 'chrome');
+    assert.strictEqual(answers.defaultBrowser, 'firefox');
     assert.strictEqual(answers.addExamples, true);
     assert.strictEqual(answers.examplesLocation, 'nightwatch');
+    assert.deepStrictEqual(answers.plugins, ['@nightwatch/react']);
 
     // Test otherInfo
     assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, undefined);
@@ -438,6 +484,7 @@ describe('e2e tests for init', function () {
     assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'nightwatch');
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, undefined);
+    assert.strictEqual(nightwatchInit.otherInfo.templatesGenerated, true);
 
     // Test generated config
     assert.strictEqual(fs.existsSync(configPath), true);
@@ -446,9 +493,10 @@ describe('e2e tests for init', function () {
     assert.deepEqual(config.page_objects_path, ['nightwatch/page-objects']);
     assert.deepEqual(config.custom_commands_path, ['nightwatch/custom-commands']);
     assert.deepEqual(config.custom_assertions_path, ['nightwatch/custom-assertions']);
+    assert.deepEqual(config.plugins, ['@nightwatch/react']);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.test_runner.type, 'mocha');
-    assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
+    assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox');
     assert.strictEqual(config.test_settings.browserstack.selenium.host, 'hub.browserstack.com');
     assert.strictEqual(config.test_settings.browserstack.selenium.port, 443);
     assert.strictEqual(config.test_settings.browserstack.desiredCapabilities['bstack:options'].userName, '${BROWSERSTACK_USERNAME}');
@@ -457,54 +505,72 @@ describe('e2e tests for init', function () {
       assert.deepEqual(Object.keys(config.test_settings), [
         'default',
         'safari',
-        'chrome',
+        'firefox',
+        'app',
+        'app.android.emulator',
+        'app.android.real',
+        'app.ios.simulator',
+        'app.ios.real',
         'browserstack',
         'browserstack.local',
-        'browserstack.chrome',
+        'browserstack.firefox',
         'browserstack.safari',
-        'browserstack.local_chrome'
+        'browserstack.local_firefox'
       ]);
     } else {
       assert.deepEqual(Object.keys(config.test_settings), [
         'default',
-        'chrome',
+        'firefox',
+        'app',
+        'app.android.emulator',
+        'app.android.real',
         'browserstack',
         'browserstack.local',
-        'browserstack.chrome',
+        'browserstack.firefox',
         'browserstack.safari',
-        'browserstack.local_chrome'
+        'browserstack.local_firefox'
       ]);
     }
 
     // Test Packages and webdrivers installed
-    assert.strictEqual(commandsExecuted.length, 3);
+    if (process.platform === 'darwin') {
+      assert.strictEqual(commandsExecuted.length, 8);
+      assert.strictEqual(commandsExecuted[6], 'sudo safaridriver --enable');
+    } else {
+      assert.strictEqual(commandsExecuted.length, 7);
+    }
     assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
-    assert.strictEqual(commandsExecuted[1], 'npm install chromedriver --save-dev');
+    assert.strictEqual(commandsExecuted[1], 'npm install appium --save-dev');
+    assert.strictEqual(commandsExecuted[2], 'npm install @nightwatch/react --save-dev');
+    assert.strictEqual(commandsExecuted[3], 'npm install @nightwatch/mobile-helper --save-dev');
+    assert.strictEqual(commandsExecuted[4], 'npm install geckodriver --save-dev');
+    assert.strictEqual(commandsExecuted[5], 'npm install chromedriver --save-dev');
+
+    // Test mobile-helper setup
+    assert.deepStrictEqual(androidSetupOptions, {browsers: [], appium: true});
 
     // Test examples copied
     const examplesPath = path.join(rootDir, answers.examplesLocation);
     assert.strictEqual(fs.existsSync(examplesPath), true);
     const exampleFiles = fs.readdirSync(examplesPath);
-    assert.strictEqual(exampleFiles.length, 5);
-    assert.deepEqual(exampleFiles, ['custom-assertions', 'custom-commands', 'examples',  'page-objects', 'templates']);
+    assert.strictEqual(exampleFiles.length, 7);
+    assert.deepEqual(exampleFiles, [
+      'custom-assertions', 'custom-commands', 'examples',
+      'index.jsx', 'page-objects', 'sample-apps', 'templates']);
+    assert.strictEqual(appDownloaderCalled, true);
 
     // Test console output
     const output = consoleOutput.toString();
     assert.strictEqual(output.includes('Installing nightwatch'), true);
     assert.strictEqual(output.includes('Success! Configuration file generated at:'), true);
     assert.strictEqual(output.includes('Installing webdriver for Chrome (chromedriver)...'), true);
-    if (process.platform === 'darwin') {
-      assert.strictEqual(
-        output.includes('Please run \'sudo safaridriver --enable\' command to enable safaridriver later.'),
-        true
-      );
-    }
     assert.strictEqual(output.includes('Generating example files...'), true);
     assert.strictEqual(output.includes('Success! Generated some example files at \'nightwatch\'.'), true);
     assert.strictEqual(output.includes('Please set the credentials required to run tests on your cloud provider'), true);
     assert.strictEqual(output.includes('- BROWSERSTACK_USERNAME'), true);
     assert.strictEqual(output.includes('- BROWSERSTACK_ACCESS_KEY'), true);
     assert.strictEqual(output.includes('(.env files are also supported)'), true);
+    assert.strictEqual(output.includes('RUN EXAMPLE TESTS'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
     assert.strictEqual(output.includes(`npx nightwatch .${path.sep}${path.join('nightwatch', 'examples')}`), true);
@@ -514,11 +580,40 @@ describe('e2e tests for init', function () {
     );
     assert.strictEqual(output.includes('[Selenium Server]'), false);
 
+    assert.strictEqual(output.includes('RUN MOBILE EXAMPLE TESTS'), true);
+    assert.strictEqual(output.includes('change directory to the root dir'), true);
+    assert.strictEqual(output.includes('To run an example test on Real Android device'), true);
+    assert.strictEqual(output.includes('* Make sure your device is connected'), true);
+    assert.strictEqual(output.includes('* Make sure required browsers are installed.'), true);
+    assert.strictEqual(output.includes('For mobile app tests, run:'), true);
+    assert.strictEqual(output.includes('mobile-app-tests --env app.android.real'), true);
+    assert.strictEqual(output.includes('To run an example test on Android Emulator'), false);
+
+    if (process.platform === 'darwin') {
+      assert.strictEqual(output.includes('To run an example test on iOS simulator'), true);
+      assert.strictEqual(output.includes('For mobile app tests, run:'), true);
+      assert.strictEqual(output.includes('mobile-app-tests --env app.ios.simulator'), true);
+      assert.strictEqual(output.includes('iOS setup incomplete...'), true);
+      assert.strictEqual(output.includes('Please follow the guide above'), true);
+      assert.strictEqual(output.includes('For iOS setup, run:'), true);
+      assert.strictEqual(output.includes('For iOS help, run:'), true);
+      assert.strictEqual(output.includes('After completing the setup...'), true);
+      assert.strictEqual(output.includes('To run an example test on real iOS device'), true);
+      assert.strictEqual(output.includes('To run an example test on iOS simulator'), true);
+    } else {
+      assert.strictEqual(output.includes('To run an example test on iOS simulator'), false);
+      assert.strictEqual(output.includes('To run an example test on real iOS device'), false);
+      assert.strictEqual(output.includes('iOS setup failed...'), false);
+      assert.strictEqual(output.includes('iOS setup incomplete...'), false);
+    }
+
+    assert.strictEqual(output.includes('RUN MOBILE EXAMPLE TESTS ON CLOUD'), false);
+
     rmDirSync(rootDir);
 
   });
 
-  it('with ts-nightwatch-remote-mobile', async function () {
+  it('with ts-nightwatch-remote-mobile-app', async function() {
     const consoleOutput = [];
     mockLogger(consoleOutput);
 
@@ -548,10 +643,17 @@ describe('e2e tests for init', function () {
       red: colorFn
     });
 
+    let appDownloaderCalled = false;
+    const origUtils = require('../../lib/utils.js');
+    origUtils.downloadWithProgressBar = () => {
+      return appDownloaderCalled = true;
+    };
+
     // Create an empty 'tests' folder in the rootDir.
     fs.mkdirSync(path.join(rootDir, 'tests'), {recursive: true});
 
     const answers = {
+      testingType: ['e2e', 'app'],
       language: 'ts',
       runner: 'nightwatch',
       backend: 'remote',
@@ -582,7 +684,7 @@ describe('e2e tests for init', function () {
     assert.deepEqual(answers.remoteBrowsers, ['chrome', 'edge', 'safari']);
     assert.deepStrictEqual(answers.mobileBrowsers, undefined);
     assert.strictEqual(answers.mobileRemote, true);
-    assert.strictEqual(answers.mobilePlatform, undefined);
+    assert.strictEqual(answers.mobilePlatform, 'android');
     assert.strictEqual(answers.cloudProvider, 'saucelabs');
     assert.strictEqual(answers.remoteName, 'saucelabs');
     assert.strictEqual(answers.remoteEnv.username, 'SAUCE_USERNAME');
@@ -598,6 +700,7 @@ describe('e2e tests for init', function () {
     assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'nightwatch');
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, undefined);
+    assert.strictEqual(nightwatchInit.otherInfo.templatesGenerated, undefined);
 
     // Test generated config
     assert.strictEqual(fs.existsSync(configPath), true);
@@ -606,6 +709,7 @@ describe('e2e tests for init', function () {
     assert.deepEqual(config.page_objects_path, []);
     assert.deepEqual(config.custom_commands_path, []);
     assert.deepEqual(config.custom_assertions_path, []);
+    assert.deepEqual(config.plugins, []);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
     assert.strictEqual(config.test_settings.saucelabs.selenium.host, 'ondemand.saucelabs.com');
@@ -620,42 +724,51 @@ describe('e2e tests for init', function () {
     ]);
 
     // Test Packages and webdrivers installed
-    assert.strictEqual(commandsExecuted.length, 7);
+    assert.strictEqual(commandsExecuted.length, 6);
     assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[1], 'npm install typescript --save-dev');
     assert.strictEqual(commandsExecuted[2], 'npm install @types/nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[3], 'npm install ts-node --save-dev');
-    assert.strictEqual(commandsExecuted[4], 'npm install @nightwatch/mobile-helper --save-dev');
-    assert.strictEqual(commandsExecuted[5], 'npx tsc --init');
-    assert.strictEqual(commandsExecuted[6], 'npx nightwatch --version');
+    assert.strictEqual(commandsExecuted[4], 'npx tsc --init');
+    assert.strictEqual(commandsExecuted[5], 'npx nightwatch --version');
 
     // Test examples copied
     const examplesPath = path.join(rootDir, answers.examplesLocation);
     assert.strictEqual(fs.existsSync(examplesPath), true);
     const exampleFiles = fs.readdirSync(examplesPath);
-    assert.strictEqual(exampleFiles.length, 5);
-    assert.deepEqual(exampleFiles, ['duckDuckGo.ts', 'ecosia.ts', 'github.ts', 'google.ts', 'tsconfig.json']);
+    assert.strictEqual(exampleFiles.length, 7);
+    assert.deepStrictEqual(exampleFiles, ['duckDuckGo.ts', 'ecosia.ts', 'github.ts', 'google.ts', 'mobile-app-tests', 'sample-apps', 'tsconfig.json']);
+    assert.strictEqual(appDownloaderCalled, true);
 
     // Test console output
     const output = consoleOutput.toString();
     assert.strictEqual(output.includes('Installing nightwatch'), true);
     assert.strictEqual(output.includes('Installing typescript'), true);
     assert.strictEqual(output.includes('Installing @types/nightwatch'), true);
-    assert.strictEqual(output.includes('Installing @nightwatch/mobile-helper'), true);
-    assert.strictEqual(
-      output.includes(`Success! Configuration file generated at: "${path.join(rootDir, 'nightwatch.conf.js')}"`),
-      true
-    );
     assert.strictEqual(output.includes('Generating example files...'), true);
     assert.strictEqual(
       output.includes('Success! Generated some example files at \'nightwatch\'.'),
       true
     );
+    assert.strictEqual(output.includes('Generating mobile-app example tests...'), true);
+    assert.strictEqual(output.includes('Downloading sample android app...'), true);
+    assert.strictEqual(output.includes('Downloading sample ios app...'), false);
+    assert.strictEqual(
+      output.includes(`Success! Configuration file generated at: "${path.join(rootDir, 'nightwatch.conf.js')}"`),
+      true
+    );
+    // Mobile-helper tool not run for remote
+    assert.strictEqual(output.includes('Running Android Setup...'), false);
+    assert.strictEqual(output.includes('Running iOS Setup...'), false);
+    assert.strictEqual(output.includes('SETUP COMPLETE'), true);
+    assert.strictEqual(output.includes('TEMPLATE TESTS'), false); // templates only copied for js
 
+    // Web testing instructions (remote)
     assert.strictEqual(output.includes('Please set the credentials required to run tests on your cloud provider'), true);
     assert.strictEqual(output.includes('- SAUCE_USERNAME'), true);
     assert.strictEqual(output.includes('- SAUCE_ACCESS_KEY'), true);
     assert.strictEqual(output.includes('(.env files are also supported)'), true);
+    assert.strictEqual(output.includes('RUN EXAMPLE TESTS'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
     assert.strictEqual(output.includes(`npx nightwatch .${path.sep}${path.join('nightwatch')} --env saucelabs.chrome`), true);
@@ -667,11 +780,16 @@ describe('e2e tests for init', function () {
     );
     assert.strictEqual(output.includes('Note: Microsoft Edge Webdriver is not installed automatically.'), false);
 
+    // Mobile web/app testing instructions
+    // only printed if no other instructions are printed
+    assert.strictEqual(output.includes('RUN MOBILE EXAMPLE TESTS'), false);
+    assert.strictEqual(output.includes('RUN MOBILE EXAMPLE TESTS ON CLOUD'), false);
+
     rmDirSync(rootDir);
 
   });
 
-  it('with ts-mocha-both-browserstack-mobile and non-default config', async function () {
+  it('with ts-mocha-both-browserstack-mobile and non-default config', async function() {
     const consoleOutput = [];
     mockLogger(consoleOutput);
 
@@ -736,6 +854,7 @@ describe('e2e tests for init', function () {
     fs.mkdirSync(path.join(rootDir, 'nightwatch', 'sample'), {recursive: true});
 
     const answers = {
+      testingType: ['e2e'],
       language: 'ts',
       runner: 'mocha',
       backend: 'both',
@@ -797,6 +916,7 @@ describe('e2e tests for init', function () {
     assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'nightwatch');
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, configFileName);
+    assert.strictEqual(nightwatchInit.otherInfo.templatesGenerated, undefined);
 
     // Test generated config
     assert.strictEqual(fs.existsSync(configPath), true);
@@ -805,6 +925,7 @@ describe('e2e tests for init', function () {
     assert.deepEqual(config.page_objects_path, []);
     assert.deepEqual(config.custom_commands_path, []);
     assert.deepEqual(config.custom_assertions_path, []);
+    assert.deepEqual(config.plugins, []);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox');
     assert.strictEqual(config.test_settings.browserstack.selenium.host, 'hub.browserstack.com');
@@ -866,6 +987,12 @@ describe('e2e tests for init', function () {
     assert.strictEqual(output.includes('Installing typescript'), true);
     assert.strictEqual(output.includes('Installing @types/nightwatch'), true);
     assert.strictEqual(output.includes('Installing @nightwatch/mobile-helper'), true);
+    if (process.platform === 'darwin') {
+      assert.strictEqual(
+        output.includes('Please run \'sudo safaridriver --enable\' command to enable safaridriver later.'),
+        true
+      );
+    }
     assert.strictEqual(
       output.includes(`Success! Configuration file generated at: "${path.join(rootDir, configFileName)}"`),
       true
@@ -895,18 +1022,19 @@ describe('e2e tests for init', function () {
     );
     assert.strictEqual(output.includes('[Selenium Server]'), false);
 
-    assert.strictEqual(output.includes('RUN NIGHTWATCH TESTS ON MOBILE'), true);
+    assert.strictEqual(output.includes('RUN MOBILE EXAMPLE TESTS'), true);
     assert.strictEqual(output.includes('To run an example test on Real Android device'), true);
     assert.strictEqual(output.includes('* Make sure your device is connected'), true);
     assert.strictEqual(output.includes('* Make sure required browsers are installed.'), true);
+    assert.strictEqual(output.includes('For mobile web tests, run:'), true);
     assert.strictEqual(output.includes('github.ts --config new-config.conf.js --env android.real.firefox'), true);
     assert.strictEqual(output.includes('github.ts --config new-config.conf.js --env android.real.chrome'), false);
-    assert.strictEqual(output.includes('To run an example test on Android Emulator, run:'), true);
+    assert.strictEqual(output.includes('To run an example test on Android Emulator'), true);
     assert.strictEqual(output.includes('github.ts --config new-config.conf.js --env android.emulator.firefox'), true);
     assert.strictEqual(output.includes('github.ts --config new-config.conf.js --env android.emulator.chrome'), false);
     if (process.platform === 'darwin') {
-      assert.strictEqual(output.includes('To run an example test on real iOS device, run:'), true);
-      assert.strictEqual(output.includes('To run an example test on iOS simulator, run:'), true);
+      assert.strictEqual(output.includes('To run an example test on real iOS device'), true);
+      assert.strictEqual(output.includes('To run an example test on iOS simulator'), true);
       assert.strictEqual(output.includes('github.ts --config new-config.conf.js --env ios.real.safari'), true);
       assert.strictEqual(output.includes('github.ts --config new-config.conf.js --env ios.simulator.safari'), true);
     }
@@ -915,7 +1043,7 @@ describe('e2e tests for init', function () {
 
   });
 
-  it('with yes and browser flag', async function () {
+  it('with yes and browser flag', async function() {
     const consoleOutput = [];
     mockLogger(consoleOutput);
 
@@ -984,6 +1112,7 @@ describe('e2e tests for init', function () {
     assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'nightwatch');
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, undefined);
+    assert.strictEqual(nightwatchInit.otherInfo.templatesGenerated, true);
 
     // Test generated config
     assert.strictEqual(fs.existsSync(configPath), true);
@@ -992,6 +1121,7 @@ describe('e2e tests for init', function () {
     assert.deepEqual(config.page_objects_path, ['nightwatch/page-objects']);
     assert.deepEqual(config.custom_commands_path, ['nightwatch/custom-commands']);
     assert.deepEqual(config.custom_assertions_path, ['nightwatch/custom-assertions']);
+    assert.deepEqual(config.plugins, []);
     assert.strictEqual(config.test_settings.default.launch_url, 'http://localhost');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox');
     assert.strictEqual(config.test_settings.browserstack.selenium.host, 'hub.browserstack.com');
@@ -1020,6 +1150,7 @@ describe('e2e tests for init', function () {
     assert.strictEqual(commandsExecuted[2], 'java -version');
     assert.strictEqual(commandsExecuted[3], 'npm install geckodriver --save-dev');
     assert.strictEqual(commandsExecuted[4], 'npm install chromedriver --save-dev');
+    assert.strictEqual(commandsExecuted[5], 'npx nightwatch --version');
 
     // Test examples copied
     const examplesPath = path.join(rootDir, answers.examplesLocation);
@@ -1041,6 +1172,8 @@ describe('e2e tests for init', function () {
     assert.strictEqual(output.includes('- BROWSERSTACK_USERNAME'), true);
     assert.strictEqual(output.includes('- BROWSERSTACK_ACCESS_KEY'), true);
     assert.strictEqual(output.includes('(.env files are also supported)'), true);
+    assert.strictEqual(output.includes('TEMPLATE TESTS'), true);
+    assert.strictEqual(output.includes('RUN EXAMPLE TESTS'), true);
     assert.strictEqual(output.includes('First, change directory to the root dir of your project:'), true);
     assert.strictEqual(output.includes('cd test_output'), true);
     assert.strictEqual(output.includes(`npx nightwatch .${path.sep}${path.join('nightwatch', 'examples')}`), true);
@@ -1055,13 +1188,13 @@ describe('e2e tests for init', function () {
     rmDirSync(rootDir);
   });
 
-  it('with yes, browser and mobile flag', async function () {
+  it('with yes, browser and mobile flag', async function() {
     const consoleOutput = [];
     mockLogger(consoleOutput);
 
     const commandsExecuted = [];
     mockery.registerMock('child_process', {
-      execSync(command, options) {
+      execSync(command) {
         commandsExecuted.push(command);
       }
     });
@@ -1156,6 +1289,7 @@ describe('e2e tests for init', function () {
     assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'nightwatch');
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, undefined);
+    assert.strictEqual(nightwatchInit.otherInfo.templatesGenerated, true);
 
     // Test generated config
     assert.strictEqual(fs.existsSync(configPath), true);
@@ -1164,6 +1298,7 @@ describe('e2e tests for init', function () {
     assert.deepEqual(config.page_objects_path, ['nightwatch/page-objects']);
     assert.deepEqual(config.custom_commands_path, ['nightwatch/custom-commands']);
     assert.deepEqual(config.custom_assertions_path, ['nightwatch/custom-assertions']);
+    assert.deepEqual(config.plugins, []);
     assert.strictEqual(config.test_settings.default.launch_url, 'http://localhost');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox');
     assert.strictEqual(config.test_settings.browserstack.selenium.host, 'hub.browserstack.com');
@@ -1231,31 +1366,189 @@ describe('e2e tests for init', function () {
     assert.strictEqual(output.includes('- BROWSERSTACK_USERNAME'), true);
     assert.strictEqual(output.includes('- BROWSERSTACK_ACCESS_KEY'), true);
     assert.strictEqual(output.includes('(.env files are also supported)'), true);
+    assert.strictEqual(output.includes('TEMPLATE TESTS'), true);
 
-    assert.strictEqual(output.includes('RUN NIGHTWATCH TESTS ON MOBILE'), true);
+    assert.strictEqual(output.includes('RUN MOBILE EXAMPLE TESTS'), true);
     assert.strictEqual(output.includes('Android setup failed...'), true);
     assert.strictEqual(output.includes('Please go through the setup logs above'), true);
     assert.strictEqual(output.includes('To setup Android, run:'), true);
     assert.strictEqual(output.includes('For Android help, run:'), true);
     assert.strictEqual(output.includes('Once setup is complete...'), true);
     assert.strictEqual(output.includes('To run an example test on Real Android device'), true);
-    assert.strictEqual(output.includes('To run an example test on Android Emulator, run:'), true);
+    assert.strictEqual(output.includes('To run an example test on Android Emulator'), true);
+    assert.strictEqual(output.includes('For mobile web tests, run:'), true);
+    assert.strictEqual(output.includes('For mobile app tests, run:'), false);
     if (process.platform === 'darwin') {
-      assert.strictEqual(output.includes('To run an example test on real iOS device, run:'), true);
+      assert.strictEqual(output.includes('To run an example test on real iOS device'), true);
       assert.strictEqual(output.includes('ecosia.js --env ios.real.safari'), true);
       assert.strictEqual(output.includes('iOS setup incomplete...'), true);
       assert.strictEqual(output.includes('Please follow the guide above'), true);
       assert.strictEqual(output.includes('For iOS setup, run:'), true);
       assert.strictEqual(output.includes('For iOS help, run:'), true);
       assert.strictEqual(output.includes('After completing the setup...'), true);
-      assert.strictEqual(output.includes('To run an example test on real iOS device, run:'), true);
-      assert.strictEqual(output.includes('To run an example test on iOS simulator, run:'), true);
+      assert.strictEqual(output.includes('To run an example test on real iOS device'), true);
+      assert.strictEqual(output.includes('To run an example test on iOS simulator'), true);
     }
 
     rmDirSync(rootDir);
   });
 
-  it('generate-config with js-nightwatch-local and seleniumServer false', async function () {
+  it('with yes, and native flag', async function() {
+    const consoleOutput = [];
+    mockLogger(consoleOutput);
+
+    const commandsExecuted = [];
+    mockery.registerMock('child_process', {
+      execSync(command) {
+        commandsExecuted.push(command);
+      }
+    });
+
+    let appDownloaderCalled = false;
+    const origUtils = require('../../lib/utils.js');
+    origUtils.downloadWithProgressBar = () => {
+      return appDownloaderCalled = true;
+    };
+
+    const colorFn = (arg) => arg;
+    mockery.registerMock('ansi-colors', {
+      green: colorFn,
+      yellow: colorFn,
+      magenta: colorFn,
+      cyan: colorFn,
+      red: colorFn,
+      gray: {
+        italic: colorFn
+      }
+    });
+
+    let androidSetupOptions;
+    mockery.registerMock('@nightwatch/mobile-helper', {
+      AndroidSetup: class {
+        constructor(options) {
+          androidSetupOptions = options;
+        }
+        run() {
+          return {
+            status: true,
+            mode: 'both'
+          };
+        }
+      }
+    });
+
+    const answers = require('../../lib/defaultsApp.json');
+    mockery.registerMock('./defaultsApp.json', answers);
+
+    const {NightwatchInit} = require('../../lib/init');
+    const nightwatchInit = new NightwatchInit(rootDir, {
+      'generate-config': false,
+      yes: true,
+      native: true
+    });
+
+    const configPath = path.join(rootDir, 'nightwatch.conf.js');
+    nightwatchInit.getConfigDestPath = function() {
+      return configPath;
+    };
+
+    await nightwatchInit.run();
+
+    // Test answers
+    assert.strictEqual(answers.backend, 'local');
+    assert.deepStrictEqual(answers.browsers, []);
+    assert.deepStrictEqual(answers.mobileBrowsers, []);
+    assert.strictEqual(answers.mobilePlatform, 'android');
+    assert.deepEqual(answers.remoteBrowsers, undefined);
+    assert.strictEqual(answers.mobileRemote, undefined);
+    assert.strictEqual(answers.cloudProvider, undefined);
+    assert.strictEqual(answers.seleniumServer, undefined);
+    assert.strictEqual(answers.defaultBrowser, '');
+    assert.strictEqual(answers.testsLocation, 'nightwatch');
+    assert.strictEqual(answers.addExamples, true);
+    assert.strictEqual(answers.examplesLocation, 'nightwatch');
+    assert.strictEqual(answers.baseUrl, '');
+
+    // Test otherInfo
+    assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, undefined);
+    assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'nightwatch');
+    assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'nightwatch');
+    assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
+    assert.strictEqual(nightwatchInit.otherInfo.nonDefaultConfigName, undefined);
+    assert.strictEqual(nightwatchInit.otherInfo.templatesGenerated, undefined);
+
+    // Test generated config
+    assert.strictEqual(fs.existsSync(configPath), true);
+    const config = require(configPath);
+    assert.deepEqual(config.src_folders, ['nightwatch/examples']);
+    // only set for web testing
+    assert.deepEqual(config.page_objects_path, []);
+    assert.deepEqual(config.custom_commands_path, []);
+    assert.deepEqual(config.custom_assertions_path, []);
+    assert.deepEqual(config.plugins, []);
+    assert.strictEqual(config.test_settings.default.launch_url, '');
+    assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, '');
+    assert.strictEqual(config.test_settings.app.selenium.host, 'localhost');
+    assert.strictEqual(config.test_settings.app.selenium.port, 4723);
+    assert.strictEqual(config.test_settings.app.selenium.use_appium, true);
+    assert.deepStrictEqual(Object.keys(config.test_settings), [
+      'default',
+      'app',
+      'app.android.emulator',
+      'app.android.real'
+    ]);
+
+    // Test Packages and webdrivers installed
+    assert.strictEqual(commandsExecuted.length, 5);
+    assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
+    assert.strictEqual(commandsExecuted[1], 'npm install appium --save-dev');
+    assert.strictEqual(commandsExecuted[2], 'npm install @nightwatch/mobile-helper --save-dev');
+    assert.strictEqual(commandsExecuted[3], 'npm install chromedriver --save-dev');
+    assert.strictEqual(commandsExecuted[4], 'npx nightwatch --version');
+
+    // Test mobile-helper setup
+    assert.deepStrictEqual(androidSetupOptions, {browsers: [], appium: true});
+
+    // Test examples copied
+    const examplesPath = path.join(rootDir, answers.examplesLocation);
+    assert.strictEqual(fs.existsSync(examplesPath), true);
+
+    const exampleFiles = fs.readdirSync(examplesPath);
+    assert.strictEqual(exampleFiles.length, 2);
+    assert.deepStrictEqual(exampleFiles, ['examples', 'sample-apps']);
+    assert.strictEqual(fs.existsSync(path.join(examplesPath, 'examples', 'mobile-app-tests')), true);
+    assert.strictEqual(appDownloaderCalled, true);
+
+    // Test console output
+    const output = consoleOutput.toString();
+    assert.strictEqual(output.includes('Installing nightwatch'), true);
+    assert.strictEqual(output.includes('Installing appium'), true);
+    assert.strictEqual(output.includes('Installing @nightwatch/mobile-helper'), true);
+    assert.strictEqual(output.includes('Installing webdriver for Chrome (chromedriver)...'), true);
+    assert.strictEqual(output.includes('Generating mobile-app example tests...'), true);
+    assert.strictEqual(output.includes('Downloading sample android app...'), true);
+    assert.strictEqual(output.includes('Success! Configuration file generated at:'), true);
+    assert.strictEqual(output.includes('Running Android Setup...'), true);
+    assert.strictEqual(output.includes('SETUP COMPLETE'), true);
+
+    assert.strictEqual(output.includes('TEMPLATE TESTS'), false);
+    assert.strictEqual(output.includes('RUN EXAMPLE TESTS'), false);
+
+    assert.strictEqual(output.includes('RUN MOBILE EXAMPLE TESTS'), true);
+    assert.strictEqual(output.includes('change directory to the root dir'), true);
+    assert.strictEqual(output.includes('To run an example test on Real Android device'), true);
+    assert.strictEqual(output.includes('* Make sure your device is connected'), true);
+    assert.strictEqual(output.includes('* Make sure required browsers are installed.'), true);
+    assert.strictEqual(output.includes('For mobile app tests, run:'), true);
+    assert.strictEqual(output.includes('mobile-app-tests --env app.android.real'), true);
+    assert.strictEqual(output.includes('To run an example test on Android Emulator'), true);
+    assert.strictEqual(output.includes('For mobile app tests, run:'), true);
+    assert.strictEqual(output.includes('mobile-app-tests --env app.android.emulator'), true);
+
+    rmDirSync(rootDir);
+  });
+
+  it('generate-config with js-nightwatch-local and seleniumServer false', async function() {
     const consoleOutput = [];
     mockLogger(consoleOutput);
 
@@ -1286,6 +1579,7 @@ describe('e2e tests for init', function () {
     });
 
     const answers = {
+      testingType: ['e2e'],
       language: 'js',
       runner: 'nightwatch',
       backend: 'local',
@@ -1334,6 +1628,7 @@ describe('e2e tests for init', function () {
     assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
     assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
+    assert.strictEqual(nightwatchInit.otherInfo.templatesGenerated, undefined);
 
     // Test generated config
     assert.strictEqual(fs.existsSync(configPath), true);
@@ -1342,6 +1637,7 @@ describe('e2e tests for init', function () {
     assert.deepEqual(config.page_objects_path, []);
     assert.deepEqual(config.custom_commands_path, []);
     assert.deepEqual(config.custom_assertions_path, []);
+    assert.deepEqual(config.plugins, []);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'chrome');
     if (process.platform === 'darwin') {
@@ -1380,7 +1676,7 @@ describe('e2e tests for init', function () {
 
   });
 
-  it('generate-config with ts-nightwatch-both', async function () {
+  it('generate-config with ts-nightwatch-both', async function() {
     const consoleOutput = [];
     mockLogger(consoleOutput);
 
@@ -1411,6 +1707,7 @@ describe('e2e tests for init', function () {
     });
 
     const answers = {
+      testingType: ['e2e'],
       language: 'ts',
       runner: 'nightwatch',
       backend: 'both',
@@ -1457,6 +1754,7 @@ describe('e2e tests for init', function () {
     assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
     assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, undefined);
     assert.strictEqual(nightwatchInit.otherInfo.cucumberExamplesAdded, undefined);
+    assert.strictEqual(nightwatchInit.otherInfo.templatesGenerated, undefined);
 
     // Test generated config
     assert.strictEqual(fs.existsSync(configPath), true);
@@ -1465,6 +1763,7 @@ describe('e2e tests for init', function () {
     assert.deepEqual(config.page_objects_path, []);
     assert.deepEqual(config.custom_commands_path, []);
     assert.deepEqual(config.custom_assertions_path, []);
+    assert.deepEqual(config.plugins, []);
     assert.strictEqual(config.test_settings.default.launch_url, 'https://nightwatchjs.org');
     assert.strictEqual(config.test_settings.default.desiredCapabilities.browserName, 'firefox');
     assert.strictEqual(config.test_settings.remote.selenium.host, '<remote-hostname>');
@@ -1502,7 +1801,7 @@ describe('e2e tests for init', function () {
     rmDirSync(rootDir);
   });
 
-  it('make sure we send analytics data if allowAnalytics is set to true', async function () {
+  it('make sure we send analytics data if allowAnalytics is set to true', async function() {
     const consoleOutput = [];
     mockLogger(consoleOutput);
 
@@ -1514,6 +1813,7 @@ describe('e2e tests for init', function () {
     });
 
     const answers = {
+      testingType: ['e2e'],
       language: 'ts',
       runner: 'nightwatch',
       backend: 'both',
@@ -1573,7 +1873,7 @@ describe('e2e tests for init', function () {
     });
   });
 
-  it('make sure we do not send analytics data if allowAnalytics is set to false', async function () {
+  it('make sure we do not send analytics data if allowAnalytics is set to false', async function() {
     const consoleOutput = [];
     mockLogger(consoleOutput);
 
@@ -1585,6 +1885,7 @@ describe('e2e tests for init', function () {
     });
 
     const answers = {
+      testingType: ['e2e'],
       language: 'ts',
       runner: 'nightwatch',
       backend: 'both',
