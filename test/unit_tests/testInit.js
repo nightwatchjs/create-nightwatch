@@ -1585,7 +1585,7 @@ describe('init tests', function() {
       assert.strictEqual(nightwatchInit.otherInfo.testsJsSrc, 'tests');
       assert.strictEqual(nightwatchInit.otherInfo.examplesJsSrc, 'nightwatch');
 
-      assert.deepEqual(config.src_folders, ['tests', path.join('nightwatch', 'examples')]);
+      assert.deepEqual(config.src_folders, ['tests', 'nightwatch/examples']);
       // only set for web testing
       assert.deepEqual(config.page_objects_path, []);
       assert.deepEqual(config.custom_commands_path, []);
