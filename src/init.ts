@@ -759,9 +759,12 @@ export class NightwatchInit {
       copy(examplesSrcPath, examplesDestPath);
 
       Logger.info(`Downloading sample ${platform} app...`);
-      const downloaded = await downloadWithProgressBar(DOWNLOADS.wikipedia[platform], appDestPath);
+      const downloadUrl = DOWNLOADS.wikipedia[platform];
+      const downloaded = await downloadWithProgressBar(downloadUrl, appDestPath);
       if (!downloaded) {
-        Logger.info(`${colors.red('Download Failed!')}\n`);
+        Logger.info(`${colors.red('Download Failed!')} You can download it from ${downloadUrl} and save it to '${path.join(
+          examplesLocation, 'sample-apps'
+        )}' inside your project root dir.\n`);
       }
     }
   }
@@ -1001,7 +1004,7 @@ export class NightwatchInit {
 
     const appTsExample = `npx nightwatch .${path.sep}${path.join(
       this.otherInfo.examplesJsSrc || '',
-      'mobile-web-tests'
+      'mobile-app-tests'
     )}${configFlag}`;
 
     const appJsExample = `npx nightwatch .${path.sep}${path.join(
@@ -1011,10 +1014,7 @@ export class NightwatchInit {
     )}${configFlag}`;
 
     const appExampleCommand = (envFlag: string) => {
-      if (answers.runner === Runner.Cucumber) {
-        return `${cucumberExample}${envFlag}`;
-      }
-
+      // no cucumber app-tests for now
       if (answers.language === 'ts') {
         return `${appTsExample}${envFlag}`;
       }
@@ -1022,7 +1022,8 @@ export class NightwatchInit {
       return `${appJsExample}${envFlag}`;
     };
 
-    if (isLocalMobileTestingSetup(answers) && answers.mobilePlatform) {
+    const cucumberAppTestingOnly = answers.runner === Runner.Cucumber && isAppTestingSetup(answers) && !answers.mobile;
+    if (isLocalMobileTestingSetup(answers) && answers.mobilePlatform && !cucumberAppTestingOnly) {
       exampleCommandsShared = true;
 
       Logger.info(colors.green('🚀 RUN MOBILE EXAMPLE TESTS'), '\n');
@@ -1050,7 +1051,7 @@ export class NightwatchInit {
             }
           }
           
-          if (isAppTestingSetup(answers)) {
+          if (isAppTestingSetup(answers) && answers.runner !== Runner.Cucumber) {
             commands.push('  For mobile app tests, run:');
             const envFlag = ' --env app.android.real';
             commands.push(`    ${colors.cyan(appExampleCommand(envFlag) || '')}${newline}`);
@@ -1071,7 +1072,7 @@ export class NightwatchInit {
             }
           }
 
-          if (isAppTestingSetup(answers)) {
+          if (isAppTestingSetup(answers) && answers.runner !== Runner.Cucumber) {
             commands.push('  For mobile app tests, run:');
             const envFlag = ' --env app.android.emulator';
             commands.push(`    ${colors.cyan(appExampleCommand(envFlag) || '')}${newline}`);
@@ -1140,7 +1141,7 @@ export class NightwatchInit {
             commands.push(`    ${colors.cyan(mobileExampleCommand(' --env ios.real.safari'))}`);
           }
           
-          if (isAppTestingSetup(answers)) {
+          if (isAppTestingSetup(answers) && answers.runner !== Runner.Cucumber) {
             commands.push('  For mobile app tests, run:');
             commands.push(`    ${colors.cyan(appExampleCommand(' --env app.ios.real'))}`);
           }
@@ -1157,7 +1158,7 @@ export class NightwatchInit {
             commands.push(`    ${colors.cyan(mobileExampleCommand(' --env ios.simulator.safari'))}`);
           }
 
-          if (isAppTestingSetup(answers)) {
+          if (isAppTestingSetup(answers) && answers.runner !== Runner.Cucumber) {
             commands.push('  For mobile app tests, run:');
             commands.push(`    ${colors.cyan(appExampleCommand(' --env app.ios.simulator'))}`);
           }

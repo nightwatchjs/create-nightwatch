@@ -163,6 +163,11 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
         languageRunners = languageRunners.filter((languageRunner) => languageRunner.value.includes('nightwatch'));
       }
 
+      if (isAppTestingSetup(answers)) {
+        // don't allow cucumber for now
+        languageRunners = languageRunners.filter((languageRunner) => !languageRunner.value.includes('cucumber'));
+      }
+
       return languageRunners;
     },
     filter: (value, answers) => {

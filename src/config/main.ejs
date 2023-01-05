@@ -351,12 +351,12 @@ module.exports = {
         host: 'localhost',
         port: 4723,
         server_path: '',
-        // args to pass when starting the server
+        // args to pass when starting the Appium server
         cli_args: [
           // automatically download the required chromedriver
-          '--allow-insecure=chromedriver_autodownload'
-        ]
-        // Uncomment below line if using Appium v2
+          // '--allow-insecure=chromedriver_autodownload'
+        ],
+        // Uncomment below line when using Appium v2
         // default_path_prefix: ''
       },
       webdriver: {
@@ -374,7 +374,7 @@ module.exports = {
       'desiredCapabilities': {
         // More capabilities can be found at https://github.com/appium/appium-uiautomator2-driver#capabilities
         browserName: null,
-        platformName: 'Android',
+        platformName: 'android',
         // `appium:options` is not natively supported in Appium v1, but works with Nightwatch.
         // If copying these capabilities elsewhere while using Appium v1, make sure to remove `appium:options`
         // and add `appium:` prefix to each one of its capabilities, e.g. change 'app' to 'appium:app'.
@@ -400,7 +400,7 @@ module.exports = {
       'desiredCapabilities': {
         // More capabilities can be found at https://github.com/appium/appium-uiautomator2-driver#capabilities
         browserName: null,
-        platformName: 'Android',
+        platformName: 'android',
         // `appium:options` is not natively supported in Appium v1, but works with Nightwatch.
         // If copying these capabilities elsewhere while using Appium v1, make sure to remove `appium:options`
         // and add `appium:` prefix to each one of its capabilities, e.g. change 'app' to 'appium:app'.
@@ -432,7 +432,7 @@ module.exports = {
       'desiredCapabilities': {
         // More capabilities can be found at https://github.com/appium/appium-xcuitest-driver#capabilities
         browserName: null,
-        platformName: 'iOS',
+        platformName: 'ios',
         // `appium:options` is not natively supported in Appium v1, but works with Nightwatch.
         // If copying these capabilities elsewhere while using Appium v1, make sure to remove `appium:options`
         // and add `appium:` prefix to each one of its capabilities, e.g. change 'app' to 'appium:app'.
@@ -454,7 +454,7 @@ module.exports = {
       'desiredCapabilities': {
         // More capabilities can be found at https://github.com/appium/appium-xcuitest-driver#capabilities
         browserName: null,
-        platformName: 'iOS',
+        platformName: 'ios',
         // `appium:options` is not natively supported in Appium v1, but works with Nightwatch.
         // If copying these capabilities elsewhere while using Appium v1, make sure to remove `appium:options`
         // and add `appium:` prefix to each one of its capabilities, e.g. change 'app' to 'appium:app'.
