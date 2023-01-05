@@ -1,10 +1,10 @@
 describe('Wikipedia Android app test', function() {
-  before(function(client) {
-    client.click('id', 'org.wikipedia:id/fragment_onboarding_skip_button');
+  before(function(app) {
+    app.click('id', 'org.wikipedia:id/fragment_onboarding_skip_button');
   });
 
-  it('Search for BrowserStack', async function(client) {
-    client
+  it('Search for BrowserStack', async function(app) {
+    app
       .click('id', 'org.wikipedia:id/search_container')
       .sendKeys('id', 'org.wikipedia:id/search_src_text', 'browserstack')
       .click({selector: 'org.wikipedia:id/page_list_item_title', locateStrategy: 'id', index: 0})

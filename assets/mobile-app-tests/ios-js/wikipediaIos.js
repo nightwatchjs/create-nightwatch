@@ -1,10 +1,10 @@
 describe('Wikipedia iOS app test', function() {
-  before(function(client) {
-    client.click('xpath', '//XCUIElementTypeButton[@name="Skip"]');
+  before(function(app) {
+    app.click('xpath', '//XCUIElementTypeButton[@name="Skip"]');
   });
 
-  it('Search for BrowserStack', async function(client) {
-    client
+  it('Search for BrowserStack', async function(app) {
+    app
       .useXpath()
       .click('//XCUIElementTypeSearchField[@name="Search Wikipedia"]')
       .sendKeys('//XCUIElementTypeSearchField[@name="Search Wikipedia"]', 'browserstack')
