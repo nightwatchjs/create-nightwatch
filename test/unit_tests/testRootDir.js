@@ -2,7 +2,7 @@ const path = require('path');
 const mockery = require('mockery');
 const assert = require('assert');
 
-function mockLoger(consoleOutput) {
+function mockLogger(consoleOutput) {
   mockery.registerMock(
     './logger',
     class {
@@ -32,7 +32,7 @@ describe('test confirmRootDir', async function () {
 
   it('when given root dir is confirmed', async function () {
     const consoleOutput = [];
-    mockLoger(consoleOutput);
+    mockLogger(consoleOutput);
 
     mockery.registerMock('inquirer', {
       prompt() {
@@ -54,7 +54,7 @@ describe('test confirmRootDir', async function () {
 
   it('when given root dir is not confirmed and new path is provided', async function () {
     const consoleOutput = [];
-    mockLoger(consoleOutput);
+    mockLogger(consoleOutput);
 
     mockery.registerMock('inquirer', {
       prompt() {

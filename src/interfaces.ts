@@ -3,7 +3,7 @@ import {AndroidSetup, IosSetup} from '@nightwatch/mobile-helper';
 export interface ConfigGeneratorAnswers {
   rootDir?: string;
   onlyConfig?: boolean;
-  testingType?: Array<'e2e-test' | 'ct-test'>
+  testingType?: Array<'e2e' | 'component' | 'app'>
   languageRunnerSetup?: string;
   language?: 'js' | 'ts';
   runner?: 'nightwatch' | 'mocha' | 'cucumber';
@@ -27,6 +27,7 @@ export interface ConfigGeneratorAnswers {
   mobile?: boolean;
   mobileRemote?: boolean;
   mobileBrowsers?: string[];
+  native?: boolean;
   mobilePlatform?: 'android' | 'ios' | 'both';
   uiFramework?: 'react' | 'vue' | 'storybook';
   plugins?: string[];
@@ -43,12 +44,13 @@ export interface OtherInfo {
   testsJsSrc?: string;
   examplesJsSrc?: string;
   cucumberExamplesAdded?: boolean;
+  templatesGenerated?: boolean;
   javaNotInstalled?: boolean;
   nonDefaultConfigName?: string;
   usingESM?: boolean;
 }
 
-export interface MobileResult {
+export interface MobileHelperResult {
   android?: Awaited<ReturnType<AndroidSetup['run']>>;
   ios?: Awaited<ReturnType<IosSetup['run']>>;
 }

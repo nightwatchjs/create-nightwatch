@@ -23,7 +23,13 @@ Nightwatch Configuration Wizard
 Setting up Nightwatch in %s...
 `;
 
-export const AVAILABLE_CONFIG_FLAGS = ['yes', 'generate-config', 'browser', 'y', 'b', 'mobile'];
+export const AVAILABLE_CONFIG_FLAGS = ['yes', 'generate-config', 'browser', 'y', 'b', 'mobile', 'app', 'native'];
+
+const TESTING_TYPE_CHOICES = [
+  {name: 'End-to-End testing', value: 'e2e'},
+  {name: 'Component testing', value: 'component'},
+  {name: 'Mobile app testing', value: 'app'}
+];
 
 export const BROWSER_CHOICES = [
   {name: 'Chrome', value: 'chrome'},
@@ -37,6 +43,38 @@ export const MOBILE_BROWSER_CHOICES = [
   {name: 'Firefox (Android)', value: 'firefox'},
   {name: 'Safari (iOS)', value: 'safari'}
 ];
+
+export const MOBILE_PLATFORM_CHOICES = [
+  {name: 'Android', value: 'android'},
+  {name: 'iOS', value: 'ios'},
+  {name: 'Both', value: 'both'}
+];
+
+export const isWebTestingSetup = (answers: ConfigGeneratorAnswers) => {
+  return answers.testingType?.some(
+    (type) => ['e2e', 'component'].includes(type)
+  );
+};
+
+export const isAppTestingSetup = (answers: ConfigGeneratorAnswers) => {
+  return answers.testingType?.includes('app');
+};
+
+export const isLocalMobileTestingSetup = (answers: ConfigGeneratorAnswers) => {
+  if (answers.backend === 'remote') {
+    return false;
+  }
+
+  return (answers.mobile || isAppTestingSetup(answers));
+};
+
+export const isRemoteMobileTestingSetup = (answers: ConfigGeneratorAnswers) => {
+  if (answers.backend === 'local') {
+    return false;
+  }
+
+  return (answers.mobile || isAppTestingSetup(answers));
+};
 
 export const MOBILE_BROWSER_QUES: inquirer.QuestionCollection =
 {
@@ -56,14 +94,18 @@ export const MOBILE_BROWSER_QUES: inquirer.QuestionCollection =
   validate: (value) => {
     return !!value.length || 'Please select at least 1 browser.';
   },
-  when: (answers) => {
+  when: (answers: ConfigGeneratorAnswers) => {
+    if (!answers.mobile || answers.backend === 'remote') {
+      return false;
+    }
+
     const mobileBrowserValues = MOBILE_BROWSER_CHOICES
       .map((browserObj) => browserObj.value);
 
-    const browsersHasMobileBrowsers = (answers.browsers as string[] | undefined)
+    const browsersHasMobileBrowsers = answers.browsers
       ?.some(((browser: string) => mobileBrowserValues.includes(browser)));
 
-    return answers.mobile && answers.backend !== 'remote' && !browsersHasMobileBrowsers;
+    return !browsersHasMobileBrowsers;
   }
 };
 
@@ -75,14 +117,28 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     type: 'checkbox',
     name: 'testingType',
     message: 'Select testing type to setup for your project',
-    choices: [
-      {name: 'End-to-End testing', value: 'e2e-test'},
-      {name: 'Component testing', value: 'ct-test'}
-      // { name: 'mobile app testing', value: 'mobile-test' }
-    ],
-    default: ['e2e-test'],
+    choices: (answers) => {
+      let testingTypes = TESTING_TYPE_CHOICES;
+
+      if (answers.mobile) {
+        // if --mobile flag is used
+        testingTypes = testingTypes.filter((type) => ['e2e', 'component'].includes(type.value));
+      }
+
+      return testingTypes;
+    },
+    default: ['e2e'],
     validate: (value) => {
       return !!value.length || 'Please select at least 1 testing type.';
+    },
+    when: (answers: ConfigGeneratorAnswers) => {
+      if (answers.native) {
+        answers.testingType = ['app'];
+
+        return false;
+      }
+
+      return true;
     }
   },
 
@@ -102,9 +158,14 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
         // {name: 'TypeScript - CucumberJS Test Runner', value: 'ts-cucumber'}
       ];
 
-      if (answers.testingType?.includes('ct-test')) {
+      if (answers.testingType?.includes('component')) {
         // component tests only work with default test runner.
         languageRunners = languageRunners.filter((languageRunner) => languageRunner.value.includes('nightwatch'));
+      }
+
+      if (isAppTestingSetup(answers)) {
+        // don't allow cucumber for now
+        languageRunners = languageRunners.filter((languageRunner) => !languageRunner.value.includes('cucumber'));
       }
 
       return languageRunners;
@@ -128,7 +189,7 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
       {name: 'Vue.js', value: 'vue'},
       {name: 'Storybook', value: 'storybook'}
     ],
-    when: (answers: ConfigGeneratorAnswers) => answers.testingType?.includes('ct-test')
+    when: (answers: ConfigGeneratorAnswers) => answers.testingType?.includes('component')
   },
 
   // BROWSERS
@@ -148,10 +209,34 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     validate: (value) => {
       return !!value.length || 'Please select at least 1 browser.';
     },
-    when: (answers) => !answers.mobile
+    when: (answers) => {
+      if (answers.mobile) {
+        // --mobile flag is used.
+        return false;
+      }
+
+      return isWebTestingSetup(answers);
+    }
   },
 
   MOBILE_BROWSER_QUES,
+
+  // PLATFORM
+  {
+    type: 'list',
+    name: 'mobilePlatform',
+    message: 'Select target mobile platform(s)',
+    choices: () => {
+      let platforms = MOBILE_PLATFORM_CHOICES;
+  
+      if (process.platform !== 'darwin') {
+        platforms = platforms.filter((platform) => platform.value === 'android');
+      }
+  
+      return platforms;
+    },
+    when: (answers) => isAppTestingSetup(answers)
+  },
 
   // TEST LOCATION
   {
@@ -190,7 +275,8 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
       }
 
       return 'http://localhost';
-    }
+    },
+    when: (answers) => isWebTestingSetup(answers)
   },
 
   // TESTING BACKEND
@@ -198,11 +284,20 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
     type: 'list',
     name: 'backend',
     message: 'Select where to run Nightwatch tests',
-    choices: [
-      {name: 'On localhost', value: 'local'},
-      {name: 'On a remote/cloud service', value: 'remote'},
-      {name: 'Both', value: 'both'}
-    ],
+    choices: (answers: ConfigGeneratorAnswers) => {
+      // temporary change till app-testing is supported on BrowserStack
+      const choices = [
+        {name: 'On localhost', value: 'local'},
+        {name: 'On a remote/cloud service', value: 'remote'},
+        {name: 'Both', value: 'both'}
+      ];
+
+      if (answers.testingType && answers.testingType.length === 1 && answers.testingType[0] === 'app') {
+        return [choices[0]];
+      }
+
+      return choices;
+    },
     default: 'local'
   },
 
@@ -235,7 +330,17 @@ export const QUESTIONAIRRE: inquirer.QuestionCollection = [
       {name: 'Yes', value: true},
       {name: 'No, skip for now', value: false}
     ],
-    default: false
+    default: false,
+    when: (answers) => {
+      if (isWebTestingSetup(answers) && isAppTestingSetup(answers)) {
+        // setup mobile-web testing as well
+        answers.mobile = true;
+
+        return false;
+      }
+
+      return isWebTestingSetup(answers);
+    }
   },
 
   MOBILE_BROWSER_QUES

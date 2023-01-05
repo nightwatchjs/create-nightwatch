@@ -1,5 +1,9 @@
 import fs from 'node:fs';
 import path from 'path';
+import cliProgress from 'cli-progress';
+import colors from 'ansi-colors';
+import {DownloaderHelper} from 'node-downloader-helper';
+import Logger from './logger';
 
 /**
  * Strips out all control characters from a string
@@ -36,13 +40,17 @@ export const symbols = () => {
 
 export const isNodeProject = (rootDir: string): boolean => fs.existsSync(path.join(rootDir, 'package.json'));
 
-export const copy = (src: string, dest: string, excludeDir: string[] = []): void => {
+export const copy = (src: string, dest: string, excludeDir: string[] = [], overwrite = false): void => {
   const stat = fs.statSync(src);
   if (stat.isDirectory()) {
-    copyDir(src, dest, excludeDir);
-  } else {
-    fs.copyFileSync(src, dest);
+    return copyDir(src, dest, excludeDir);
   }
+
+  if (fs.existsSync(dest) && !overwrite) {
+    return;
+  }
+
+  fs.copyFileSync(src, dest);
 };
 
 const copyDir = (srcDir: string, destDir: string, excludeDir: string[]): void => {
@@ -72,4 +80,28 @@ export const rmDirSync = (dirPath: string) => {
     });
     fs.rmdirSync(dirPath);
   }
+};
+
+export const downloadWithProgressBar = async (url: string, dest: string) => {
+  const progressBar = new cliProgress.Bar({
+    format: ' [{bar}] {percentage}% | ETA: {eta}s'
+  }, cliProgress.Presets.shades_classic);
+
+  const downloader = new DownloaderHelper(url, dest, {override: {skip: true}});
+
+  downloader.on('start', () => progressBar.start(100, 0));
+  downloader.on('progress', (stats) => {
+    progressBar.update(stats.progress);
+  });
+  downloader.on('skip', (skipInfo) => {
+    progressBar.stop();
+    Logger.info(`Download skipped! File already present at: '${skipInfo.filePath}'\n`);
+  });
+  downloader.on('end', (downloadInfo) => {
+    progressBar.stop();
+    Logger.info(`${colors.green('Success!')} File downloaded at: '${downloadInfo.filePath}'\n`);
+  });
+  downloader.on('error', () => progressBar.stop());
+
+  return await downloader.start();
 };
