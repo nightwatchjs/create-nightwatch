@@ -586,13 +586,13 @@ describe('e2e tests for init', function() {
     assert.strictEqual(output.includes('* Make sure your device is connected'), true);
     assert.strictEqual(output.includes('* Make sure required browsers are installed.'), true);
     assert.strictEqual(output.includes('For mobile app tests, run:'), true);
-    assert.strictEqual(output.includes('mobile-app-tests --env app.android.real'), true);
+    assert.strictEqual(output.includes(`${path.join('mobile-app-tests', 'wikipedia-android.js')} --env app.android.real`), true);
     assert.strictEqual(output.includes('To run an example test on Android Emulator'), false);
 
     if (process.platform === 'darwin') {
       assert.strictEqual(output.includes('To run an example test on iOS simulator'), true);
       assert.strictEqual(output.includes('For mobile app tests, run:'), true);
-      assert.strictEqual(output.includes('mobile-app-tests --env app.ios.simulator'), true);
+      assert.strictEqual(output.includes('mobile-app-tests/wikipedia-ios.js --env app.ios.simulator'), true);
       assert.strictEqual(output.includes('iOS setup incomplete...'), true);
       assert.strictEqual(output.includes('Please follow the guide above'), true);
       assert.strictEqual(output.includes('For iOS setup, run:'), true);
@@ -1540,10 +1540,10 @@ describe('e2e tests for init', function() {
     assert.strictEqual(output.includes('* Make sure your device is connected'), true);
     assert.strictEqual(output.includes('* Make sure required browsers are installed.'), true);
     assert.strictEqual(output.includes('For mobile app tests, run:'), true);
-    assert.strictEqual(output.includes('mobile-app-tests --env app.android.real'), true);
+    assert.strictEqual(output.includes(`${path.join('mobile-app-tests', 'wikipedia-android.js')} --env app.android.real`), true);
     assert.strictEqual(output.includes('To run an example test on Android Emulator'), true);
     assert.strictEqual(output.includes('For mobile app tests, run:'), true);
-    assert.strictEqual(output.includes('mobile-app-tests --env app.android.emulator'), true);
+    assert.strictEqual(output.includes(`${path.join('mobile-app-tests', 'wikipedia-android.js')} --env app.android.emulator`), true);
 
     rmDirSync(rootDir);
   });

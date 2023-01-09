@@ -1002,24 +1002,30 @@ export class NightwatchInit {
       return `${mobileJsExample}${envFlag}`;
     };
 
-    const appTsExample = `npx nightwatch .${path.sep}${path.join(
-      this.otherInfo.examplesJsSrc || '',
-      'mobile-app-tests'
-    )}${configFlag}`;
+    const appTsExample = (mobilePlatform: string) => {
+      return `npx nightwatch .${path.sep}${path.join(
+        this.otherInfo.examplesJsSrc || '',
+        'mobile-app-tests',
+        `wikipedia-${mobilePlatform}.ts`
+      )}${configFlag}`;
+    };
 
-    const appJsExample = `npx nightwatch .${path.sep}${path.join(
-      this.otherInfo.examplesJsSrc || '',
-      EXAMPLE_TEST_FOLDER,
-      'mobile-app-tests'
-    )}${configFlag}`;
+    const appJsExample = (mobilePlatform: string) => {
+      return `npx nightwatch .${path.sep}${path.join(
+        this.otherInfo.examplesJsSrc || '',
+        EXAMPLE_TEST_FOLDER,
+        'mobile-app-tests',
+        `wikipedia-${mobilePlatform}.js`
+      )}${configFlag}`;
+    };
 
-    const appExampleCommand = (envFlag: string) => {
+    const appExampleCommand = (envFlag: string, mobilePlatform: string) => {
       // no cucumber app-tests for now
       if (answers.language === 'ts') {
-        return `${appTsExample}${envFlag}`;
+        return `${appTsExample(mobilePlatform)}${envFlag}`;
       }
 
-      return `${appJsExample}${envFlag}`;
+      return `${appJsExample(mobilePlatform)}${envFlag}`;
     };
 
     const cucumberAppTestingOnly = answers.runner === Runner.Cucumber && isAppTestingSetup(answers) && !answers.mobile;
@@ -1047,14 +1053,14 @@ export class NightwatchInit {
             commands.push('  For mobile web tests, run:');
             for (const browser of browsers) {
               const envFlag = ` --env android.real.${browser}`;
-              commands.push(`    ${colors.cyan(mobileExampleCommand(envFlag) || '')}${newline}`);
+              commands.push(`    ${colors.cyan(mobileExampleCommand(envFlag))}${newline}`);
             }
           }
           
           if (isAppTestingSetup(answers) && answers.runner !== Runner.Cucumber) {
             commands.push('  For mobile app tests, run:');
             const envFlag = ' --env app.android.real';
-            commands.push(`    ${colors.cyan(appExampleCommand(envFlag) || '')}${newline}`);
+            commands.push(`    ${colors.cyan(appExampleCommand(envFlag, 'android'))}${newline}`);
           }
 
           return commands.join('\n');
@@ -1068,14 +1074,14 @@ export class NightwatchInit {
             commands.push('  For mobile web tests, run:');
             for (const browser of browsers) {
               const envFlag = ` --env android.emulator.${browser}`;
-              commands.push(`    ${colors.cyan(mobileExampleCommand(envFlag) || '')}${newline}`);
+              commands.push(`    ${colors.cyan(mobileExampleCommand(envFlag))}${newline}`);
             }
           }
 
           if (isAppTestingSetup(answers) && answers.runner !== Runner.Cucumber) {
             commands.push('  For mobile app tests, run:');
             const envFlag = ' --env app.android.emulator';
-            commands.push(`    ${colors.cyan(appExampleCommand(envFlag) || '')}${newline}`);
+            commands.push(`    ${colors.cyan(appExampleCommand(envFlag, 'android'))}${newline}`);
           }
 
           return commands.join('\n');
@@ -1143,7 +1149,7 @@ export class NightwatchInit {
           
           if (isAppTestingSetup(answers) && answers.runner !== Runner.Cucumber) {
             commands.push('  For mobile app tests, run:');
-            commands.push(`    ${colors.cyan(appExampleCommand(' --env app.ios.real'))}`);
+            commands.push(`    ${colors.cyan(appExampleCommand(' --env app.ios.real', 'ios'))}`);
           }
 
           return commands.join('\n');
@@ -1160,7 +1166,7 @@ export class NightwatchInit {
 
           if (isAppTestingSetup(answers) && answers.runner !== Runner.Cucumber) {
             commands.push('  For mobile app tests, run:');
-            commands.push(`    ${colors.cyan(appExampleCommand(' --env app.ios.simulator'))}`);
+            commands.push(`    ${colors.cyan(appExampleCommand(' --env app.ios.simulator', 'ios'))}`);
           }
 
           return commands.join('\n');
