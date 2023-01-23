@@ -310,8 +310,8 @@ module.exports = {
       desiredCapabilities: {
         browserName: 'safari',
         platformName: 'iOS',
-        // add the device UDID to run tests on (necessary)
-        // Run command: `xcrun simctl list devices`
+        // add udid of the device to run tests on (necessary)
+        // Run command: `xcrun xctrace list devices`
         // 'safari:deviceUDID': '00008030-00024C2C3453402E',
       },
     
@@ -329,8 +329,8 @@ module.exports = {
         browserName: 'safari',
         platformName: 'iOS',
         'safari:useSimulator': true,
-        // change the deviceName, platformVersion accordingly to run tests on 
-        // Run command: `xcrun simctl list devices`
+        // To find the available deviceName/platformName to run tests on,
+        // run command: `xcrun simctl list devices`
         // 'safari:platformVersion': '15.0',
         'safari:deviceName': 'iPhone 13'
       },
@@ -438,8 +438,8 @@ module.exports = {
         // and add `appium:` prefix to each one of its capabilities, e.g. change 'app' to 'appium:app'.
         'appium:options': {
           automationName: 'XCUITest',
+          // platformVersion: '15.5',
           deviceName: 'iPhone 13',
-          platformVersion: '15.5',
           // While Appium v1 supports relative paths, it's more safe to use absolute paths instead.
           // Appium v2 does not support relative paths.
           app: `${__dirname}/nightwatch/sample-apps/wikipedia.zip`,
@@ -467,7 +467,7 @@ module.exports = {
           newCommandTimeout: 0,
           // add udid of the device to run tests on. Or, pass the id to `--deviceId` flag when running tests.
           // device id could be retrieved from Xcode > Window > "Devices and Simulators" window.
-          // udid: ''
+          // udid: '00008030-00024C2C3453402E'
         }
       }
     },
