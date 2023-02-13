@@ -12,14 +12,9 @@ describe('Wikipedia Android app test', function() {
         // wait for webview context to be available
         const contexts = await this.appium.getContexts();
 
-        return contexts.length > 1;
+        return contexts.includes('WEBVIEW_org.wikipedia');
       })
-      .perform(async function() {
-        // switch to webview context
-        const contexts = await this.appium.getContexts();
-
-        await this.appium.setContext(contexts[1]);
-      })
+      .appium.setContext('WEBVIEW_org.wikipedia')
       .assert.textEquals('.pcs-edit-section-title', 'BrowserStack');  // command run in webview context
   });
 });
