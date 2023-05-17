@@ -167,7 +167,11 @@ export class NightwatchInit {
     }
 
     if (answers.allowAnonymousMetrics) {
-      this.pushAnonymousMetrics(answers);
+      try {
+        this.pushAnonymousMetrics(answers);
+      } catch (err) {
+        // do nothing
+      }
     }
   }
 
@@ -1279,6 +1283,9 @@ export class NightwatchInit {
 
     const req = https.request(options);
     req.write(data);
+    req.on('error', () => {
+      // ignore connection errors
+    });
     req.end();
   }
 }
