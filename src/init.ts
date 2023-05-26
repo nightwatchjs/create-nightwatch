@@ -119,7 +119,7 @@ export class NightwatchInit {
         if (isAppTestingSetup(answers)) {
           await this.copyAppTestingExamples(answers);
         }
-        
+
         // For now the templates added only for JS
         if (answers.language !== 'ts' && isWebTestingSetup(answers)) {
           this.copyTemplates(path.join(answers.examplesLocation || ''));
@@ -354,7 +354,7 @@ export class NightwatchInit {
     if (answers.plugins) {
       packages.push(...answers.plugins);
     }
-    
+
     // Identify packages already installed and don't install them again
     const packageJson = JSON.parse(fs.readFileSync(path.join(this.rootDir, 'package.json'), 'utf-8'));
 
@@ -438,7 +438,7 @@ export class NightwatchInit {
         fs.mkdirSync(nightwatchPath);
         // eslint-disable-next-line
       } catch (err) {}
-      
+
       // Generate a new index.jsx file
       const reactIndexSrcPath = path.join(componentConfigPath, 'index.jsx');
       const reactIndexDestPath = path.join(nightwatchPath, 'index.jsx');
@@ -493,7 +493,7 @@ export class NightwatchInit {
   }
 
   generateConfig(answers: ConfigGeneratorAnswers, configDestPath: string) {
- 
+
     const templateFile = path.join(__dirname, '..', 'src', 'config', 'main.ejs');
 
     const src_folders: string[] = []; // to go into the config file as the value of src_folders property.
@@ -609,26 +609,6 @@ export class NightwatchInit {
       Logger.info(`- ${webdriver}`);
     }
     Logger.info();
-
-    const driversDownloadedFromNPM: { [key: string]: string } = {
-      geckodriver: 'Firefox',
-      chromedriver: 'Chrome'
-    };
-
-    for (const webdriver of webdriversToInstall) {
-      if (webdriver in driversDownloadedFromNPM) {
-        Logger.info(`Installing webdriver for ${driversDownloadedFromNPM[webdriver]} (${webdriver})...`);
-        try {
-          execSync(`npm install ${webdriver} --save-dev`, {
-            stdio: ['inherit', 'pipe', 'inherit'],
-            cwd: this.rootDir
-          });
-          Logger.info(colors.green('Done!'), '\n');
-        } catch (err) {
-          Logger.error(`Failed to install ${webdriver}. Please run 'npm install ${webdriver} --save-dev' later.\n`);
-        }
-      }
-    }
 
     if (webdriversToInstall.includes('safaridriver')) {
       try {
@@ -795,7 +775,7 @@ export class NightwatchInit {
     }
 
     const templatesSrcPath = path.join(__dirname, '..', 'assets', 'templates');
-    
+
     copy(templatesSrcPath, templatesDestPath);
 
     Logger.info(
@@ -813,7 +793,7 @@ export class NightwatchInit {
           configFileName = this.otherInfo.nonDefaultConfigName;
         }
         Logger.info(
-          `To run tests on your remote device, please set the ${colors.magenta('host')} and ${colors.magenta('port')} property in your ${configFileName} file.` 
+          `To run tests on your remote device, please set the ${colors.magenta('host')} and ${colors.magenta('port')} property in your ${configFileName} file.`
         );
         Logger.info('These can be located at:');
         Logger.info(
@@ -857,7 +837,7 @@ export class NightwatchInit {
     // Join Discord and GitHub
     Logger.info('💬 Join our Discord community to find answers to your issues or queries. Or just join and say hi.');
     Logger.info(colors.cyan('   https://discord.gg/SN8Da2X'), '\n');
-  
+
     let exampleCommandsShared = false;
 
     let configFlag = '';
@@ -1060,7 +1040,7 @@ export class NightwatchInit {
               commands.push(`    ${colors.cyan(mobileExampleCommand(envFlag))}${newline}`);
             }
           }
-          
+
           if (isAppTestingSetup(answers) && answers.runner !== Runner.Cucumber) {
             commands.push('  For mobile app tests, run:');
             const envFlag = ' --env app.android.real';
@@ -1092,7 +1072,7 @@ export class NightwatchInit {
         };
 
         const testCommands = `Once setup is complete...\n\n${realAndroidTestCommand()}\n\n${emulatorAndroidTestCommand()}`;
-        
+
         if (!mobileHelperResult.android) {
           // mobileHelperResult.android is undefined or false
           Logger.error(
@@ -1133,7 +1113,7 @@ export class NightwatchInit {
           }
         }
       }
-    
+
       if (['ios', 'both'].includes(answers.mobilePlatform)) {
         const setupHelp = 'Please follow the guide above to complete the setup.\n\nOr, re-run the following commands:';
 
@@ -1150,7 +1130,7 @@ export class NightwatchInit {
             commands.push('  For mobile web tests, run:');
             commands.push(`    ${colors.cyan(mobileExampleCommand(' --env ios.real.safari'))}`);
           }
-          
+
           if (isAppTestingSetup(answers) && answers.runner !== Runner.Cucumber) {
             commands.push('  For mobile app tests, run:');
             commands.push(`    ${colors.cyan(appExampleCommand(' --env app.ios.real', 'ios'))}`);
@@ -1188,11 +1168,11 @@ export class NightwatchInit {
           if (mobileHelperResult.ios.real) {
             Logger.info(realIosTestCommand(), '\n');
           }
-          
+
           if (mobileHelperResult.ios.simulator) {
             Logger.info(simulatorIosTestCommand(), '\n');
           }
-  
+
           if (!mobileHelperResult.ios.real || !mobileHelperResult.ios.simulator) {
             Logger.error(
               boxen(`${colors.yellow(
@@ -1203,7 +1183,7 @@ export class NightwatchInit {
         }
       }
     }
-    
+
     if (!exampleCommandsShared && isRemoteMobileTestingSetup(answers) && answers.cloudProvider === 'browserstack') {
       // no other test run commands are printed and remote with mobile (web/app) is selected.
 
