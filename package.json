@@ -11,8 +11,8 @@
     "prepublishOnly": "tsc --outDir dist",
     "create-nightwatch": "tsc && node dev-run.js",
     "esbuild": "esbuild --bundle src/index.ts --outdir=dist --platform=node --target=ES2019",
-    "test:unit": "npx nightwatch test/unit_tests",
-    "test:e2e": "npx nightwatch test/e2e_tests"
+    "test:unit": "npm run build && npx nightwatch test/unit_tests",
+    "test:e2e": "npm run build && npx nightwatch test/e2e_tests"
   },
   "keywords": [],
   "author": "Priyansh Garg",
