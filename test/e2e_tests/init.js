@@ -2,8 +2,8 @@ const assert = require('assert');
 const mockery = require('mockery');
 const fs = require('node:fs');
 const path = require('path');
-const {execSync} = require('child_process');
-const {rmDirSync} = require('../../lib/utils');
+const { execSync } = require('child_process');
+const { rmDirSync } = require('../../lib/utils');
 const nock = require('nock');
 
 const rootDir = path.join(process.cwd(), 'test_output');
@@ -26,26 +26,26 @@ function mockLogger(consoleOutput) {
 }
 
 
-describe('e2e tests for init', function() {
-  before(function() {
+describe('e2e tests for init', function () {
+  before(function () {
     if (!nock.isActive()) {
       nock.activate();
     }
   });
 
-  after(function() {
+  after(function () {
     nock.cleanAll();
     nock.restore();
   });
 
-  beforeEach(function() {
+  beforeEach(function () {
     rmDirSync(rootDir);
 
-    mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
+    mockery.enable({ useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false });
 
     if (!fs.existsSync(path.join(rootDir, 'package.json'))) {
       if (!fs.existsSync(rootDir)) {
-        fs.mkdirSync(rootDir, {recursive: true});
+        fs.mkdirSync(rootDir, { recursive: true });
       }
       execSync('npm init -y', {
         stdio: 'pipe',
@@ -54,13 +54,13 @@ describe('e2e tests for init', function() {
     }
   });
 
-  afterEach(function() {
+  afterEach(function () {
     mockery.deregisterAll();
     mockery.resetCache();
     mockery.disable();
   });
 
-  it('with js-nightwatch-local', async function() {
+  it('with js-nightwatch-local', async function () {
     const consoleOutput = [];
     mockLogger(consoleOutput);
 
@@ -74,7 +74,7 @@ describe('e2e tests for init', function() {
     mockery.registerMock('inquirer', {
       prompt(questions) {
         if (questions[0].name === 'safaridriver') {
-          return {safaridriver: true};
+          return { safaridriver: true };
         } else {
           return {};
         }
@@ -101,14 +101,14 @@ describe('e2e tests for init', function() {
       allowAnonymousMetrics: false
     };
 
-    const {NightwatchInit} = require('../../lib/init');
+    const { NightwatchInit } = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, []);
 
-    nightwatchInit.askQuestions = function() {
+    nightwatchInit.askQuestions = function () {
       return answers;
     };
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestPath = function() {
+    nightwatchInit.getConfigDestPath = function () {
       return configPath;
     };
 
@@ -213,7 +213,7 @@ describe('e2e tests for init', function() {
 
   });
 
-  it('with js-cucumber-remote', async function() {
+  it('with js-cucumber-remote', async function () {
     const consoleOutput = [];
     mockLogger(consoleOutput);
 
@@ -227,7 +227,7 @@ describe('e2e tests for init', function() {
     mockery.registerMock('inquirer', {
       prompt(questions) {
         if (questions[0].name === 'safaridriver') {
-          return {safaridriver: true};
+          return { safaridriver: true };
         } else {
           return {};
         }
@@ -256,10 +256,10 @@ describe('e2e tests for init', function() {
       allowAnonymousMetrics: false
     };
 
-    const {NightwatchInit} = require('../../lib/init');
+    const { NightwatchInit } = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, []);
 
-    nightwatchInit.askQuestions = function() {
+    nightwatchInit.askQuestions = function () {
       return answers;
     };
     const configPath = path.join(rootDir, 'nightwatch.conf.cjs');
@@ -361,7 +361,7 @@ describe('e2e tests for init', function() {
 
   });
 
-  it('with js-mocha-both-app', async function() {
+  it('with js-mocha-both-app', async function () {
     const consoleOutput = [];
     mockLogger(consoleOutput);
 
@@ -375,7 +375,7 @@ describe('e2e tests for init', function() {
     mockery.registerMock('inquirer', {
       prompt(questions) {
         if (questions[0].name === 'safaridriver') {
-          return {safaridriver: true};
+          return { safaridriver: true };
         } else {
           return {};
         }
@@ -425,7 +425,7 @@ describe('e2e tests for init', function() {
     });
 
     // Create a folder in the 'tests' folder, to make it non-empty.
-    fs.mkdirSync(path.join(rootDir, 'tests', 'sample'), {recursive: true});
+    fs.mkdirSync(path.join(rootDir, 'tests', 'sample'), { recursive: true });
 
     const answers = {
       testingType: ['component', 'app'],
@@ -441,14 +441,14 @@ describe('e2e tests for init', function() {
       allowAnonymousMetrics: false
     };
 
-    const {NightwatchInit} = require('../../lib/init');
+    const { NightwatchInit } = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, []);
 
-    nightwatchInit.askQuestions = function() {
+    nightwatchInit.askQuestions = function () {
       return answers;
     };
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestPath = function() {
+    nightwatchInit.getConfigDestPath = function () {
       return configPath;
     };
 
@@ -542,7 +542,7 @@ describe('e2e tests for init', function() {
     assert.strictEqual(commandsExecuted[3], 'npm install @nightwatch/mobile-helper --save-dev');
 
     // Test mobile-helper setup
-    assert.deepStrictEqual(androidSetupOptions, {browsers: [], appium: true});
+    assert.deepStrictEqual(androidSetupOptions, { browsers: [], appium: true });
 
     // Test examples copied
     const examplesPath = path.join(rootDir, answers.examplesLocation);
@@ -607,7 +607,7 @@ describe('e2e tests for init', function() {
 
   });
 
-  it('with ts-nightwatch-remote-mobile-app', async function() {
+  it('with ts-nightwatch-remote-mobile-app', async function () {
     const consoleOutput = [];
     mockLogger(consoleOutput);
 
@@ -621,7 +621,7 @@ describe('e2e tests for init', function() {
     mockery.registerMock('inquirer', {
       prompt(questions) {
         if (questions[0].name === 'safaridriver') {
-          return {safaridriver: true};
+          return { safaridriver: true };
         } else {
           return {};
         }
@@ -644,7 +644,7 @@ describe('e2e tests for init', function() {
     };
 
     // Create an empty 'tests' folder in the rootDir.
-    fs.mkdirSync(path.join(rootDir, 'tests'), {recursive: true});
+    fs.mkdirSync(path.join(rootDir, 'tests'), { recursive: true });
 
     const answers = {
       testingType: ['e2e', 'app'],
@@ -660,14 +660,14 @@ describe('e2e tests for init', function() {
       mobile: true
     };
 
-    const {NightwatchInit} = require('../../lib/init');
+    const { NightwatchInit } = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, []);
 
-    nightwatchInit.askQuestions = function() {
+    nightwatchInit.askQuestions = function () {
       return answers;
     };
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestPath = function() {
+    nightwatchInit.getConfigDestPath = function () {
       return configPath;
     };
 
@@ -718,13 +718,12 @@ describe('e2e tests for init', function() {
     ]);
 
     // Test Packages and webdrivers installed
-    assert.strictEqual(commandsExecuted.length, 6);
+    assert.strictEqual(commandsExecuted.length, 5);
     assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[1], 'npm install typescript --save-dev');
-    assert.strictEqual(commandsExecuted[2], 'npm install @types/nightwatch --save-dev');
-    assert.strictEqual(commandsExecuted[3], 'npm install ts-node --save-dev');
-    assert.strictEqual(commandsExecuted[4], 'npx tsc --init');
-    assert.strictEqual(commandsExecuted[5], 'npx nightwatch --version');
+    assert.strictEqual(commandsExecuted[2], 'npm install ts-node --save-dev');
+    assert.strictEqual(commandsExecuted[3], 'npx tsc --init');
+    assert.strictEqual(commandsExecuted[4], 'npx nightwatch --version');
 
     // Test examples copied
     const examplesPath = path.join(rootDir, answers.examplesLocation);
@@ -738,7 +737,6 @@ describe('e2e tests for init', function() {
     const output = consoleOutput.toString();
     assert.strictEqual(output.includes('Installing nightwatch'), true);
     assert.strictEqual(output.includes('Installing typescript'), true);
-    assert.strictEqual(output.includes('Installing @types/nightwatch'), true);
     assert.strictEqual(output.includes('Generating example files...'), true);
     assert.strictEqual(
       output.includes('Success! Generated some example files at \'nightwatch\'.'),
@@ -783,7 +781,7 @@ describe('e2e tests for init', function() {
 
   });
 
-  it('with ts-mocha-both-browserstack-mobile and non-default config', async function() {
+  it('with ts-mocha-both-browserstack-mobile and non-default config', async function () {
     const consoleOutput = [];
     mockLogger(consoleOutput);
 
@@ -797,7 +795,7 @@ describe('e2e tests for init', function() {
     mockery.registerMock('inquirer', {
       prompt(questions) {
         if (questions[0].name === 'safaridriver') {
-          return {safaridriver: false};
+          return { safaridriver: false };
         } else {
           return {};
         }
@@ -844,8 +842,8 @@ describe('e2e tests for init', function() {
 
     // Create a non-empty 'tests' folder as well as a non-empty
     // 'nightwatch' folder in the rootDir.
-    fs.mkdirSync(path.join(rootDir, 'tests', 'sample'), {recursive: true});
-    fs.mkdirSync(path.join(rootDir, 'nightwatch', 'sample'), {recursive: true});
+    fs.mkdirSync(path.join(rootDir, 'tests', 'sample'), { recursive: true });
+    fs.mkdirSync(path.join(rootDir, 'nightwatch', 'sample'), { recursive: true });
 
     const answers = {
       testingType: ['e2e'],
@@ -861,16 +859,16 @@ describe('e2e tests for init', function() {
       mobile: true
     };
 
-    const {NightwatchInit} = require('../../lib/init');
+    const { NightwatchInit } = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, []);
 
-    nightwatchInit.askQuestions = function() {
+    nightwatchInit.askQuestions = function () {
       return answers;
     };
 
     const configFileName = 'new-config.conf.js';
     const configPath = path.join(rootDir, configFileName);
-    nightwatchInit.getConfigDestPath = function() {
+    nightwatchInit.getConfigDestPath = function () {
       nightwatchInit.otherInfo.nonDefaultConfigName = configFileName;
 
       return configPath;
@@ -901,7 +899,7 @@ describe('e2e tests for init', function() {
     assert.strictEqual(answers.examplesLocation, 'nightwatch');
 
     // Test info passed
-    assert.deepStrictEqual(androidSetupOptionsPassed, {browsers: browsers});
+    assert.deepStrictEqual(androidSetupOptionsPassed, { browsers: browsers });
     assert.strictEqual(androidSetupRootDirPassed, rootDir);
 
     // Test otherInfo
@@ -958,13 +956,12 @@ describe('e2e tests for init', function() {
     }
 
     // Test Packages and webdrivers installed
-    assert.strictEqual(commandsExecuted.length, 7);
+    assert.strictEqual(commandsExecuted.length, 6);
     assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[1], 'npm install typescript --save-dev');
-    assert.strictEqual(commandsExecuted[2], 'npm install @types/nightwatch --save-dev');
-    assert.strictEqual(commandsExecuted[3], 'npm install ts-node --save-dev');
-    assert.strictEqual(commandsExecuted[4], 'npm install @nightwatch/mobile-helper --save-dev');
-    assert.strictEqual(commandsExecuted[5], 'npx tsc --init');
+    assert.strictEqual(commandsExecuted[2], 'npm install ts-node --save-dev');
+    assert.strictEqual(commandsExecuted[3], 'npm install @nightwatch/mobile-helper --save-dev');
+    assert.strictEqual(commandsExecuted[4], 'npx tsc --init');
 
     // Test examples copied
     const examplesPath = path.join(rootDir, answers.examplesLocation);
@@ -978,7 +975,6 @@ describe('e2e tests for init', function() {
     const output = consoleOutput.toString();
     assert.strictEqual(output.includes('Installing nightwatch'), true);
     assert.strictEqual(output.includes('Installing typescript'), true);
-    assert.strictEqual(output.includes('Installing @types/nightwatch'), true);
     assert.strictEqual(output.includes('Installing @nightwatch/mobile-helper'), true);
     if (process.platform === 'darwin') {
       assert.strictEqual(
@@ -1035,7 +1031,7 @@ describe('e2e tests for init', function() {
 
   });
 
-  it('with yes and browser flag', async function() {
+  it('with yes and browser flag', async function () {
     const consoleOutput = [];
     mockLogger(consoleOutput);
 
@@ -1049,7 +1045,7 @@ describe('e2e tests for init', function() {
     mockery.registerMock('inquirer', {
       prompt(questions) {
         if (questions[0].name === 'safaridriver') {
-          return {safaridriver: true};
+          return { safaridriver: true };
         } else {
           return {};
         }
@@ -1068,7 +1064,7 @@ describe('e2e tests for init', function() {
     const answers = require('../../lib/defaults.json');
     mockery.registerMock('./defaults.json', answers);
 
-    const {NightwatchInit} = require('../../lib/init');
+    const { NightwatchInit } = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, {
       'generate-config': false,
       yes: true,
@@ -1076,7 +1072,7 @@ describe('e2e tests for init', function() {
     });
 
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestPath = function() {
+    nightwatchInit.getConfigDestPath = function () {
       return configPath;
     };
 
@@ -1176,7 +1172,7 @@ describe('e2e tests for init', function() {
     rmDirSync(rootDir);
   });
 
-  it('with yes, browser and mobile flag', async function() {
+  it('with yes, browser and mobile flag', async function () {
     const consoleOutput = [];
     mockLogger(consoleOutput);
 
@@ -1190,7 +1186,7 @@ describe('e2e tests for init', function() {
     mockery.registerMock('inquirer', {
       prompt(questions) {
         if (questions[0].name === 'safaridriver') {
-          return {safaridriver: true};
+          return { safaridriver: true };
         } else {
           return {};
         }
@@ -1233,7 +1229,7 @@ describe('e2e tests for init', function() {
     const answers = require('../../lib/defaultsMobile.json');
     mockery.registerMock('./defaultsMobile.json', answers);
 
-    const {NightwatchInit} = require('../../lib/init');
+    const { NightwatchInit } = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, {
       'generate-config': false,
       yes: true,
@@ -1242,7 +1238,7 @@ describe('e2e tests for init', function() {
     });
 
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestPath = function() {
+    nightwatchInit.getConfigDestPath = function () {
       return configPath;
     };
 
@@ -1377,7 +1373,7 @@ describe('e2e tests for init', function() {
     rmDirSync(rootDir);
   });
 
-  it('with yes, and native flag', async function() {
+  it('with yes, and native flag', async function () {
     const consoleOutput = [];
     mockLogger(consoleOutput);
 
@@ -1424,7 +1420,7 @@ describe('e2e tests for init', function() {
     const answers = require('../../lib/defaultsApp.json');
     mockery.registerMock('./defaultsApp.json', answers);
 
-    const {NightwatchInit} = require('../../lib/init');
+    const { NightwatchInit } = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, {
       'generate-config': false,
       yes: true,
@@ -1432,7 +1428,7 @@ describe('e2e tests for init', function() {
     });
 
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestPath = function() {
+    nightwatchInit.getConfigDestPath = function () {
       return configPath;
     };
 
@@ -1490,7 +1486,7 @@ describe('e2e tests for init', function() {
     assert.strictEqual(commandsExecuted[3], 'npx nightwatch --version');
 
     // Test mobile-helper setup
-    assert.deepStrictEqual(androidSetupOptions, {browsers: [], appium: true});
+    assert.deepStrictEqual(androidSetupOptions, { browsers: [], appium: true });
 
     // Test examples copied
     const examplesPath = path.join(rootDir, answers.examplesLocation);
@@ -1530,7 +1526,7 @@ describe('e2e tests for init', function() {
     rmDirSync(rootDir);
   });
 
-  it('generate-config with js-nightwatch-local and seleniumServer false', async function() {
+  it('generate-config with js-nightwatch-local and seleniumServer false', async function () {
     const consoleOutput = [];
     mockLogger(consoleOutput);
 
@@ -1544,7 +1540,7 @@ describe('e2e tests for init', function() {
     mockery.registerMock('inquirer', {
       prompt(questions) {
         if (questions[0].name === 'safaridriver') {
-          return {safaridriver: true};
+          return { safaridriver: true };
         } else {
           return {};
         }
@@ -1572,14 +1568,14 @@ describe('e2e tests for init', function() {
       allowAnonymousMetrics: false
     };
 
-    const {NightwatchInit} = require('../../lib/init');
-    const nightwatchInit = new NightwatchInit(rootDir, {'generate-config': true});
+    const { NightwatchInit } = require('../../lib/init');
+    const nightwatchInit = new NightwatchInit(rootDir, { 'generate-config': true });
 
-    nightwatchInit.askQuestions = function() {
+    nightwatchInit.askQuestions = function () {
       return answers;
     };
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestPath = function() {
+    nightwatchInit.getConfigDestPath = function () {
       return configPath;
     };
 
@@ -1656,7 +1652,7 @@ describe('e2e tests for init', function() {
 
   });
 
-  it('generate-config with ts-nightwatch-both', async function() {
+  it('generate-config with ts-nightwatch-both', async function () {
     const consoleOutput = [];
     mockLogger(consoleOutput);
 
@@ -1670,7 +1666,7 @@ describe('e2e tests for init', function() {
     mockery.registerMock('inquirer', {
       prompt(questions) {
         if (questions[0].name === 'safaridriver') {
-          return {safaridriver: true};
+          return { safaridriver: true };
         } else {
           return {};
         }
@@ -1699,14 +1695,14 @@ describe('e2e tests for init', function() {
       allowAnonymousMetrics: false
     };
 
-    const {NightwatchInit} = require('../../lib/init');
-    const nightwatchInit = new NightwatchInit(rootDir, {'generate-config': true});
+    const { NightwatchInit } = require('../../lib/init');
+    const nightwatchInit = new NightwatchInit(rootDir, { 'generate-config': true });
 
-    nightwatchInit.askQuestions = function() {
+    nightwatchInit.askQuestions = function () {
       return answers;
     };
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestPath = function() {
+    nightwatchInit.getConfigDestPath = function () {
       return configPath;
     };
 
@@ -1760,17 +1756,15 @@ describe('e2e tests for init', function() {
     ]);
 
     // Test Packages and webdrivers installed
-    assert.strictEqual(commandsExecuted.length, 4);
+    assert.strictEqual(commandsExecuted.length, 3);
     assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
     assert.strictEqual(commandsExecuted[1], 'npm install typescript --save-dev');
-    assert.strictEqual(commandsExecuted[2], 'npm install @types/nightwatch --save-dev');
-    assert.strictEqual(commandsExecuted[3], 'npm install ts-node --save-dev');
+    assert.strictEqual(commandsExecuted[2], 'npm install ts-node --save-dev');
 
     // Test console output
     const output = consoleOutput.toString();
     assert.strictEqual(output.includes('Installing nightwatch'), true);
     assert.strictEqual(output.includes('Installing typescript'), true);
-    assert.strictEqual(output.includes('Installing @types/nightwatch'), true);
     assert.strictEqual(
       output.includes(`Success! Configuration file generated at: "${path.join(rootDir, 'nightwatch.conf.js')}"`),
       true
@@ -1779,7 +1773,7 @@ describe('e2e tests for init', function() {
     rmDirSync(rootDir);
   });
 
-  it('make sure we send analytics data if allowAnalytics is set to true', async function() {
+  it('make sure we send analytics data if allowAnalytics is set to true', async function () {
     const consoleOutput = [];
     mockLogger(consoleOutput);
 
@@ -1827,22 +1821,22 @@ describe('e2e tests for init', function() {
         };
       });
 
-    const {NightwatchInit} = require('../../lib/init');
-    const nightwatchInit = new NightwatchInit(rootDir, {'generate-config': true});
+    const { NightwatchInit } = require('../../lib/init');
+    const nightwatchInit = new NightwatchInit(rootDir, { 'generate-config': true });
 
-    nightwatchInit.askQuestions = function() {
+    nightwatchInit.askQuestions = function () {
       return answers;
     };
 
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestPath = function() {
+    nightwatchInit.getConfigDestPath = function () {
       return configPath;
     };
 
     await nightwatchInit.run();
 
     new Promise(resolve => {
-      setTimeout(function() {
+      setTimeout(function () {
         assert.ok(scope.isDone());
         resolve();
       }, 0);
@@ -1851,7 +1845,7 @@ describe('e2e tests for init', function() {
     });
   });
 
-  it('make sure there are now errors even if analytics request fails', async function() {
+  it('make sure there are now errors even if analytics request fails', async function () {
     const consoleOutput = [];
     mockLogger(consoleOutput);
 
@@ -1882,22 +1876,22 @@ describe('e2e tests for init', function() {
         errno: 'ECONNREFUSED'
       });
 
-    const {NightwatchInit} = require('../../lib/init');
-    const nightwatchInit = new NightwatchInit(rootDir, {'generate-config': true});
+    const { NightwatchInit } = require('../../lib/init');
+    const nightwatchInit = new NightwatchInit(rootDir, { 'generate-config': true });
 
-    nightwatchInit.askQuestions = function() {
+    nightwatchInit.askQuestions = function () {
       return answers;
     };
 
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestPath = function() {
+    nightwatchInit.getConfigDestPath = function () {
       return configPath;
     };
 
     await nightwatchInit.run();
 
     new Promise(resolve => {
-      setTimeout(function() {
+      setTimeout(function () {
         assert.ok(scope.isDone());
         resolve();
       }, 0);
@@ -1906,7 +1900,7 @@ describe('e2e tests for init', function() {
     });
   });
 
-  it('make sure we do not send analytics data if allowAnalytics is set to false', async function() {
+  it('make sure we do not send analytics data if allowAnalytics is set to false', async function () {
     const consoleOutput = [];
     mockLogger(consoleOutput);
 
@@ -1936,15 +1930,15 @@ describe('e2e tests for init', function() {
         assert.fail();
       });
 
-    const {NightwatchInit} = require('../../lib/init');
-    const nightwatchInit = new NightwatchInit(rootDir, {'generate-config': true});
+    const { NightwatchInit } = require('../../lib/init');
+    const nightwatchInit = new NightwatchInit(rootDir, { 'generate-config': true });
 
-    nightwatchInit.askQuestions = function() {
+    nightwatchInit.askQuestions = function () {
       return answers;
     };
 
     const configPath = path.join(rootDir, 'nightwatch.conf.js');
-    nightwatchInit.getConfigDestPath = function() {
+    nightwatchInit.getConfigDestPath = function () {
       return configPath;
     };
 

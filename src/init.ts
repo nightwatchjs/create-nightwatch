@@ -336,7 +336,7 @@ export class NightwatchInit {
     const packages: string[] = ['nightwatch'];
 
     if (answers.language === 'ts') {
-      packages.push('typescript', '@types/nightwatch', 'ts-node');
+      packages.push('typescript', 'ts-node');
     }
 
     if (answers.runner === Runner.Cucumber) {

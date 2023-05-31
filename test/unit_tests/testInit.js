@@ -22,26 +22,26 @@ function mockLogger(consoleOutput) {
 
 const rootDir = path.join(process.cwd(), 'test_output');
 
-describe('init tests', function() {
-  describe('test askQuestions', function() {
-    beforeEach(function() {
-      mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
+describe('init tests', function () {
+  describe('test askQuestions', function () {
+    beforeEach(function () {
+      mockery.enable({ useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false });
     });
 
-    afterEach(function() {
+    afterEach(function () {
       mockery.deregisterAll();
       mockery.resetCache();
       mockery.disable();
     });
 
-    it('if answers passed to inquirer contains rootDir and onlyConfig by default', async function() {
+    it('if answers passed to inquirer contains rootDir and onlyConfig by default', async function () {
       mockery.registerMock('inquirer', {
         async prompt(questions, answers) {
           return answers;
         }
       });
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, {});
       const answers = await nightwatchInit.askQuestions();
 
@@ -52,14 +52,14 @@ describe('init tests', function() {
       assert.strictEqual(answers['browsers'], undefined);
     });
 
-    it('answers passed to inquirer also contains browsers, mobile and native when flags passed', async function() {
+    it('answers passed to inquirer also contains browsers, mobile and native when flags passed', async function () {
       mockery.registerMock('inquirer', {
         async prompt(questions, answers) {
           return answers;
         }
       });
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, {
         browser: ['firefox'],
         mobile: true,
@@ -79,18 +79,18 @@ describe('init tests', function() {
       assert.strictEqual(answers['native'], true);
     });
 
-    it('answers passed to inquirer contains correct property when mobile flag passed with wrong type', async function() {
+    it('answers passed to inquirer contains correct property when mobile flag passed with wrong type', async function () {
       mockery.registerMock('inquirer', {
         async prompt(questions, answers) {
           return answers;
         }
       });
 
-      const {NightwatchInit} = require('../../lib/init');
-      const nightwatchInit = new NightwatchInit(rootDir, {browser: ['firefox'], mobile: 'random'});
+      const { NightwatchInit } = require('../../lib/init');
+      const nightwatchInit = new NightwatchInit(rootDir, { browser: ['firefox'], mobile: 'random' });
       const answers = await nightwatchInit.askQuestions();
 
-      
+
       assert.deepStrictEqual(Object.keys(answers), ['rootDir', 'onlyConfig', 'browsers', 'mobile']);
 
       assert.strictEqual(answers['rootDir'], rootDir);
@@ -100,26 +100,26 @@ describe('init tests', function() {
     });
   });
 
-  describe('test refineAnswers', function() {
-    beforeEach(function() {
-      mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
+  describe('test refineAnswers', function () {
+    beforeEach(function () {
+      mockery.enable({ useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false });
     });
 
-    afterEach(function() {
+    afterEach(function () {
       mockery.deregisterAll();
       mockery.resetCache();
       mockery.disable();
     });
 
-    it('with just both in answers', function() {
+    it('with just both in answers', function () {
       mockery.registerMock('node:fs', {
         existsSync: () => false
       });
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
-      let answers = {backend: 'both'};
+      let answers = { backend: 'both' };
       nightwatchInit.refineAnswers(answers);
       assert.strictEqual('browsers' in answers, true);
       assert.strictEqual('remoteBrowsers' in answers, true);
@@ -150,12 +150,12 @@ describe('init tests', function() {
       assert.strictEqual(answers['baseUrl'], '');
     });
 
-    it('with local, seleniumServer and no mobile and testsLocation (non-existent) in answers', function() {
+    it('with local, seleniumServer and no mobile and testsLocation (non-existent) in answers', function () {
       mockery.registerMock('node:fs', {
         existsSync: () => false
       });
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       let answers = {
@@ -183,7 +183,7 @@ describe('init tests', function() {
       assert.strictEqual('baseUrl' in answers, true);
 
       const browsers = ['firefox', 'chrome', 'edge', 'safari'];
-      if (process.platform !== 'darwin') {browsers.splice(3, 1)}
+      if (process.platform !== 'darwin') { browsers.splice(3, 1) }
       assert.deepEqual(answers['browsers'], browsers);
 
       assert.deepEqual(answers['mobileBrowsers'], []);
@@ -195,12 +195,12 @@ describe('init tests', function() {
       assert.strictEqual(answers['baseUrl'], 'http://localhost');
     });
 
-    it('with local, mobile with no mobileBrowsers, and app testing', function() {
+    it('with local, mobile with no mobileBrowsers, and app testing', function () {
       mockery.registerMock('node:fs', {
         existsSync: () => false
       });
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       let answers = {
@@ -227,11 +227,11 @@ describe('init tests', function() {
       assert.strictEqual('baseUrl' in answers, true);
 
       const browsers = ['chrome', 'firefox', 'edge', 'safari'];
-      if (process.platform !== 'darwin') {browsers.splice(3, 1)}
+      if (process.platform !== 'darwin') { browsers.splice(3, 1) }
       assert.deepEqual(answers['browsers'], browsers);
 
       const mobileBrowsers = ['chrome', 'firefox', 'safari'];
-      if (process.platform !== 'darwin') {mobileBrowsers.splice(2, 1)}
+      if (process.platform !== 'darwin') { mobileBrowsers.splice(2, 1) }
       assert.deepEqual(answers['mobileBrowsers'], mobileBrowsers);
 
       assert.strictEqual(answers['defaultBrowser'], 'chrome');
@@ -246,12 +246,12 @@ describe('init tests', function() {
       assert.strictEqual(answers['baseUrl'], '');
     });
 
-    it('with local and mobile with mobile flag and app testing', function() {
+    it('with local and mobile with mobile flag and app testing', function () {
       mockery.registerMock('node:fs', {
         existsSync: () => false
       });
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       let answers = {
@@ -295,12 +295,12 @@ describe('init tests', function() {
       }
     });
 
-    it('with local and app testing only', function() {
+    it('with local and app testing only', function () {
       mockery.registerMock('node:fs', {
         existsSync: () => false
       });
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       let answers = {
@@ -334,13 +334,13 @@ describe('init tests', function() {
       assert.strictEqual(answers['mobilePlatform'], 'android');
     });
 
-    it('with remote (browserstack) and testsLocation (exist but empty) in answers', function() {
+    it('with remote (browserstack) and testsLocation (exist but empty) in answers', function () {
       mockery.registerMock('node:fs', {
         existsSync: () => true,
         readdirSync: () => []
       });
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       let answers = {
@@ -379,13 +379,13 @@ describe('init tests', function() {
       assert.strictEqual(answers['baseUrl'], '');
     });
 
-    it('with remote (saucelabs) and mobile and testsLocation (exist and non-empty) in answers', function() {
+    it('with remote (saucelabs) and mobile and testsLocation (exist and non-empty) in answers', function () {
       mockery.registerMock('node:fs', {
         existsSync: () => true,
         readdirSync: () => ['file.txt']
       });
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       let answers = {
@@ -426,12 +426,12 @@ describe('init tests', function() {
       assert.strictEqual(answers['baseUrl'], 'http://localhost');
     });
 
-    it('with remote (other) in answers and onlyConfig flag and mobile with mobile flag', function() {
+    it('with remote (other) in answers and onlyConfig flag and mobile with mobile flag', function () {
       mockery.registerMock('node:fs', {
         existsSync: () => false
       });
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       let answers = {
@@ -466,8 +466,8 @@ describe('init tests', function() {
       assert.strictEqual(answers['remoteEnv'].access_key, 'REMOTE_ACCESS_KEY');
     });
 
-    it('with both (remote - other) and cucumber runner and seleniumServer false', function() {
-      const {NightwatchInit} = require('../../lib/init');
+    it('with both (remote - other) and cucumber runner and seleniumServer false', function () {
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       let answers = {
@@ -510,8 +510,8 @@ describe('init tests', function() {
       assert.strictEqual(answers['baseUrl'], '');
     });
 
-    it('with both (remote - other) and mobile with mobile flag', function() {
-      const {NightwatchInit} = require('../../lib/init');
+    it('with both (remote - other) and mobile with mobile flag', function () {
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       let answers = {
@@ -557,13 +557,13 @@ describe('init tests', function() {
       assert.strictEqual(answers['examplesLocation'], 'nightwatch');
     });
 
-    it('with remote (browserstack) and app testing only', function() {
+    it('with remote (browserstack) and app testing only', function () {
       mockery.registerMock('node:fs', {
         existsSync: () => true,
         readdirSync: () => []
       });
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       let answers = {
@@ -608,12 +608,12 @@ describe('init tests', function() {
       assert.strictEqual(answers['baseUrl'], '');
     });
 
-    it('when component testing is not selected', function() {
+    it('when component testing is not selected', function () {
       mockery.registerMock('node:fs', {
         existsSync: () => false
       });
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       let answers = {};
@@ -622,12 +622,12 @@ describe('init tests', function() {
       assert.strictEqual('uiFramework' in answers, false);
     });
 
-    it('when react is selected as uiFramework', function() {
+    it('when react is selected as uiFramework', function () {
       mockery.registerMock('node:fs', {
         existsSync: () => false
       });
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       let answers = {
@@ -640,12 +640,12 @@ describe('init tests', function() {
       assert.strictEqual(answers['uiFramework'], 'react');
     });
 
-    it('when vue is selected as uiFramework', function() {
+    it('when vue is selected as uiFramework', function () {
       mockery.registerMock('node:fs', {
         existsSync: () => false
       });
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       let answers = {
@@ -658,12 +658,12 @@ describe('init tests', function() {
       assert.strictEqual(answers['uiFramework'], 'vue');
     });
 
-    it('when storybook is selected as uiFramework', function() {
+    it('when storybook is selected as uiFramework', function () {
       mockery.registerMock('node:fs', {
         existsSync: () => false
       });
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       let answers = {
@@ -677,18 +677,18 @@ describe('init tests', function() {
     });
   });
 
-  describe('test identifyPackagesToInstall', function() {
-    beforeEach(function() {
-      mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
+  describe('test identifyPackagesToInstall', function () {
+    beforeEach(function () {
+      mockery.enable({ useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false });
     });
 
-    afterEach(function() {
+    afterEach(function () {
       mockery.deregisterAll();
       mockery.resetCache();
       mockery.disable();
     });
 
-    it('correct packages are installed with ts-mocha-seleniumServer-mobile', function() {
+    it('correct packages are installed with ts-mocha-seleniumServer-mobile', function () {
       mockery.registerMock('node:fs', {
         readFileSync(path, encoding) {
           return `{
@@ -708,20 +708,19 @@ describe('init tests', function() {
         mobile: true
       };
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       const packagesToInstall = nightwatchInit.identifyPackagesToInstall(answers);
 
-      assert.strictEqual(packagesToInstall.length, 5);
+      assert.strictEqual(packagesToInstall.length, 4);
       assert.strictEqual(packagesToInstall.includes('nightwatch'), true);
-      assert.strictEqual(packagesToInstall.includes('@types/nightwatch'), true);
       assert.strictEqual(packagesToInstall.includes('ts-node'), true);
       assert.strictEqual(packagesToInstall.includes('@nightwatch/selenium-server'), true);
       assert.strictEqual(packagesToInstall.includes('@nightwatch/mobile-helper'), true);
     });
 
-    it('correct packages are installed with js-cucumber-plugins-mobile-app with backend remote', function() {
+    it('correct packages are installed with js-cucumber-plugins-mobile-app with backend remote', function () {
       mockery.registerMock('node:fs', {
         readFileSync(path, encoding) {
           return `{
@@ -741,7 +740,7 @@ describe('init tests', function() {
         mobile: true
       };
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       const packagesToInstall = nightwatchInit.identifyPackagesToInstall(answers);
@@ -753,7 +752,7 @@ describe('init tests', function() {
       assert.strictEqual(packagesToInstall.includes('@nightwatch/storybook'), true);
     });
 
-    it('correct packages are installed with js,app-testing in backend both and @nightwatch/mobile-helper always updated', function() {
+    it('correct packages are installed with js,app-testing in backend both and @nightwatch/mobile-helper always updated', function () {
       mockery.registerMock('node:fs', {
         readFileSync() {
           return `{
@@ -771,7 +770,7 @@ describe('init tests', function() {
         backend: 'both'
       };
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       const packagesToInstall = nightwatchInit.identifyPackagesToInstall(answers);
@@ -782,7 +781,7 @@ describe('init tests', function() {
       assert.strictEqual(packagesToInstall.includes('@nightwatch/mobile-helper'), true);
     });
 
-    it('correct packages are installed with ts-cucumber-seleniumServer without initial packages', function() {
+    it('correct packages are installed with ts-cucumber-seleniumServer without initial packages', function () {
       mockery.registerMock('node:fs', {
         readFileSync(path, encoding) {
           return '{}';
@@ -797,33 +796,32 @@ describe('init tests', function() {
         seleniumServer: true
       };
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       const packagesToInstall = nightwatchInit.identifyPackagesToInstall(answers);
 
-      assert.strictEqual(packagesToInstall.length, 6);
+      assert.strictEqual(packagesToInstall.length, 5);
       assert.strictEqual(packagesToInstall.includes('nightwatch'), true);
       assert.strictEqual(packagesToInstall.includes('typescript'), true);
-      assert.strictEqual(packagesToInstall.includes('@types/nightwatch'), true);
       assert.strictEqual(packagesToInstall.includes('ts-node'), true);
       assert.strictEqual(packagesToInstall.includes('@cucumber/cucumber'), true);
       assert.strictEqual(packagesToInstall.includes('@nightwatch/selenium-server'), true);
     });
   });
 
-  describe('test installPackages', function() {
-    beforeEach(function() {
-      mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
+  describe('test installPackages', function () {
+    beforeEach(function () {
+      mockery.enable({ useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false });
     });
 
-    afterEach(function() {
+    afterEach(function () {
       mockery.deregisterAll();
       mockery.resetCache();
       mockery.disable();
     });
 
-    it('packages are installed correctly with correct output', function() {
+    it('packages are installed correctly with correct output', function () {
       const consoleOutput = [];
       mockLogger(consoleOutput);
 
@@ -834,44 +832,42 @@ describe('init tests', function() {
         }
       });
 
-      const packagesToInstall = ['nightwatch', '@types/nightwatch', '@nightwatch/selenium-server', '@nightwatch/mobile-helper'];
+      const packagesToInstall = ['nightwatch', '@nightwatch/selenium-server', '@nightwatch/mobile-helper'];
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
       nightwatchInit.installPackages(packagesToInstall);
 
       // Check the commands executed
-      assert.strictEqual(commandsExecuted.length, 4);
+      assert.strictEqual(commandsExecuted.length, 3);
       assert.strictEqual(commandsExecuted[0], 'npm install nightwatch --save-dev');
-      assert.strictEqual(commandsExecuted[1], 'npm install @types/nightwatch --save-dev');
-      assert.strictEqual(commandsExecuted[2], 'npm install @nightwatch/selenium-server --save-dev');
-      assert.strictEqual(commandsExecuted[3], 'npm install @nightwatch/mobile-helper --save-dev');
+      assert.strictEqual(commandsExecuted[1], 'npm install @nightwatch/selenium-server --save-dev');
+      assert.strictEqual(commandsExecuted[2], 'npm install @nightwatch/mobile-helper --save-dev');
 
       const output = consoleOutput.toString();
       // 3 packages are installed
-      assert.strictEqual((output.match(/- /g) || []).length, 4);
-      assert.strictEqual((output.match(/Installing/g) || []).length, 5);
-      assert.strictEqual((output.match(/Done!/g) || []).length, 4);
+      assert.strictEqual((output.match(/- /g) || []).length, 3);
+      assert.strictEqual((output.match(/Installing/g) || []).length, 4);
+      assert.strictEqual((output.match(/Done!/g) || []).length, 3);
       // Check the packages installed
       assert.strictEqual(output.includes('nightwatch'), true);
-      assert.strictEqual(output.includes('@types/nightwatch'), true);
       assert.strictEqual(output.includes('@nightwatch/selenium-server'), true);
       assert.strictEqual(output.includes('@nightwatch/mobile-helper'), true);
     });
   });
 
-  describe('test setupTypesript', function() {
-    beforeEach(function() {
-      mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
+  describe('test setupTypesript', function () {
+    beforeEach(function () {
+      mockery.enable({ useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false });
     });
 
-    afterEach(function() {
+    afterEach(function () {
       mockery.deregisterAll();
       mockery.resetCache();
       mockery.disable();
     });
 
-    it('with both tsconfig not present', function() {
+    it('with both tsconfig not present', function () {
       let nwTsconfigCopied = false;
 
       mockery.registerMock('node:fs', {
@@ -890,7 +886,7 @@ describe('init tests', function() {
         }
       });
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       nightwatchInit.setupTypescript();
@@ -902,7 +898,7 @@ describe('init tests', function() {
       assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, '');
     });
 
-    it('with both tsconfig already present', function() {
+    it('with both tsconfig already present', function () {
       let nwTsconfigCopied = false;
 
       mockery.registerMock('node:fs', {
@@ -921,7 +917,7 @@ describe('init tests', function() {
         }
       });
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       nightwatchInit.setupTypescript();
@@ -931,7 +927,7 @@ describe('init tests', function() {
       assert.strictEqual(nightwatchInit.otherInfo.tsOutDir, '');
     });
 
-    it('with tsconfig.nightwatch.json already present', function() {
+    it('with tsconfig.nightwatch.json already present', function () {
       let nwTsconfigCopied = false;
 
       mockery.registerMock('node:fs', {
@@ -954,7 +950,7 @@ describe('init tests', function() {
         }
       });
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       nightwatchInit.setupTypescript();
@@ -967,18 +963,18 @@ describe('init tests', function() {
     });
   });
 
-  describe('test setupComponentTesting', function() {
-    beforeEach(function() {
-      mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
+  describe('test setupComponentTesting', function () {
+    beforeEach(function () {
+      mockery.enable({ useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false });
     });
 
-    afterEach(function() {
+    afterEach(function () {
       mockery.deregisterAll();
       mockery.resetCache();
       mockery.disable();
     });
 
-    it('generates index file for react', function() {
+    it('generates index file for react', function () {
       let newFolderPath = '';
       let reactIndexCopied = false;
       let reactIndexDestPath = '';
@@ -997,7 +993,7 @@ describe('init tests', function() {
         uiFramework: 'react'
       };
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       nightwatchInit.setupComponentTesting(answers);
@@ -1008,18 +1004,18 @@ describe('init tests', function() {
     });
   });
 
-  describe('test getConfigDestPath', function() {
-    beforeEach(function() {
-      mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
+  describe('test getConfigDestPath', function () {
+    beforeEach(function () {
+      mockery.enable({ useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false });
     });
 
-    afterEach(function() {
+    afterEach(function () {
       mockery.deregisterAll();
       mockery.resetCache();
       mockery.disable();
     });
 
-    it('if config file is not already present', async function() {
+    it('if config file is not already present', async function () {
       const consoleOutput = [];
       mockLogger(consoleOutput);
 
@@ -1032,7 +1028,7 @@ describe('init tests', function() {
         }
       });
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
       const configDestPath = await nightwatchInit.getConfigDestPath();
 
@@ -1043,7 +1039,7 @@ describe('init tests', function() {
       assert.strictEqual(nightwatchInit.otherInfo.usingESM, false);
     });
 
-    it('if config file is already present and overwrite in prompt', async function() {
+    it('if config file is already present and overwrite in prompt', async function () {
       const consoleOutput = [];
       mockLogger(consoleOutput);
 
@@ -1058,11 +1054,11 @@ describe('init tests', function() {
 
       mockery.registerMock('inquirer', {
         async prompt() {
-          return {overwrite: true};
+          return { overwrite: true };
         }
       });
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
       const configDestPath = await nightwatchInit.getConfigDestPath();
 
@@ -1073,7 +1069,7 @@ describe('init tests', function() {
       assert.strictEqual(nightwatchInit.otherInfo.usingESM, false);
     });
 
-    it('if config file is already present and new file in prompt', async function() {
+    it('if config file is already present and new file in prompt', async function () {
       const consoleOutput = [];
       mockLogger(consoleOutput);
 
@@ -1089,11 +1085,11 @@ describe('init tests', function() {
       const configFileNameInitials = 'new-config';
       mockery.registerMock('inquirer', {
         async prompt() {
-          return {overwrite: false, newFileName: configFileNameInitials};
+          return { overwrite: false, newFileName: configFileNameInitials };
         }
       });
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
       const configDestPath = await nightwatchInit.getConfigDestPath();
 
@@ -1105,7 +1101,7 @@ describe('init tests', function() {
       assert.strictEqual(nightwatchInit.otherInfo.usingESM, false);
     });
 
-    it('if config file is not already present (ESM)', async function() {
+    it('if config file is not already present (ESM)', async function () {
       const consoleOutput = [];
       mockLogger(consoleOutput);
 
@@ -1118,7 +1114,7 @@ describe('init tests', function() {
         }
       });
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
       const configDestPath = await nightwatchInit.getConfigDestPath();
 
@@ -1129,7 +1125,7 @@ describe('init tests', function() {
       assert.strictEqual(nightwatchInit.otherInfo.usingESM, true);
     });
 
-    it('if config file is already present and new file in prompt (ESM)', async function() {
+    it('if config file is already present and new file in prompt (ESM)', async function () {
       const consoleOutput = [];
       mockLogger(consoleOutput);
 
@@ -1148,15 +1144,15 @@ describe('init tests', function() {
         async prompt(questions, answers) {
           answersPassedToInquirer = answers;
 
-          return {overwrite: false, newFileName: configFileNameInitials};
+          return { overwrite: false, newFileName: configFileNameInitials };
         }
       });
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
       const configDestPath = await nightwatchInit.getConfigDestPath();
 
-      assert.deepStrictEqual(answersPassedToInquirer, {rootDir: rootDir, configExt: '.conf.cjs'});
+      assert.deepStrictEqual(answersPassedToInquirer, { rootDir: rootDir, configExt: '.conf.cjs' });
 
       const configFileName = `${configFileNameInitials}.conf.cjs`;
       const configExpPath = path.join(rootDir, configFileName);
@@ -1167,18 +1163,18 @@ describe('init tests', function() {
     });
   });
 
-  describe('test generateConfig', function() {
-    beforeEach(function() {
-      mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
+  describe('test generateConfig', function () {
+    beforeEach(function () {
+      mockery.enable({ useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false });
     });
 
-    afterEach(function() {
+    afterEach(function () {
       mockery.deregisterAll();
       mockery.resetCache();
       mockery.disable();
     });
 
-    it('generateConfig with js and without testsLocation and examplesLocation', function() {
+    it('generateConfig with js and without testsLocation and examplesLocation', function () {
       mockLogger([]);
 
       const answers = {
@@ -1192,7 +1188,7 @@ describe('init tests', function() {
         plugins: ['@nightwatch/react']
       };
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       nightwatchInit.generateConfig(answers, 'test_config.conf.js');
@@ -1212,7 +1208,7 @@ describe('init tests', function() {
       fs.unlinkSync('test_config.conf.js');
     });
 
-    it('generateConfig with js (local with mobile and app) and same testsLocation and examplesLocation', function() {
+    it('generateConfig with js (local with mobile and app) and same testsLocation and examplesLocation', function () {
       mockLogger([]);
 
       const answers = {
@@ -1230,7 +1226,7 @@ describe('init tests', function() {
         mobile: true
       };
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       nightwatchInit.generateConfig(answers, 'test_config.conf.js');
@@ -1261,7 +1257,7 @@ describe('init tests', function() {
       fs.unlinkSync('test_config.conf.js');
     });
 
-    it('generateConfig with js (local with mobile) with mobile flag', function() {
+    it('generateConfig with js (local with mobile) with mobile flag', function () {
       mockLogger([]);
 
       const answers = {
@@ -1278,7 +1274,7 @@ describe('init tests', function() {
         mobile: true
       };
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       nightwatchInit.generateConfig(answers, 'test_config.conf.js');
@@ -1312,7 +1308,7 @@ describe('init tests', function() {
       fs.unlinkSync('test_config.conf.js');
     });
 
-    it('generateConfig with js with different testsLocation and examplesLocation', function() {
+    it('generateConfig with js with different testsLocation and examplesLocation', function () {
       mockLogger([]);
 
       const answers = {
@@ -1336,7 +1332,7 @@ describe('init tests', function() {
         allowAnonymousMetrics: false
       };
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       nightwatchInit.generateConfig(answers, 'test_config.conf.js');
@@ -1368,7 +1364,7 @@ describe('init tests', function() {
       fs.unlinkSync('test_config.conf.js');
     });
 
-    it('generateConfig with js with cucumber and same testsLocation and examplesLocation', function() {
+    it('generateConfig with js with cucumber and same testsLocation and examplesLocation', function () {
       mockLogger([]);
 
       const answers = {
@@ -1393,7 +1389,7 @@ describe('init tests', function() {
         allowAnonymousMetrics: false
       };
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       nightwatchInit.generateConfig(answers, 'test_config.conf.js');
@@ -1427,7 +1423,7 @@ describe('init tests', function() {
       fs.unlinkSync('test_config.conf.js');
     });
 
-    it('generateConfig with js with cucumber (both and mobile with mobile flag) and different testsLocation and examplesLocation', function() {
+    it('generateConfig with js with cucumber (both and mobile with mobile flag) and different testsLocation and examplesLocation', function () {
       mockLogger([]);
 
       // can be converted to sauce once we have sauce mobile configs
@@ -1455,7 +1451,7 @@ describe('init tests', function() {
         mobile: true
       };
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       nightwatchInit.generateConfig(answers, 'test_config.conf.js');
@@ -1491,7 +1487,7 @@ describe('init tests', function() {
       fs.unlinkSync('test_config.conf.js');
     });
 
-    it('generateConfig with ts (remote with mobile) with testsLocation and examplesLocation', function() {
+    it('generateConfig with ts (remote with mobile) with testsLocation and examplesLocation', function () {
       mockLogger([]);
 
       const answers = {
@@ -1515,7 +1511,7 @@ describe('init tests', function() {
         mobile: true
       };
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
       nightwatchInit.otherInfo.tsOutDir = 'dist';
 
@@ -1550,7 +1546,7 @@ describe('init tests', function() {
       fs.unlinkSync('test_config.conf.js');
     });
 
-    it('generateConfig with js and app testing with allowAnonymousMetrics set to false', function() {
+    it('generateConfig with js and app testing with allowAnonymousMetrics set to false', function () {
       mockLogger([]);
 
       mockery.registerMock(
@@ -1577,7 +1573,7 @@ describe('init tests', function() {
         allowAnonymousMetrics: false
       };
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
 
       assert.strictEqual(nightwatchInit.client_id, '3141-5926-5358-9793');
@@ -1610,7 +1606,7 @@ describe('init tests', function() {
       fs.unlinkSync('test_config.conf.js');
     });
 
-    it('generateConfig with js with allowAnonymousMetrics set to true', function() {
+    it('generateConfig with js with allowAnonymousMetrics set to true', function () {
       mockLogger([]);
 
       const answers = {
@@ -1623,7 +1619,7 @@ describe('init tests', function() {
         allowAnonymousMetrics: true
       };
 
-      const {NightwatchInit} = require('../../lib/init');
+      const { NightwatchInit } = require('../../lib/init');
       const nightwatchInit = new NightwatchInit(rootDir, []);
       nightwatchInit.otherInfo.tsOutDir = 'dist';
 
@@ -1637,24 +1633,24 @@ describe('init tests', function() {
   });
 });
 
-describe('test identifyWebdriversToInstall', function() {
-  beforeEach(function() {
-    mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
+describe('test identifyWebdriversToInstall', function () {
+  beforeEach(function () {
+    mockery.enable({ useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false });
   });
 
-  afterEach(function() {
+  afterEach(function () {
     mockery.deregisterAll();
     mockery.resetCache();
     mockery.disable();
   });
 
-  it('selects correct webdrivers with firefox,chrome,safari browsers', function() {
+  it('selects correct webdrivers with firefox,chrome,safari browsers', function () {
     const answers = {
       testingType: ['e2e'],
       browsers: ['chrome', 'firefox', 'safari']
     };
 
-    const {NightwatchInit} = require('../../lib/init');
+    const { NightwatchInit } = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, []);
 
     const webdriversToInstall = nightwatchInit.identifyWebdriversToInstall(answers);
@@ -1665,14 +1661,14 @@ describe('test identifyWebdriversToInstall', function() {
     assert.strictEqual(webdriversToInstall.includes('safaridriver'), true);
   });
 
-  it('selects correct webdrivers with firefox,chrome mobileBrowser and safari browsers', function() {
+  it('selects correct webdrivers with firefox,chrome mobileBrowser and safari browsers', function () {
     const answers = {
       testingType: ['e2e'],
       browsers: ['safari'],
       mobileBrowsers: ['chrome', 'firefox']
     };
 
-    const {NightwatchInit} = require('../../lib/init');
+    const { NightwatchInit } = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, []);
 
     const webdriversToInstall = nightwatchInit.identifyWebdriversToInstall(answers);
@@ -1683,14 +1679,14 @@ describe('test identifyWebdriversToInstall', function() {
     assert.strictEqual(webdriversToInstall.includes('safaridriver'), true);
   });
 
-  it('selects correct webdrivers with firefox browser and app testing on android', function() {
+  it('selects correct webdrivers with firefox browser and app testing on android', function () {
     const answers = {
       testingType: ['e2e', 'app'],
       browsers: ['firefox'],
       mobilePlatform: 'android'
     };
 
-    const {NightwatchInit} = require('../../lib/init');
+    const { NightwatchInit } = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, []);
 
     const webdriversToInstall = nightwatchInit.identifyWebdriversToInstall(answers);
@@ -1700,13 +1696,13 @@ describe('test identifyWebdriversToInstall', function() {
     assert.strictEqual(webdriversToInstall.includes('chromedriver'), true);
   });
 
-  it('selects correct webdrivers with no browser and app testing on both', function() {
+  it('selects correct webdrivers with no browser and app testing on both', function () {
     const answers = {
       testingType: ['app'],
       mobilePlatform: 'both'
     };
 
-    const {NightwatchInit} = require('../../lib/init');
+    const { NightwatchInit } = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, []);
 
     const webdriversToInstall = nightwatchInit.identifyWebdriversToInstall(answers);
@@ -1716,14 +1712,14 @@ describe('test identifyWebdriversToInstall', function() {
     assert.strictEqual(webdriversToInstall.includes('safaridriver'), true);
   });
 
-  it('selects correct webdrivers with chrome mobileBrowser and app testing on ios', function() {
+  it('selects correct webdrivers with chrome mobileBrowser and app testing on ios', function () {
     const answers = {
       testingType: ['component', 'app'],
       mobileBrowsers: ['chrome'],
       mobilePlatform: 'ios'
     };
 
-    const {NightwatchInit} = require('../../lib/init');
+    const { NightwatchInit } = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, []);
 
     const webdriversToInstall = nightwatchInit.identifyWebdriversToInstall(answers);
@@ -1733,13 +1729,13 @@ describe('test identifyWebdriversToInstall', function() {
     assert.strictEqual(webdriversToInstall.includes('safaridriver'), true);
   });
 
-  it('selects correct webdrivers with safari mobileBrowser', function() {
+  it('selects correct webdrivers with safari mobileBrowser', function () {
     const answers = {
       testingType: ['component'],
       mobileBrowsers: ['safari']
     };
 
-    const {NightwatchInit} = require('../../lib/init');
+    const { NightwatchInit } = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, []);
 
     const webdriversToInstall = nightwatchInit.identifyWebdriversToInstall(answers);
@@ -1747,8 +1743,8 @@ describe('test identifyWebdriversToInstall', function() {
     assert.strictEqual(webdriversToInstall.length, 1);
     assert.strictEqual(webdriversToInstall.includes('safaridriver'), true);
   });
-  
-  it('selects correct webdrivers with firefox browser and app testing on both and backend remote', function() {
+
+  it('selects correct webdrivers with firefox browser and app testing on both and backend remote', function () {
     const answers = {
       backend: 'remote',
       browsers: ['firefox'],
@@ -1756,7 +1752,7 @@ describe('test identifyWebdriversToInstall', function() {
       mobilePlatform: 'both'
     };
 
-    const {NightwatchInit} = require('../../lib/init');
+    const { NightwatchInit } = require('../../lib/init');
     const nightwatchInit = new NightwatchInit(rootDir, []);
 
     const webdriversToInstall = nightwatchInit.identifyWebdriversToInstall(answers);
