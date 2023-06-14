@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    // "rootDirs": ["src",],
     "strict": true,
     "module": "commonjs",
     "allowJs": true,
@@ -17,10 +16,6 @@
     "noImplicitThis": true,
     "strictNullChecks": true,
     "skipLibCheck": true
-    // "typeRoots": [
-    //   "./custom-typings",
-    //   "./node_modules/@types"
-    // ]
   },
   "include": [
     "src/**/*"

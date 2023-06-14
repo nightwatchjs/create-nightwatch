@@ -3,12 +3,12 @@ import path from 'path';
 import {execSync} from 'child_process';
 import colors from 'ansi-colors';
 import {prompt} from 'inquirer';
-import {NightwatchInit} from './init';
+import {NightwatchInitiator} from '@nightwatch/setup-tools';
 import {NIGHTWATCH_TITLE, AVAILABLE_CONFIG_FLAGS} from './constants';
 import Logger from './logger';
-import {isNodeProject} from './utils';
 import minimist from 'minimist';
 import suggestSimilarOption from './utils/suggestSimilar';
+import {isNodeProject} from './utils';
 import axios, {AxiosResponse} from 'axios';
 import {Packument} from '@npm/types';
 
@@ -36,7 +36,7 @@ export const run = async () => {
       const findAndSuggestSimilarOption = suggestSimilarOption(wrongUserFlags[0], AVAILABLE_CONFIG_FLAGS);
       if (findAndSuggestSimilarOption !== '') {
         Logger.error(`error: unknown option '${wrongUserFlags[0]}'${findAndSuggestSimilarOption}`);
-  
+
         return;
       }
     }
@@ -61,8 +61,8 @@ export const run = async () => {
       initializeNodeProject(rootDir);
     }
 
-    const nightwatchInit = new NightwatchInit(rootDir, options);
-    await nightwatchInit.run();
+    const nightwatchInitiator = new NightwatchInitiator(rootDir, options);
+    await nightwatchInitiator.run();
   } catch (err) {
     Logger.error(err as string);
     process.exit(1);

@@ -21,8 +21,8 @@ function mockLogger(consoleOutput) {
   );
 }
 
-describe('test run function', function () {
-  beforeEach(function () {
+describe('test run function', function() {
+  beforeEach(function() {
     this.originalProcessArgv = process.argv;
     mockery.enable({useCleanCache: true, warnOnReplace: false, warnOnUnregistered: false});
     if (!nock.isActive()) {
@@ -38,7 +38,7 @@ describe('test run function', function () {
     
   });
 
-  afterEach(function () {
+  afterEach(function() {
     process.argv = this.originalProcessArgv;
     mockery.deregisterAll();
     mockery.resetCache();
@@ -47,7 +47,7 @@ describe('test run function', function () {
     nock.restore();
   });
 
-  it('works with no argument and package.json present', async function () {
+  it('works with no argument and package.json present', async function() {
     process.argv = ['node', 'filename.js'];
 
     mockLogger([]);
@@ -62,8 +62,8 @@ describe('test run function', function () {
 
     let rootDirPassed;
     let optionsPassed;
-    mockery.registerMock('./init', {
-      NightwatchInit: class {
+    mockery.registerMock('@nightwatch/setup-tools', {
+      NightwatchInitiator: class {
         constructor(rootDir, options) {
           rootDirPassed = rootDir;
           optionsPassed = options;
@@ -75,7 +75,7 @@ describe('test run function', function () {
     const index = require('../../lib/index');
     await index.run();
 
-    // Check the arguments passed to NightwatchInit
+    // Check the arguments passed to NightwatchInitiator
     assert.strictEqual(rootDirPassed, process.cwd());
     assert.deepEqual(optionsPassed, {
       'generate-config': false,
@@ -84,7 +84,7 @@ describe('test run function', function () {
     });
   });
 
-  it('works with no argument, package.json not present, and root dir empty', async function () {
+  it('works with no argument, package.json not present, and root dir empty', async function() {
     process.argv = ['node', 'filename.js'];
 
     const consoleOutput = [];
@@ -105,8 +105,8 @@ describe('test run function', function () {
 
     let rootDirPassed;
     let optionsPassed;
-    mockery.registerMock('./init', {
-      NightwatchInit: class {
+    mockery.registerMock('@nightwatch/setup-tools', {
+      NightwatchInitiator: class {
         constructor(rootDir, options) {
           rootDirPassed = rootDir;
           optionsPassed = options;
@@ -126,7 +126,7 @@ describe('test run function', function () {
 
     await index.run();
 
-    // Check the arguments passed to NightwatchInit
+    // Check the arguments passed to NightwatchInitiator
     assert.strictEqual(rootDirPassed, process.cwd());
     assert.deepEqual(optionsPassed, {
       'generate-config': false,
@@ -139,7 +139,7 @@ describe('test run function', function () {
     assert.strictEqual(newNodeProjectRootDir, process.cwd());
   });
 
-  it('works with no argument, package.json not present, and root dir not empty', async function () {
+  it('works with no argument, package.json not present, and root dir not empty', async function() {
     process.argv = ['node', 'filename.js'];
 
     const consoleOutput = [];
@@ -160,8 +160,8 @@ describe('test run function', function () {
 
     let rootDirPassed;
     let optionsPassed;
-    mockery.registerMock('./init', {
-      NightwatchInit: class {
+    mockery.registerMock('@nightwatch/setup-tools', {
+      NightwatchInitiator: class {
         constructor(rootDir, options) {
           rootDirPassed = rootDir;
           optionsPassed = options;
@@ -188,7 +188,7 @@ describe('test run function', function () {
 
     await index.run();
 
-    // Check the arguments passed to NightwatchInit
+    // Check the arguments passed to NightwatchInitiator
     assert.strictEqual(rootDirPassed, process.cwd());
     assert.deepEqual(optionsPassed, {
       'generate-config': false,
@@ -204,7 +204,7 @@ describe('test run function', function () {
     assert.strictEqual(newNodeProjectRootDir, process.cwd());
   });
 
-  it('works with many arguments, no options, and package.json present', async function () {
+  it('works with many arguments, no options, and package.json present', async function() {
     process.argv = ['node', 'filename.js', 'new-project', 'some', 'random', 'args'];
     const expectedRootDir = path.join(process.cwd(), 'new-project');
 
@@ -219,8 +219,8 @@ describe('test run function', function () {
 
     let rootDirPassed;
     let optionsPassed;
-    mockery.registerMock('./init', {
-      NightwatchInit: class {
+    mockery.registerMock('@nightwatch/setup-tools', {
+      NightwatchInitiator: class {
         constructor(rootDir, options) {
           rootDirPassed = rootDir;
           optionsPassed = options;
@@ -232,7 +232,7 @@ describe('test run function', function () {
     const index = require('../../lib/index');
     await index.run();
 
-    // Check the arguments passed to NightwatchInit
+    // Check the arguments passed to NightwatchInitiator
     assert.strictEqual(rootDirPassed, expectedRootDir);
     assert.deepEqual(optionsPassed, {
       'generate-config': false,
@@ -241,7 +241,7 @@ describe('test run function', function () {
     });
   });
 
-  it('works with many argument, no options, and package.json not present', async function () {
+  it('works with many argument, no options, and package.json not present', async function() {
     process.argv = ['node', 'filename.js', 'new-project', 'some', 'random', 'args'];
     const expectedRootDir = path.join(process.cwd(), 'new-project');
 
@@ -257,8 +257,8 @@ describe('test run function', function () {
 
     let rootDirPassed;
     let optionsPassed;
-    mockery.registerMock('./init', {
-      NightwatchInit: class {
+    mockery.registerMock('@nightwatch/setup-tools', {
+      NightwatchInitiator: class {
         constructor(rootDir, options) {
           rootDirPassed = rootDir;
           optionsPassed = options;
@@ -278,7 +278,7 @@ describe('test run function', function () {
 
     await index.run();
 
-    // Check the arguments passed to NightwatchInit
+    // Check the arguments passed to NightwatchInitiator
     assert.strictEqual(rootDirPassed, expectedRootDir);
     assert.deepEqual(optionsPassed, {
       'generate-config': false,
@@ -291,7 +291,7 @@ describe('test run function', function () {
     assert.strictEqual(newNodeProjectRootDir, expectedRootDir);
   });
 
-  it('works with many arguments, generate-config options, and package.json present', async function () {
+  it('works with many arguments, generate-config options, and package.json present', async function() {
     process.argv = ['node', 'filename.js', 'new-project', 'random', '--generate-config', 'args'];
     const expectedRootDir = path.join(process.cwd(), 'new-project');
 
@@ -305,8 +305,8 @@ describe('test run function', function () {
 
     let rootDirPassed;
     let optionsPassed;
-    mockery.registerMock('./init', {
-      NightwatchInit: class {
+    mockery.registerMock('@nightwatch/setup-tools', {
+      NightwatchInitiator: class {
         constructor(rootDir, options) {
           rootDirPassed = rootDir;
           optionsPassed = options;
@@ -318,7 +318,7 @@ describe('test run function', function () {
     const index = require('../../lib/index');
     await index.run();
 
-    // Check the arguments passed to NightwatchInit
+    // Check the arguments passed to NightwatchInitiator
     assert.strictEqual(rootDirPassed, expectedRootDir);
     assert.deepEqual(optionsPassed, {
       'generate-config': true,
@@ -327,7 +327,7 @@ describe('test run function', function () {
     });
   });
 
-  it('works with many arguments, generate-config options, and package.json not present', async function () {
+  it('works with many arguments, generate-config options, and package.json not present', async function() {
     process.argv = ['node', 'filename.js', 'new-project', 'random', '--generate-config', 'args'];
 
     const origProcessExit = process.exit;
@@ -348,8 +348,8 @@ describe('test run function', function () {
 
     let rootDirPassed;
     let optionsPassed;
-    mockery.registerMock('./init', {
-      NightwatchInit: class {
+    mockery.registerMock('@nightwatch/setup-tools', {
+      NightwatchInitiator: class {
         constructor(rootDir, options) {
           rootDirPassed = rootDir;
           optionsPassed = options;
@@ -361,7 +361,7 @@ describe('test run function', function () {
     const index = require('../../lib/index');
     await index.run();
 
-    // Check the arguments passed to NightwatchInit (it won't be run due to error)
+    // Check the arguments passed to NightwatchInitiator (it won't be run due to error)
     assert.strictEqual(rootDirPassed, undefined);
     assert.deepEqual(optionsPassed, undefined);
 
@@ -396,8 +396,8 @@ describe('test run function', function () {
 
     let rootDirPassed;
     let optionsPassed;
-    mockery.registerMock('./init', {
-      NightwatchInit: class {
+    mockery.registerMock('@nightwatch/setup-tools', {
+      NightwatchInitiator: class {
         constructor(rootDir, options) {
           rootDirPassed = rootDir;
           optionsPassed = options;
@@ -409,7 +409,7 @@ describe('test run function', function () {
     const index = require('../../lib/index');
     await index.run();
 
-    // Check the arguments passed to NightwatchInit
+    // Check the arguments passed to NightwatchInitiator
     assert.strictEqual(rootDirPassed, expectedRootDir);
     assert.deepEqual(optionsPassed, {
       'generate-config': false,
@@ -420,7 +420,7 @@ describe('test run function', function () {
     });
   });
 
-  it('works with no arguments, browser options without =, and package.json not present', async function () {
+  it('works with no arguments, browser options without =, and package.json not present', async function() {
     process.argv = ['node', 'filename.js', '--browser', 'chrome', '--browser', 'safari'];
 
     const consoleOutput = [];
@@ -441,8 +441,8 @@ describe('test run function', function () {
 
     let rootDirPassed;
     let optionsPassed;
-    mockery.registerMock('./init', {
-      NightwatchInit: class {
+    mockery.registerMock('@nightwatch/setup-tools', {
+      NightwatchInitiator: class {
         constructor(rootDir, options) {
           rootDirPassed = rootDir;
           optionsPassed = options;
@@ -462,7 +462,7 @@ describe('test run function', function () {
 
     await index.run();
 
-    // Check the arguments passed to NightwatchInit
+    // Check the arguments passed to NightwatchInitiator
     assert.strictEqual(rootDirPassed, process.cwd());
     assert.deepEqual(optionsPassed, {
       'generate-config': false,
@@ -477,7 +477,7 @@ describe('test run function', function () {
     assert.strictEqual(newNodeProjectRootDir, process.cwd());
   });
 
-  it('works with many arguments, many options, and package.json present', async function () {
+  it('works with many arguments, many options, and package.json present', async function() {
     process.argv = ['node', 'filename.js', 'new-project', '-y', '--hello', '--there=hi', '-d', '--generate-config'];
     const expectedRootDir = path.join(process.cwd(), 'new-project');
 
@@ -491,8 +491,8 @@ describe('test run function', function () {
 
     let rootDirPassed;
     let optionsPassed;
-    mockery.registerMock('./init', {
-      NightwatchInit: class {
+    mockery.registerMock('@nightwatch/setup-tools', {
+      NightwatchInitiator: class {
         constructor(rootDir, options) {
           rootDirPassed = rootDir;
           optionsPassed = options;
@@ -504,7 +504,7 @@ describe('test run function', function () {
     const index = require('../../lib/index');
     await index.run();
 
-    // Check the arguments passed to NightwatchInit
+    // Check the arguments passed to NightwatchInitiator
     assert.strictEqual(rootDirPassed, expectedRootDir);
     assert.deepEqual(optionsPassed, {
       'generate-config': true,
@@ -532,8 +532,8 @@ describe('test run function', function () {
 
     let rootDirPassed;
     let optionsPassed;
-    mockery.registerMock('./init', {
-      NightwatchInit: class {
+    mockery.registerMock('@nightwatch/setup-tools', {
+      NightwatchInitiator: class {
         constructor(rootDir, options) {
           rootDirPassed = rootDir;
           optionsPassed = options;
@@ -545,7 +545,7 @@ describe('test run function', function () {
     const index = require('../../lib/index');
     await index.run();
 
-    // Check the arguments passed to NightwatchInit
+    // Check the arguments passed to NightwatchInitiator
     assert.strictEqual(rootDirPassed, expectedRootDir);
     assert.deepEqual(optionsPassed, {
       'generate-config': false,

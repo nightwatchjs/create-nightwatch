@@ -101,8 +101,8 @@ describe('e2e tests for init', function() {
       allowAnonymousMetrics: false
     };
 
-    const {NightwatchInit} = require('../../lib/init');
-    const nightwatchInit = new NightwatchInit(rootDir, []);
+    const {NightwatchInitiator} = require('@nightwatch/setup-tools');
+    const nightwatchInit = new NightwatchInitiator(rootDir, []);
 
     nightwatchInit.askQuestions = function() {
       return answers;
@@ -259,8 +259,8 @@ describe('e2e tests for init', function() {
       allowAnonymousMetrics: false
     };
 
-    const {NightwatchInit} = require('../../lib/init');
-    const nightwatchInit = new NightwatchInit(rootDir, []);
+    const {NightwatchInitiator} = require('@nightwatch/setup-tools');
+    const nightwatchInit = new NightwatchInitiator(rootDir, []);
 
     nightwatchInit.askQuestions = function() {
       return answers;
@@ -386,7 +386,7 @@ describe('e2e tests for init', function() {
     });
 
     let appDownloaderCalled = false;
-    const origUtils = require('../../lib/utils.js');
+    const origUtils = require('@nightwatch/setup-tools/dist/utils.js');
     origUtils.downloadWithProgressBar = () => {
       return appDownloaderCalled = true;
     };
@@ -444,8 +444,8 @@ describe('e2e tests for init', function() {
       allowAnonymousMetrics: false
     };
 
-    const {NightwatchInit} = require('../../lib/init');
-    const nightwatchInit = new NightwatchInit(rootDir, []);
+    const {NightwatchInitiator} = require('@nightwatch/setup-tools');
+    const nightwatchInit = new NightwatchInitiator(rootDir, []);
 
     nightwatchInit.askQuestions = function() {
       return answers;
@@ -644,7 +644,7 @@ describe('e2e tests for init', function() {
     });
 
     let appDownloaderCalled = false;
-    const origUtils = require('../../lib/utils.js');
+    const origUtils = require('@nightwatch/setup-tools/dist/utils.js');
     origUtils.downloadWithProgressBar = () => {
       return appDownloaderCalled = true;
     };
@@ -666,8 +666,8 @@ describe('e2e tests for init', function() {
       mobile: true
     };
 
-    const {NightwatchInit} = require('../../lib/init');
-    const nightwatchInit = new NightwatchInit(rootDir, []);
+    const {NightwatchInitiator} = require('@nightwatch/setup-tools');
+    const nightwatchInit = new NightwatchInitiator(rootDir, []);
 
     nightwatchInit.askQuestions = function() {
       return answers;
@@ -867,8 +867,8 @@ describe('e2e tests for init', function() {
       mobile: true
     };
 
-    const {NightwatchInit} = require('../../lib/init');
-    const nightwatchInit = new NightwatchInit(rootDir, []);
+    const {NightwatchInitiator} = require('@nightwatch/setup-tools');
+    const nightwatchInit = new NightwatchInitiator(rootDir, []);
 
     nightwatchInit.askQuestions = function() {
       return answers;
@@ -1073,11 +1073,11 @@ describe('e2e tests for init', function() {
       red: colorFn
     });
 
-    const answers = require('../../lib/defaults.json');
+    const answers = require('./defaults.json');
     mockery.registerMock('./defaults.json', answers);
 
-    const {NightwatchInit} = require('../../lib/init');
-    const nightwatchInit = new NightwatchInit(rootDir, {
+    const {NightwatchInitiator} = require('@nightwatch/setup-tools');
+    const nightwatchInit = new NightwatchInitiator(rootDir, {
       'generate-config': false,
       yes: true,
       browser: ['firefox', 'chrome']
@@ -1242,11 +1242,11 @@ describe('e2e tests for init', function() {
       }
     });
 
-    const answers = require('../../lib/defaultsMobile.json');
+    const answers = require('./defaultsMobile.json');
     mockery.registerMock('./defaultsMobile.json', answers);
 
-    const {NightwatchInit} = require('../../lib/init');
-    const nightwatchInit = new NightwatchInit(rootDir, {
+    const {NightwatchInitiator} = require('@nightwatch/setup-tools');
+    const nightwatchInit = new NightwatchInitiator(rootDir, {
       'generate-config': false,
       yes: true,
       browser: ['firefox', 'chrome', 'safari'],
@@ -1405,7 +1405,7 @@ describe('e2e tests for init', function() {
     });
 
     let appDownloaderCalled = false;
-    const origUtils = require('../../lib/utils.js');
+    const origUtils = require('@nightwatch/setup-tools/dist/utils.js');
     origUtils.downloadWithProgressBar = () => {
       return appDownloaderCalled = true;
     };
@@ -1437,11 +1437,11 @@ describe('e2e tests for init', function() {
       }
     });
 
-    const answers = require('../../lib/defaultsApp.json');
+    const answers = require('./defaultsApp.json');
     mockery.registerMock('./defaultsApp.json', answers);
 
-    const {NightwatchInit} = require('../../lib/init');
-    const nightwatchInit = new NightwatchInit(rootDir, {
+    const {NightwatchInitiator} = require('@nightwatch/setup-tools');
+    const nightwatchInit = new NightwatchInitiator(rootDir, {
       'generate-config': false,
       yes: true,
       native: true
@@ -1590,8 +1590,8 @@ describe('e2e tests for init', function() {
       allowAnonymousMetrics: false
     };
 
-    const {NightwatchInit} = require('../../lib/init');
-    const nightwatchInit = new NightwatchInit(rootDir, {'generate-config': true});
+    const {NightwatchInitiator} = require('@nightwatch/setup-tools');
+    const nightwatchInit = new NightwatchInitiator(rootDir, {'generate-config': true});
 
     nightwatchInit.askQuestions = function() {
       return answers;
@@ -1719,8 +1719,8 @@ describe('e2e tests for init', function() {
       allowAnonymousMetrics: false
     };
 
-    const {NightwatchInit} = require('../../lib/init');
-    const nightwatchInit = new NightwatchInit(rootDir, {'generate-config': true});
+    const {NightwatchInitiator} = require('@nightwatch/setup-tools');
+    const nightwatchInit = new NightwatchInitiator(rootDir, {'generate-config': true});
 
     nightwatchInit.askQuestions = function() {
       return answers;
@@ -1849,8 +1849,8 @@ describe('e2e tests for init', function() {
         };
       });
 
-    const {NightwatchInit} = require('../../lib/init');
-    const nightwatchInit = new NightwatchInit(rootDir, {'generate-config': true});
+    const {NightwatchInitiator} = require('@nightwatch/setup-tools');
+    const nightwatchInit = new NightwatchInitiator(rootDir, {'generate-config': true});
 
     nightwatchInit.askQuestions = function() {
       return answers;
@@ -1904,8 +1904,8 @@ describe('e2e tests for init', function() {
         errno: 'ECONNREFUSED'
       });
 
-    const {NightwatchInit} = require('../../lib/init');
-    const nightwatchInit = new NightwatchInit(rootDir, {'generate-config': true});
+    const {NightwatchInitiator} = require('@nightwatch/setup-tools');
+    const nightwatchInit = new NightwatchInitiator(rootDir, {'generate-config': true});
 
     nightwatchInit.askQuestions = function() {
       return answers;
@@ -1958,8 +1958,8 @@ describe('e2e tests for init', function() {
         assert.fail();
       });
 
-    const {NightwatchInit} = require('../../lib/init');
-    const nightwatchInit = new NightwatchInit(rootDir, {'generate-config': true});
+    const {NightwatchInitiator} = require('@nightwatch/setup-tools');
+    const nightwatchInit = new NightwatchInitiator(rootDir, {'generate-config': true});
 
     nightwatchInit.askQuestions = function() {
       return answers;
