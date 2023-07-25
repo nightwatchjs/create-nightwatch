@@ -46,7 +46,7 @@ describe('index tests', function() {
   });
 
   it('should not give suggestion when right args are passed ', async function() {
-    process.argv = ['node', 'filename.js', '--browser=chrome', '--browser=safari', '--app', 'args'];
+    process.argv = ['node', 'filename.js', '--browser=chrome', '--browser=safari', '--app', 'args', '--yes'];
 
     const consoleOutput = [];
     mockLogger(consoleOutput);
@@ -57,6 +57,9 @@ describe('index tests', function() {
       },
       mkdirSync() {
         return true;
+      },
+      readFileSync() {
+        return '{}';
       }
     });
 
@@ -67,8 +70,8 @@ describe('index tests', function() {
       red: colorFn
     });
 
-    mockery.registerMock('./init', {
-      NightwatchInit: class {
+    mockery.registerMock('@nightwatch/setup-tools', {
+      NightwatchInitiator: class {
         constructor() {}
         run() {}
       }
@@ -145,8 +148,8 @@ describe('index tests', function() {
       red: colorFn
     });
 
-    mockery.registerMock('./init', {
-      NightwatchInit: class {
+    mockery.registerMock('@nightwatch/setup-tools', {
+      NightwatchInitiator: class {
         constructor() {}
         run() {}
       }
