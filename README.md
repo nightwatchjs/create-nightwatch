@@ -38,6 +38,18 @@ or, if you want to initialize a new project:
 npm init nightwatch@latest ./path/to/new/project
 ```
 
+For testing on mobile browsers only:
+
+```sh
+npm init nightwatch@latest -- --mobile
+```
+
+Generate a new config file in your existing Nightwatch project:
+
+```sh
+npm init nightwatch@latest -- --generate-config
+```
+
 #### 2. Answer a few questions about your preferred setup:
 
 - What is your Language - Test Runner setup? 
