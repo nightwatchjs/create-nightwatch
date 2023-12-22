@@ -72,7 +72,7 @@ describe('test run function', function() {
       }
     });
 
-    const index = require('../../lib/index');
+    const index = require('../../dist/index');
     await index.run();
 
     // Check the arguments passed to NightwatchInitiator
@@ -115,7 +115,7 @@ describe('test run function', function() {
       }
     });
 
-    const index = require('../../lib/index');
+    const index = require('../../dist/index');
 
     let newNodeProjectInitialized = false;
     let newNodeProjectRootDir;
@@ -170,7 +170,7 @@ describe('test run function', function() {
       }
     });
 
-    const index = require('../../lib/index');
+    const index = require('../../dist/index');
 
     let rootDirConfirmationPrompted = false;
     index.confirmRootDir = (rootDir) => {
@@ -229,7 +229,7 @@ describe('test run function', function() {
       }
     });
 
-    const index = require('../../lib/index');
+    const index = require('../../dist/index');
     await index.run();
 
     // Check the arguments passed to NightwatchInitiator
@@ -267,7 +267,7 @@ describe('test run function', function() {
       }
     });
 
-    const index = require('../../lib/index');
+    const index = require('../../dist/index');
 
     let newNodeProjectInitialized = false;
     let newNodeProjectRootDir;
@@ -315,7 +315,7 @@ describe('test run function', function() {
       }
     });
 
-    const index = require('../../lib/index');
+    const index = require('../../dist/index');
     await index.run();
 
     // Check the arguments passed to NightwatchInitiator
@@ -358,7 +358,7 @@ describe('test run function', function() {
       }
     });
 
-    const index = require('../../lib/index');
+    const index = require('../../dist/index');
     await index.run();
 
     // Check the arguments passed to NightwatchInitiator (it won't be run due to error)
@@ -406,7 +406,7 @@ describe('test run function', function() {
       }
     });
 
-    const index = require('../../lib/index');
+    const index = require('../../dist/index');
     await index.run();
 
     // Check the arguments passed to NightwatchInitiator
@@ -451,7 +451,7 @@ describe('test run function', function() {
       }
     });
 
-    const index = require('../../lib/index');
+    const index = require('../../dist/index');
 
     let newNodeProjectInitialized = false;
     let newNodeProjectRootDir;
@@ -501,7 +501,7 @@ describe('test run function', function() {
       }
     });
 
-    const index = require('../../lib/index');
+    const index = require('../../dist/index');
     await index.run();
 
     // Check the arguments passed to NightwatchInitiator
@@ -542,7 +542,7 @@ describe('test run function', function() {
       }
     });
 
-    const index = require('../../lib/index');
+    const index = require('../../dist/index');
     await index.run();
 
     // Check the arguments passed to NightwatchInitiator

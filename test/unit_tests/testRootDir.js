@@ -40,7 +40,7 @@ describe('test confirmRootDir', async function () {
       }
     });
 
-    const index = require('../../lib/index');
+    const index = require('../../dist/index');
     const rootDirPassed = 'someDirPath';
     const rootDirReturned = await index.confirmRootDir(rootDirPassed);
 
@@ -62,7 +62,7 @@ describe('test confirmRootDir', async function () {
       }
     });
 
-    const index = require('../../lib/index');
+    const index = require('../../dist/index');
     const rootDirPassed = 'someDirPath';
     const rootDirReturned = await index.confirmRootDir(rootDirPassed);
 

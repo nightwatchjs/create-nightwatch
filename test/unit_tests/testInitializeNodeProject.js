@@ -54,7 +54,7 @@ describe('test initializeNodeProject', function () {
       }
     });
 
-    const index = require('../../lib/index');
+    const index = require('../../dist/index');
     const rootDir = 'someDirPath';
     index.initializeNodeProject(rootDir);
 
@@ -100,7 +100,7 @@ describe('test initializeNodeProject', function () {
       }
     });
 
-    const index = require('../../lib/index');
+    const index = require('../../dist/index');
     index.initializeNodeProject(rootDir);
 
     // Check new project created recursively

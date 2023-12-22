@@ -3,7 +3,7 @@ const mockery = require('mockery');
 const child_process = require.resolve('child_process');
 const nock = require('nock');
 
-const VERSION = process.env.npm_package_version;
+const {CURRENT_VERSION} = require('../../dist/utils/version.js');
 
 function mockLogger(consoleOutput) {
   mockery.registerMock(
@@ -32,7 +32,7 @@ describe('index tests', function() {
       .get('/create-nightwatch')
       .reply(200, {
         'dist-tags': {
-          latest: VERSION
+          latest: CURRENT_VERSION
         }
       });
   });
@@ -83,7 +83,7 @@ describe('index tests', function() {
       }
     });
 
-    const index = require('../../lib/index');
+    const index = require('../../dist/index');
     await index.run();
 
     const output = consoleOutput.toString();
@@ -116,7 +116,7 @@ describe('index tests', function() {
       }
     });
 
-    const index = require('../../lib/index');
+    const index = require('../../dist/index');
     await index.run();
 
     const output = consoleOutput.toString();
@@ -170,12 +170,12 @@ describe('index tests', function() {
         }
       });
 
-    const index = require('../../lib/index');
+    const index = require('../../dist/index');
     await index.run();
 
     const output = consoleOutput.toString();
     assert.strictEqual(
-      output.includes(`We've updated this onboarding tool: ${VERSION} -> 1.0.2. To get the latest experience, run: npm init nightwatch@latest`),
+      output.includes(`We've updated this onboarding tool: ${CURRENT_VERSION} -> 1.0.2.\nTo get the latest experience, run: npm init nightwatch@latest`),
       true
     );
   });
