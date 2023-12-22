@@ -1,6 +1,6 @@
 {
   "name": "create-nightwatch",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "description": "Nightwatch.js init command tool to setup everything up in no time using `npm init nightwatch`",
   "main": "index.js",
   "bin": {
