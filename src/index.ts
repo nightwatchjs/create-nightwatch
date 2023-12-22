@@ -9,6 +9,7 @@ import Logger from './logger';
 import minimist from 'minimist';
 import suggestSimilarOption from './utils/suggestSimilar';
 import {isNodeProject} from './utils';
+import {CURRENT_VERSION} from './utils/version';
 import axios, {AxiosResponse} from 'axios';
 import {Packument} from '@npm/types';
 
@@ -125,13 +126,13 @@ export const getLatestVersion = async (): Promise<string | undefined | null> => 
 
 export const checkCreateNightwatchVersion = async () => {
   const latestVersion = await getLatestVersion();
-  const currentVersion = process.env.npm_package_version;
+  const currentVersion = CURRENT_VERSION;
 
   if (latestVersion && currentVersion && latestVersion !== currentVersion) {
     Logger.info(
-      `We've updated this onboarding tool: ${colors.red(currentVersion)} -> ${colors.green(
+      `\nWe've updated this onboarding tool: ${colors.red(currentVersion)} -> ${colors.green(
         latestVersion
-      )}. To get the latest experience, run: ${colors.green('npm init nightwatch@latest')}\n\n`
+      )}.\nTo get the latest experience, run: ${colors.green('npm init nightwatch@latest')}\n\n`
     );
   }
 };

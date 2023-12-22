@@ -7,9 +7,10 @@
     "create-nightwatch": "./index.js"
   },
   "scripts": {
-    "build": "tsc",
-    "prepublishOnly": "tsc --outDir dist",
-    "create-nightwatch": "tsc && node dev-run.js",
+    "setVersion": "node -p \"'export const CURRENT_VERSION = ' + JSON.stringify(require('./package.json').version) + ';'\" > src/utils/version.ts",
+    "build": "rimraf dist && npm run setVersion && tsc",
+    "prepare": "npm run build",
+    "create-nightwatch": "npm run build && node index.js",
     "esbuild": "esbuild --bundle src/index.ts --outdir=dist --platform=node --target=ES2019",
     "test": "npm run build && npx nightwatch"
   },
@@ -33,6 +34,7 @@
     "mockery": "^2.1.0",
     "nightwatch": "^3.0.1",
     "nock": "^13.2.9",
+    "rimraf": "^5.0.5",
     "typescript": "^4.7.3"
   },
   "dependencies": {
@@ -41,5 +43,9 @@
     "axios": "^0.27.2",
     "inquirer": "^8.2.4",
     "minimist": "^1.2.6"
-  }
+  },
+  "files": [
+    "dist",
+    "index.js"
+  ]
 }

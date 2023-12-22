@@ -1,6 +1,6 @@
 .env
 node_modules/
-lib/
+dist/
 .idea
 tests_output/
 test_output/
@@ -8,3 +8,4 @@ nightwatch.conf.js
 nightwatch/
 chromedriver-mobile/
 logs/
+src/utils/version.ts
