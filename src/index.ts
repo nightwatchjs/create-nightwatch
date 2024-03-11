@@ -7,7 +7,7 @@ import {NightwatchInitiator} from '@nightwatch/setup-tools';
 import {NIGHTWATCH_TITLE, AVAILABLE_CONFIG_FLAGS} from './constants';
 import Logger from './logger';
 import minimist from 'minimist';
-import suggestSimilarOption from './utils/suggestSimilar';
+import suggestSimilarOption2 from './utils/suggestSimilar2';
 import {isNodeProject} from './utils';
 import {CURRENT_VERSION} from './utils/version';
 import axios, {AxiosResponse} from 'axios';
@@ -34,12 +34,11 @@ export const run = async () => {
     const wrongUserFlags = Object.keys(options).filter((word) => !AVAILABLE_CONFIG_FLAGS.includes(word));
 
     if (wrongUserFlags.length > 0) {
-      const findAndSuggestSimilarOption = suggestSimilarOption(wrongUserFlags[0], AVAILABLE_CONFIG_FLAGS);
-      if (findAndSuggestSimilarOption !== '') {
-        Logger.error(`error: unknown option '${wrongUserFlags[0]}'${findAndSuggestSimilarOption}`);
+      const findAndSuggestSimilarOption = suggestSimilarOption2(wrongUserFlags[0], AVAILABLE_CONFIG_FLAGS);
+      Logger.error(findAndSuggestSimilarOption);
 
-        return;
-      }
+      // Exit Nightwatch setup process
+      process.exit(0);
     }
 
     let rootDir = path.resolve(process.cwd(), args[0] || '');
