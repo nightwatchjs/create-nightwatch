@@ -2,7 +2,6 @@ const path = require('path');
 const mockery = require('mockery');
 const assert = require('assert');
 const nock = require('nock');
-const {extend} = require('axios/lib/utils');
 
 function mockLogger(consoleOutput) {
   mockery.registerMock(
@@ -56,8 +55,7 @@ describe('test run function', function() {
     mockery.registerMock('./utils', {
       isNodeProject() {
         return true;
-      },
-      extend
+      }
     });
 
     let rootDirPassed;
@@ -93,8 +91,7 @@ describe('test run function', function() {
     mockery.registerMock('./utils', {
       isNodeProject() {
         return false;
-      },
-      extend
+      }
     });
 
     mockery.registerMock('node:fs', {
@@ -148,8 +145,7 @@ describe('test run function', function() {
     mockery.registerMock('./utils', {
       isNodeProject() {
         return false;
-      },
-      extend
+      }
     });
 
     mockery.registerMock('node:fs', {
@@ -213,8 +209,7 @@ describe('test run function', function() {
     mockery.registerMock('node:fs', {
       existsSync() {
         return true;
-      },
-      extend
+      }
     });
 
     let rootDirPassed;
@@ -429,8 +424,7 @@ describe('test run function', function() {
     mockery.registerMock('./utils', {
       isNodeProject() {
         return false;
-      },
-      extend
+      }
     });
 
     mockery.registerMock('node:fs', {
