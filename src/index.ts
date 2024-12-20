@@ -4,7 +4,7 @@ import {execSync} from 'child_process';
 import colors from 'ansi-colors';
 import {prompt} from 'inquirer';
 import {NightwatchInitiator} from '@nightwatch/setup-tools';
-import {NIGHTWATCH_TITLE, AVAILABLE_CONFIG_FLAGS} from './constants';
+import {NIGHTWATCH_TITLE, AVAILABLE_CONFIG_FLAGS , HELPTEXT} from './constants';
 import Logger from './logger';
 import minimist from 'minimist';
 import suggestSimilarOption from './utils/suggestSimilar';
@@ -17,17 +17,25 @@ export const run = async () => {
   try {
     const argv = process.argv.slice(2);
     const {_: args, ...options} = minimist(argv, {
-      boolean: ['generate-config', 'native'],
+      boolean: ['generate-config', 'native' , 'help'],
       alias: {
         yes: 'y',
         browser: 'b',
-        native: 'app'
+        native: 'app',
+        help: 'h'
       }
     });
 
     // If string, convert options.browser to array.
     if (typeof options.browser === 'string') {
       options.browser = [options.browser];
+    }
+
+    // Display help if --help or -h is passed
+    if (options.help) {
+      Logger.info(NIGHTWATCH_TITLE);
+      Logger.info(HELPTEXT);
+      return;
     }
 
     // Filter flags that are not present in AVAILABLE_CONFIG_ARGS
